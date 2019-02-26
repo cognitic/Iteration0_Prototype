@@ -1,0 +1,13 @@
+﻿@{
+    ViewBag.Title = "Domain Board";
+    ViewBag.AddButtonLabel = "Add New Concept";
+    ViewBag.GeneratorTitle = "Generate Scaffold";
+}
+
+<div id="board"></div>
+
+<script type="text/javascript">
+    var boardItemAPI = { ItemEditorURL: "/Project/DomainConceptEditor?ConceptID=", ItemSaveURL: "/Project/CreateEditBoardItem", ItemRemoveURL:"/Project/RemoveRessouceDefinition"};
+    Iteration0APP.AddControl(new BoardEditorUIControl(@Html.Raw(ViewBag.editorVMAsJson), boardItemAPI));
+</script>
+

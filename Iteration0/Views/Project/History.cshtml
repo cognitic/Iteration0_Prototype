@@ -1,0 +1,24 @@
+﻿@{
+    ViewBag.Title = "History";
+    ViewBag.AddButtonLabel = "";
+}
+
+
+<div class="app-page-index">
+    <div class="underlined-row">
+        <div><h1>EVENTS</h1></div>
+    </div>
+    <p>WORK IN PROGRESS</p>
+    <div class="underlined-row">
+    </div>
+    @*@{
+            var count = 0;
+            foreach (var item in ViewBag.AllItems)
+            {
+                //@class = (count++ % 2 == 0) ? "alt-row" : ""
+                <div class="underlined-row">
+                    Concept <span class="b">[Programmatic Buying]</span> @item.Event
+                </div>
+            }
+        }*@
+</div>

@@ -1,0 +1,12 @@
+﻿@{
+    ViewBag.Title = "UI Components Board";
+    ViewBag.AddButtonLabel = "Add New Component";
+    ViewBag.GeneratorTitle = "Download Specifications";
+}
+
+<div id="board"></div>
+
+<script type="text/javascript">
+    var boardItemAPI = { ItemEditorURL: "/Project/UIComponentEditor?ComponentID=", ItemSaveURL: "/Project/CreateEditBoardItem", ItemRemoveURL: "/Project/RemoveRessouceDefinition" };
+    Iteration0APP.AddControl(new BoardEditorUIControl(@Html.Raw(ViewBag.editorVMAsJson), boardItemAPI));
+</script>

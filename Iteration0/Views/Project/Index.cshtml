@@ -1,0 +1,34 @@
+﻿@{
+    ViewBag.Title = "Projects";
+    ViewBag.AddButtonLabel = "Add New Project";
+}
+
+<div class="app-page-index">
+    @{
+        if (ViewBag.AllItems.Count > 0)
+        {
+            foreach (var item in ViewBag.AllItems)
+            {
+                <div class="underlined-row">
+                    <div><h2 class="b"><a href="/Project/ProjectEditor?ProjectID=@item.ProjectId">@item.Title</a></h2></div>
+                    <div><span class="fmin2 r"><a href="/Project/DomainConcepts?ProjectID=@item.ProjectId">@item.ConceptCount Concepts</a></span></div>
+                    <div><span class="fmin2 r"><a href="/Project/UseCases?ProjectID=@item.ProjectId">@item.FunctionCount Functions</a></span></div>
+                    <div><span class="fmin2 r"><a href="/Project/UIComponents?ProjectID=@item.ProjectId">@item.ComponentCount Components</a></span></div>
+                    <div><span class="fmin2 r"><a href="/Project/Roadmap?ProjectID=@item.ProjectId">View Roadmap</a></span></div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="tac">No Projects found</div>
+        }
+    }
+</div>
+<script type="text/javascript">
+    $('#app-page-main-action-button').click(function (e) {
+        var newEditor = new ProjectEditorUIControl(new ProjectEditorViewModel());
+        Iteration0APP.AddControl(newEditor);
+        newEditor.ShowNewDefinitionForm();
+    });
+</script>
+

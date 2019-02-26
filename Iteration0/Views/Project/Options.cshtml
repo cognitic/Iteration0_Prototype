@@ -1,0 +1,43 @@
+﻿@{
+    ViewBag.Title = "Options";
+    ViewBag.AddButtonLabel = "SAVE OPTIONS";
+}
+<div class="app-page-text">
+    <div class="underlined-row">
+        <div><h1>PALETTE</h1></div>
+    </div>
+    <p>
+        Background color : <input id="bgColor" type="color" list="presetBGColors">
+    </p>
+    <datalist id="presetBGColors">
+        <option>#C2B29E</option>
+        <option>#6BA897</option>
+        <option>#1F7374</option>
+        <option>#3A4A60</option>
+        <option>#a33243</option>
+    </datalist>
+    <p>
+        Accent color : <input id="accentColor" type="color" list="presetAccentColors">
+    </p>
+    <datalist id="presetAccentColors">
+        <option>#b39d8e</option>
+        <option>#2e5f41</option>
+        <option>#049C87</option>
+        <option>#5e58c2</option>
+        <option>#ff5599</option>
+    </datalist>
+    <div class="underlined-row">
+    </div>
+    <script type="text/javascript">
+        $('#bgColor').change(function (e) {
+            $('body').css('background-color', $(this).val());
+        });
+        $('#accentColor').change(function (e) {
+            $('button, input[type="button"], .pop_up_title').css('background-color', $(this).val());
+        });
+        $('#app-page-main-action-button').click(function (e) {
+            var formLoader = new UIControl("loader", "#xxx");
+            formLoader.AjaxCall("/Project/SaveCustomThemeColors", JSON.stringify({ bgColor: $('#bgColor').val(), accentColor: $('#accentColor').val() }), null);
+        });
+    </script>
+</div>

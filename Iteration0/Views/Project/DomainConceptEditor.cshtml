@@ -1,0 +1,40 @@
+﻿@{
+    ViewBag.Title = "Concept Editor";
+    ViewBag.AddButtonLabel = "";
+}
+
+<div id="editor">
+    <div class="editor-section">
+        <div>
+            <span class="l"><a id="edit-definition-link" href="/">Edit</a></span><div class="cb"></div>
+        </div>
+        <div class="editor-definition-wrapper">
+            <div class="definition-speech">
+                <div id="editor-definition-category" class="context-tag"></div><div id="editor-definition-code" class="req-tag"></div>
+                <p id="editor-definition-zone" style="Line-Height:34px; margin-top:8px;"></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="editor-section">
+        <div><span class="r"><a id="add-attribute-link" href="/">Add +</a></span><h2>Attributes</h2></div>
+        <div class="underlined-row">
+        </div>
+        <div id="editor-attributes-wrapper">
+            <div class="tac">No Attributes yet</div>
+        </div>
+    </div>
+
+    <div class="editor-section">
+        <div><span class="r"><a id="add-responsability-link" href="/">Add +</a></span><h2>Responsabilities</h2></div>
+        <div class="underlined-row">
+        </div>
+        <div id="editor-responsabilities-wrapper">
+            <div class="tac">No Responsabilities yet</div>
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript">
+    Iteration0APP.AddControl(new DomainConceptEditorUIControl(@Html.Raw(ViewBag.editorVMAsJson)));
+</script>

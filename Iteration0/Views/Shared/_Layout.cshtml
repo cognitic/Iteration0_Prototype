@@ -1,0 +1,132 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<meta http-equiv="expires" content="0">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="cache-control" content="no-cache, must-revalidate">
+<meta name="viewport" content="initial-scale=1.0" />
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Iteration0 | @ViewBag.Title</title>
+    @*<link href="/Styles/css/semantic/semantic.min.css" rel="stylesheet" />
+        <link href="/Styles/css/semantic/components/popup.min.css" rel="stylesheet" />
+        <link href="/Styles/css/semantic/components/transition.min.css" rel="stylesheet" />
+        <link href="/Styles/css/semantic/calendar.min.css" rel="stylesheet" />*@
+    <link href="/Styles/iteration0.css?t=@DateTime.Now.Minute" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/Scripts/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="/Scripts/Iteration0.js?t=@DateTime.Now.Minute"></script>
+    <style>
+        @Html.Raw(@Session["CustomCSSRules"])
+    </style>
+    <script type="text/javascript">
+                Iteration0APP=new Iteration0();
+    </script>
+</head>
+<body>
+    <div class="app-page-wrapper">
+        <div class="fixed-top">
+            <div class="app-header">
+                <div class="r">
+                    <div class="app-profile-options-dropdown dropdown">
+                        <button class="smallbtn">&#128100;&#9662;</button>
+                        <div class="dropdown-content">
+                            <a id="app-sign-in-link" href="/">Sign In</a>
+                            <a href="/Project/Options">Options</a>
+                            <a href="/Project/About">About Iteration0</a>
+                        </div>
+                    </div>
+                    <input type='text' id='app-search-field' class='texttype' maxlength='30' placeholder=' &#8981; Search Name or Tag Operator..' />
+                </div>
+                <a class="logo l" href="/Project/index">Iteration<img src="~/Styles/images/zero_logo.png" /></a>
+            </div>
+            <div class="app-menu">
+                <ul>
+                    @if (@ViewBag.ProjectID > 0)
+    {
+                <li><a href="/Project/ProjectEditor?ProjectID=@ViewBag.ProjectID">PROJECT</a></li>
+                <li><a href="/Project/DomainConcepts?ProjectID=@ViewBag.ProjectID">DOMAIN</a></li>
+                <li><a href="/Project/UseCases?ProjectID=@ViewBag.ProjectID">USE CASES</a></li>
+                <li><a href="/Project/UIComponents?ProjectID=@ViewBag.ProjectID">UI</a></li>
+                <li><a href="/Project/Roadmap?ProjectID=@ViewBag.ProjectID">ROADMAP</a></li>
+}
+                </ul>
+            </div>
+
+            <div class="app-page-header">
+                <div class="app-page-toolbar r">
+                    @if (@ViewBag.AddButtonLabel != "")
+                    {
+                        <button class="isEnabled" id="app-page-main-action-button">
+                            <div>
+                                <span class="b">@ViewBag.AddButtonLabel </span>
+                            </div>
+                        </button>
+                                <text>
+                                @if (@ViewBag.GeneratorTitle != null)
+                                {
+                                        <div style="margin-top:2px;"><button class="smallbtn downloadbtn">@ViewBag.GeneratorTitle</button></div>
+                                }
+                                </text>
+                    }
+                </div>
+                @if (@ViewBag.EditorTitle != null)
+                {
+                <div class="app-page-title l">
+                    <h1>@ViewBag.Title / <span class="fmin2">@ViewBag.EditorTitle</span></h1>
+                </div>
+                    <div class="cb"></div>
+                }
+                else
+                {<text>
+                        <div class="app-page-title l">
+                            <h1>@ViewBag.Title / </h1>
+                        </div>
+                        <div class="app-page-context l">
+                            <div>
+                                @if (@ViewBag.ProjectID > 0)
+                                {
+                                    <label for="project-selector" class="selector-label"></label>
+                                    <select class="form-control" name="project-selector" id="project-selector">
+                                        @{
+                                            foreach (var item in ViewBag.SelectorProjects)
+                                            {
+                                                    <option value="@item.KeyValue" @(item.KeyValue == ViewBag.ProjectID.ToString()?"selected":"")>@item.Label</option>
+                                            }
+                                        }
+                                    </select>
+                                } 
+                            </div>
+                        </div>
+                        <div class="cb"></div>
+                        @*@if (@ViewBag.ProjectID > 0)
+                        {
+                            <div class="app-page-orderby r">
+                                <label for="orderby-selector" class="selector-label fmin2"> Order by : </label>
+                                <select class="form-control fmin2" name="project-selector" id="orderby-selector">
+                                    <option value="option-1" selected="true">Last Update</option>
+                                    <option value="option-2">Name</option>
+                                </select>
+                            </div>
+                        }*@
+                </text>
+            }
+            </div>
+        </div>
+        <div id="frozen_screen_layer"></div>
+        <div class="app-page-content">
+            @RenderBody()
+        </div>
+    </div>
+    <script type="text/javascript">
+        $('#app-sign-in-link').click(function (e) {
+            Iteration0APP.ShowAlert('Coming soon !');
+            return false;
+        });
+        $('#project-selector').change(function (e) {
+            var rootUrl = window.location.href.substring(0, window.location.href.indexOf("?ProjectID="));
+            window.location.replace(rootUrl + "?ProjectID=" + $('#project-selector').val().toString());
+        });
+        
+    </script>
+</body>
+</html>
+

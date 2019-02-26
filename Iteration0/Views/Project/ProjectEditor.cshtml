@@ -1,0 +1,53 @@
+﻿@{
+    ViewBag.Title = "Project Settings";
+    ViewBag.AddButtonLabel = "Add Variation Point";
+}
+<div id="editor">
+    <div class="editor-section">
+        <div>
+            <span class="l"><a id="edit-definition-link" href="/">Edit</a></span><div class="cb"></div>
+        </div>
+        <div class="editor-definition-wrapper">
+            <div class="definition-speech">
+                <div id="editor-definition-category" class="context-tag"></div><div id="editor-definition-code" class="req-tag"></div>
+                <p id="editor-definition-zone" style="Line-Height:34px; margin-top:8px;"></p>
+            </div>
+        </div>
+    </div>
+    <div id="editor-variations-wrapper"></div>
+    <div class="editor-section">
+        <div><span class="r"><a id="add-product-link" href="/">Add +</a></span><h2>Products</h2></div>
+        <div class="underlined-row">
+        </div>
+        <div id="editor-products-wrapper">
+            <div class="tac">No Products yet</div>
+        </div>
+    </div>
+    <div class="editor-section">
+        <div><span class="r"><a id="add-domaincontext-link" href="/">Add +</a></span><h2>Domain Contexts</h2></div>
+        <div class="underlined-row">
+        </div>
+        <div id="editor-domaincontexts-wrapper">
+            <div class="tac">No Contexts yet</div>
+        </div>
+    </div>
+        <div class="editor-section">
+            <div><span class="r"><a id="add-process-link" href="/">Add +</a></span><h2>Business Processes</h2></div>
+            <div class="underlined-row">
+            </div>
+            <div id="editor-processes-wrapper">
+                <div class="tac">No Processes yet</div>
+            </div>
+        </div>
+        <div class="editor-section">
+            <div><span class="r"><a id="add-feature-link" href="/">Add +</a></span><h2>Features</h2></div>
+            <div class="underlined-row">
+            </div>
+            <div id="editor-features-wrapper">
+                <div class="tac">No Features yet</div>
+            </div>
+        </div>
+        <script type="text/javascript">
+    Iteration0APP.AddControl(new ProjectEditorUIControl(@Html.Raw(ViewBag.editorVMAsJson)));
+        </script>
+
