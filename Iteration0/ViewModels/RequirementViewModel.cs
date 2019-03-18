@@ -8,19 +8,29 @@ namespace Iteration0.ViewModels
     public class RequirementViewModel
     {
         public int RequirementID { get; set; }
-        public int RessourceID { get; set; }
-        public int RessourceName { get; set; }
         public short RequirementEnumType { get; set; }
-        public int Priority { get; set; }
-        public string Title { get; set; }
+        public string Behavior { get; set; }
         public string Description { get; set; }
-        public string Attribute1Value { get; set; }
-        public string Attribute2Value { get; set; }
-        public string Attribute3Value { get; set; }
-        public string Attribute4Value { get; set; }
-        public string Attribute5Value { get; set; }
-        public bool IsEnabled { get; set; } = true;
-        public int SortOrder { get; set; }
-        public string WorkItemURL { get; set; }
+        public int Priority { get; set; }
+        public string FieldValue1 { get; set; }
+        public string FieldValue2 { get; set; }
+        public string FieldValue3 { get; set; }
+        public string FieldValue4 { get; set; }
+        public string FieldValue5 { get; set; }
+        public int UseCaseID { get; set; }
+        public string UseCase { get; set; }
+        public int ConceptID { get; set; }
+        public string Concept { get; set; }
+        public int UIID { get; set; }
+        public string UI { get; set; }
+        public int InfrastructureID { get; set; }
+        public string Infrastructure { get; set; }
+        public int DefaultBehaviorID { get; set; }
+        public string DefaultBehavior { get; set; }
+        public List<int> ScopeIDs { get; set; }
+        public string ScopeSummary { get; set; }
+        public bool IsSelected { get; set; }
+        public List<int> SelectedVersionIDs { get; set; }
+        public string SelectedVersionSummary { get; set; } = "";
     }
 }

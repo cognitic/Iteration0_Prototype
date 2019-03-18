@@ -8,10 +8,101 @@ using System.Linq;
 
 namespace Iteration0.Business.Services
 {
-
     public class MappingService : IMappingService
     {
-    public MappingService()
+        public static void InitializeAutoMapper()
+        {
+            // Register View Models-related datamapping
+            Mapper.Initialize(cfg => {
+                //cfg.AddProfile<AppProfile>();
+                cfg.CreateMap<ProjectDefinition, ProjectDefinitionFormViewModel>()
+                    .ForMember(dest => dest.ProjectID, opts => opts.MapFrom(src => src.Id))
+                    .ReverseMap();
+                cfg.CreateMap<ProjectContextType, ProjectContextTypeViewModel>()
+                    .ForMember(dest => dest.ContextTypeID, opts => opts.MapFrom(src => src.Id))
+                    .ReverseMap();
+                cfg.CreateMap<ProjectContextType, ItemViewModel>()
+                    .ForMember(dest => dest.KeyValue, opts => opts.MapFrom(src => src.Id))
+                    .ForMember(dest => dest.Label, opts => opts.MapFrom(src => src.Name))
+                    .ReverseMap();
+                cfg.CreateMap<ProjectContext, ProjectContextViewModel>()
+                    .ForMember(dest => dest.ContextID, opts => opts.MapFrom(src => src.Id))
+                    .ReverseMap();
+                cfg.CreateMap<ProjectContext, ItemViewModel>()
+                    .ForMember(dest => dest.ParentKeyValue, opts => opts.MapFrom(src => src.Type.Id))
+                    .ForMember(dest => dest.KeyValue, opts => opts.MapFrom(src => src.Id))
+                    .ForMember(dest => dest.Label, opts => opts.MapFrom(src => src.Name))
+                    .ForMember(dest => dest.SortOrder, opts => opts.MapFrom(src => src.SortOrder))
+                    .ReverseMap();
+                cfg.CreateMap<RessourceDefinition, RessourceDefinitionViewModel>()
+                    .ForMember(dest => dest.RessourceID, opts => opts.MapFrom(src => src.Id))
+                    .ForMember(dest => dest.ProjectContextName, opts => opts.MapFrom(src => src.Context.Name))
+                    .ForMember(dest => dest.ProjectContextId, opts => opts.MapFrom(src => src.Context.Id))
+                    .ReverseMap();
+                cfg.CreateMap<RessourceRequirement, RequirementViewModel>()
+                    .ForMember(dest => dest.RequirementID, opts => opts.MapFrom(src => src.Id))
+                    .ForMember(dest => dest.UseCaseID, opts => opts.MapFrom(src => src.UseCase.Id))
+                    .ForMember(dest => dest.UseCase, opts => opts.MapFrom(src => src.UseCase.Name))
+                    .ForMember(dest => dest.ConceptID, opts => opts.MapFrom(src => src.Concept.Id))
+                    .ForMember(dest => dest.Concept, opts => opts.MapFrom(src => src.Concept.Name))
+                    .ForMember(dest => dest.UIID, opts => opts.MapFrom(src => src.UI.Id))
+                    .ForMember(dest => dest.UI, opts => opts.MapFrom(src => src.UI.Name))
+                    .ForMember(dest => dest.InfrastructureID, opts => opts.MapFrom(src => src.Infrastructure.Id))
+                    .ForMember(dest => dest.Infrastructure, opts => opts.MapFrom(src => src.Infrastructure.Name))
+                    .ForMember(dest => dest.DefaultBehaviorID, opts => opts.MapFrom(src => src.DefaultBehavior.Id))
+                    .ForMember(dest => dest.DefaultBehavior, opts => opts.MapFrom(src => src.DefaultBehavior.Behavior))
+                    .ForMember(dest => dest.SelectedVersionIDs, opts => opts.MapFrom(src => src.Versions.Select(x => x.Id)));
+                cfg.CreateMap<RequirementViewModel, RessourceRequirement>()
+                    .ForMember(dest => dest.Id, opts => opts.MapFrom(src => src.RequirementID))
+                    .ForMember(dest => dest.UseCase, opt => opt.Ignore())
+                    .ForMember(dest => dest.Concept, opt => opt.Ignore())
+                    .ForMember(dest => dest.UI, opt => opt.Ignore())
+                    .ForMember(dest => dest.Infrastructure, opt => opt.Ignore())
+                    .ForMember(dest => dest.UseCase, opt => opt.Ignore())
+                    .ForMember(dest => dest.Versions, opt => opt.Ignore());
+                cfg.CreateMap<RessourceDefinition, ItemViewModel>()
+                    .ForMember(dest => dest.KeyValue, opts => opts.MapFrom(src => src.Id))
+                    .ForMember(dest => dest.Label, opts => opts.MapFrom(src => src.Name))
+                    .ForMember(dest => dest.Tooltip, opts => opts.MapFrom(src => src.Definition))
+                    .ReverseMap();
+                //cfg.CreateMap<RequiremenContext, RequirementViewModel>()
+                //    .ForMember(dest => dest.RequirementID, opts => opts.MapFrom(src => src.Id))                  
+                //    .ReverseMap();
+                cfg.CreateMap<RessourceAssociation, RessourceAssociationViewModel>()
+                    .ForMember(dest => dest.AssociationId, opts => opts.MapFrom(src => src.Id))
+                    .ForMember(dest => dest.RessourceID, opts => opts.MapFrom(src => src.Ressource.Id))
+                    .ForMember(dest => dest.ParentID, opts => opts.MapFrom(src => src.Parent.Id))
+                    .ForMember(dest => dest.ParentName, opts => opts.MapFrom(src => src.Parent.Name))
+                    .ForMember(dest => dest.RessourceName, opts => opts.MapFrom(src => src.Ressource.Name))
+                    //.ForMember(dest => dest.ParentName, opts => opts.MapFrom(src => src.Parent.Name))
+                    .ReverseMap();
+                cfg.CreateMap<ProjectVersion, VersionViewModel>()
+                    .ForMember(dest => dest.VersionID, opts => opts.MapFrom(src => src.Id))
+                    .ReverseMap();
+                cfg.CreateMap<ProjectProduct, ItemViewModel>()
+                    .ForMember(dest => dest.KeyValue, opts => opts.MapFrom(src => src.Id))
+                    .ForMember(dest => dest.Tooltip, opts => opts.MapFrom(src => src.Mission))
+                    .ForMember(dest => dest.Label, opts => opts.MapFrom(src => src.Name))
+                    .ReverseMap();
+                cfg.CreateMap<RessourceRequirement, ItemViewModel>()
+                    .ForMember(dest => dest.KeyValue, opts => opts.MapFrom(src => src.Id))
+                    .ForMember(dest => dest.Tooltip, opts => opts.MapFrom(src => src.Description))
+                    .ForMember(dest => dest.Label, opts => opts.MapFrom(src => "#" + src.Id.ToString() + " " + src.Behavior))
+                    .ReverseMap();
+                cfg.CreateMap<RessourceDefinition, BoardItemViewModel>()
+                .ForMember(dest => dest.ItemID, opts => opts.MapFrom(src => src.Id))
+                .ForMember(dest => dest.PoolID, opts => opts.MapFrom(src => src.Context.Id))
+                .ForMember(dest => dest.ItemType, opts => opts.MapFrom(src => src.RessourceEnumType))
+                .ReverseMap();
+                //rsc.Name = formVM.Name; rsc.ProjectContextId = formVM.PoolID; rsc.ScaleOrder = formVM.ScaleOrder; rsc.StepOrder = formVM.StepOrder; rsc.SortOrder = formVM.SortOrder;
+                //cfg.CreateMap<VersionRequirement, VersionRequirementViewModel>()
+                //    .ForMember(dest => dest.VersionID, opts => opts.MapFrom(src => src.Version.Id))
+                //    .ForMember(dest => dest.RequirementID, opts => opts.MapFrom(src => src.Requirement.Id))
+                //    .ReverseMap();
+            });
+        }
+
+        public MappingService()
         {
         }
 
@@ -56,7 +147,11 @@ namespace Iteration0.Business.Services
         {
             return Mapper.Map<RessourceDefinitionViewModel, RessourceDefinition>(source);
         }
-
+        public RessourceDefinition ReBuildRessourceDefinitionWithViewModel(ItemViewModel source)
+        {
+            return Mapper.Map<ItemViewModel, RessourceDefinition>(source);
+        }
+        
         //public RequiremenContext ReBuildRessourceRequirementContextWithViewModel(RequirementViewModel source)
         //{
         //    return Mapper.Map<RequirementViewModel, RequiremenContext>(source);
@@ -101,12 +196,41 @@ namespace Iteration0.Business.Services
             return results;
         }
 
-        public List<RequirementViewModel> BuildRequirementViewModelFor(List<RessourceRequirement> source)
+        public List<RequirementViewModel> BuildRequirementViewModelFor(List<RessourceRequirement> source, List<ProjectProduct>  ProjectProducts, List<ProjectContextType> VariationPoints = null)
         {
             var results = new List<RequirementViewModel>();
             foreach (RessourceRequirement entity in source)
             {
                 var result = Mapper.Map<RessourceRequirement, RequirementViewModel>(entity);
+                if (entity.IsAlternative)
+                {
+                    result.ScopeIDs = entity.Variants.Select(x => x.Id).ToList();
+                    foreach (ProjectContextType point in VariationPoints)
+                    {
+                        var pointSummary = string.Join("/", entity.Variants.Where(v => v.Type.Id == point.Id).Select(x => x.CodeName));
+                        if (pointSummary.Length > 0)
+                        {
+                            result.ScopeSummary += pointSummary;
+                            if (point.Id != VariationPoints.Last().Id)  result.ScopeSummary += ", ";
+                        }
+                    }
+                }else
+                {
+                    result.ScopeSummary = "Default";
+                }
+                    foreach (ProjectProduct pp in ProjectProducts)
+                    {
+                        foreach (ProjectVersion pv in pp.Versions)
+                        {
+                            if (result.SelectedVersionIDs.Contains(pv.Id))
+                            {
+                            result.IsSelected = true;
+                            result.SelectedVersionSummary += pp.Name + " " + pv.NumberName + ", ";
+                            }
+                        }
+                    }
+                    if (result.SelectedVersionSummary.Length > 0) result.SelectedVersionSummary = result.SelectedVersionSummary.Substring(0, result.SelectedVersionSummary.Length - 2);
+                
                 results.Add(result);
             }
             return results;
@@ -161,6 +285,17 @@ namespace Iteration0.Business.Services
             foreach (RessourceDefinition entity in source)
             {
                 var result = Mapper.Map<RessourceDefinition, ItemViewModel>(entity);
+                results.Add(result);
+            }
+            return results;
+        }
+
+        public List<ItemViewModel> BuildItemViewModelFor(List<RessourceRequirement> source)
+        {
+            var results = new List<ItemViewModel>();
+            foreach (RessourceRequirement entity in source)
+            {
+                var result = Mapper.Map<RessourceRequirement, ItemViewModel>(entity);
                 results.Add(result);
             }
             return results;

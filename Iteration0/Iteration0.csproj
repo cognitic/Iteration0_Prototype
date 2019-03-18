@@ -231,6 +231,7 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\BoardEditorViewModel.cs" />
+    <Compile Include="ViewModels\SearchResultViewModel.cs" />
     <Compile Include="ViewModels\ItemViewModel.cs" />
     <Compile Include="ViewModels\ProjectEditorViewModel.cs" />
     <Compile Include="ViewModels\ProjectSummaryViewModel.cs" />
@@ -257,7 +258,9 @@
     <Content Include="Styles\images\software_product_line_i0.png" />
     <Content Include="Styles\images\zero_logo.png" />
     <Content Include="Styles\Iteration0.css" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -281,7 +284,7 @@
     <Content Include="Views\Project\Search.cshtml" />
     <Content Include="Views\Project\Options.cshtml" />
     <Content Include="Views\Project\RessourceCategory.cshtml" />
-    <Content Include="Views\Project\Roadmap.cshtml" />
+    <Content Include="Views\Project\ProductLine.cshtml" />
     <Content Include="Views\Project\VersionEditor.cshtml" />
   </ItemGroup>
   <ItemGroup>

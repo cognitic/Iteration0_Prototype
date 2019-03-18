@@ -1,0 +1,80 @@
+﻿@{
+    ViewBag.Title = "Product Line";
+    ViewBag.AddButtonLabel = "Add New Version";
+}
+<div class="editor-header-background">
+    <div class="tac">
+        <div class="tac"><h2 class="board-pool-header">Requirements Funnel</h2></div>
+        
+            <div class="funnel_outer">
+                <ul>
+                    <li class="funnel_step_4"><span><div>90% Required</div></span></li>
+                    <li class="funnel_step_5"><span><div>10% Planned</div></span> </li>
+                    <li class="funnel_step_6"><span><div>5% Completed</div></span></li>
+                    <li class="funnel_step_7"><span><div>1% Released</div></span></li>
+                </ul>
+            </div>
+
+    </div>
+</div>
+<div id="editor">
+
+    <div class="editor-section">
+        <div><h2>Roadmap</h2></div>
+        <div class="underlined-row">
+        </div>
+
+        <div id="editor-versions-wrapper">
+
+            @{
+                if (ViewBag.AllItems.Count > 0)
+                {
+                    foreach (var item in ViewBag.AllItems)
+                    {
+                        <h2>@item.Name</h2>
+                        <table class="table-centered">
+                            <text>
+                                @if (item.Versions.Count > 0)
+                                {
+                                    foreach (var version in item.Versions)
+                                    {
+                                        <tr class="@(( version.IsInProgress ? "inprogress" : ""))">
+                                            <td><span class="b">@version.NumberName</span> <br /> @version.NickName</td>
+                                            <td>@version.Summary</td>
+                                            <td><span class="b">@version.MonthName @version.ReleasedYear.ToString()</span> <br /> @version.ProgressName</td>
+                                            <td>
+                                                <span class="b">
+                                                    @version.CompletedAlternativeCount/@version.AlternativeCount Alternatives
+                                                </span><span class="tooltip">*<span class="tooltiptext">Alternatives with 100% of mandatory requirements</span></span>
+                                                <br /><a class="download-productline-link u action-link downloadbtn" linkID="" href="/Project/DownloadProductLine?VersionID=@version.VersionID">Download Settings</a>
+                                            </td>
+                                            <td><a class="edit-variation-link u action-link" href="/Project/VersionEditor?VersionID=@version.VersionID">Edit</a></td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr><td>No Versions yet</td><td>-</td><td>-</td><td>No Alternatives yet</td><td>-</td></tr>
+                                }
+                            </text>
+                        </table>
+                    }
+                }
+                else
+                {
+                    <div class="tac">No Products yet</div>
+                }
+
+            }
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $('#app-page-main-action-button').click(function (e) {
+        var newEditor = new VersionEditorUIControl(new VersionEditorViewModel());
+        Iteration0APP.AddControl(newEditor);
+        newEditor.ShowNewDefinitionForm(@ViewBag.ProjectID,@Html.Raw(@ViewBag.ProductItemsAsJson));
+    });
+</script>
+

@@ -12,13 +12,14 @@ namespace Iteration0.Business.Domain
         public RessourceDefinition Definition { get; set; }
 
         private Ressource _ressource;
-        public UIComponentFacade(Ressource ressource)
+        public UIComponentFacade(Ressource ressource, List<RessourceRequirement> behaviors)
         {
             this._ressource = ressource;
             this.Definition = ressource.Definition;
             this._screens = ressource.Requirements.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Screen).OrderBy(x => x.SortOrder).ToList();
             this._fields = ressource.Requirements.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Field).OrderBy(x => x.SortOrder).ToList();
-            this._Requirements = ressource.Requirements.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Rule).OrderBy(x => x.SortOrder).ToList();
+            this._Requirements = behaviors.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Default).OrderBy(x => x.SortOrder).ToList();
+            this._Alternatives = behaviors.Where(x => x.IsEnabled == true && x.IsAlternative == true).OrderBy(x => x.SortOrder).ToList();
         }
         
         private List<RessourceRequirement> _screens;
@@ -43,6 +44,14 @@ namespace Iteration0.Business.Domain
             get
             {
                 return _Requirements;
+            }
+        }
+        private List<RessourceRequirement> _Alternatives = new List<RessourceRequirement>();
+        public List<RessourceRequirement> Alternatives
+        {
+            get
+            {
+                return _Alternatives;
             }
         }
     }

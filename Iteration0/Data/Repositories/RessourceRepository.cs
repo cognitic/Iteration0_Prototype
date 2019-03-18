@@ -2,6 +2,7 @@
 using Iteration0.Business.Domain.Entities;
 using Iteration0.Business.Interfaces;
 using Iteration0.Business.Services;
+using Iteration0.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -56,44 +57,68 @@ namespace Iteration0.Data.Repositories
         public List<Ressource> GetAll()
         {
             var result = new List<Ressource>();
-            //Multi Project Access Not Authorized ! Please Use Project Repository to gain access to these ressources
-            //foreach (RessourceDefinition def in _dbSetRessourceDefinition.ToList())
-            //{
-            //    result.Add(new Ressource(def));
-            //}
+            //Multi Project Access Not Authorized ! 
+            // Please Use Project Repository to gain access to these ressources
             return result;
+        }
+
+        public IQueryable<RessourceDefinition> SearchAllRessourcesWith(int projectId, String content)
+        {
+            return ( from m in _dbSetRessourceDefinition where m.Project.Id == projectId && ( m.Name.Contains(content) || m.Definition.Contains(content) ) select m );
+        }
+        public IQueryable<RessourceRequirement> SearchAllRequirementsWith(int projectId, String content)
+        {
+            return (from m in _dbSetRequirement where m.Project.Id == projectId && (m.Behavior.Contains(content) || m.Description.Contains(content)) select m);
         }
 
         public RessourceAssociation GetAssociation(int id)
         {
             return _dbSetRessourceAssociation.Where(c => c.Id == id).FirstOrDefault();
         }
-
+        public List<RessourceAssociation> GetAllChildrenAggregations(int id)
+        {
+            return _dbSetRessourceAssociation.Where(c => c.Parent.Id == id && (c.AssociationEnumType == (short)AssociationEnumType.HasOne || c.AssociationEnumType == (short)AssociationEnumType.HasMany)).ToList();
+        }
+        public List<RessourceAssociation> GetAllParentAggregations(int id)
+        {
+            return _dbSetRessourceAssociation.Where(c => c.Ressource.Id == id && (c.AssociationEnumType == (short)AssociationEnumType.HasOne || c.AssociationEnumType == (short)AssociationEnumType.HasMany)).ToList();
+        }
         public RessourceRequirement GetRequirement(int id)
         {
-            return _dbSetRequirement.Where(c => c.Id == id && c.RequirementEnumType == (short)RequirementEnumType.Rule && c.IsEnabled == true).FirstOrDefault();
+            return _dbSetRequirement.Where(c => c.Id == id && c.IsEnabled == true).FirstOrDefault();
         }
 
         public void Update(RessourceDefinition item)
         {
-            _unitOfWork.DatabaseContext.Entry(item).State = EntityState.Modified;
-            _dbSetRessourceDefinition.Attach(item);
+            var original = _dbSetRessourceDefinition.Find(item.Id);
+            _unitOfWork.DatabaseContext.Entry(original).CurrentValues.SetValues(item);
         }
 
         public void Update(RessourceAssociation item)
         {
-            _dbSetRessourceAssociation.Attach(item);
-            _unitOfWork.DatabaseContext.Entry(item).State = EntityState.Modified;
+            var original = _dbSetRessourceAssociation.Find(item.Id);
+            _unitOfWork.DatabaseContext.Entry(original).CurrentValues.SetValues(item);
         }
 
         public void Update(RessourceRequirement item)
         {
-            _dbSetRequirement.Attach(item);
-            _unitOfWork.DatabaseContext.Entry(item).State = EntityState.Modified;
+            var original = _dbSetRequirement.Find(item.Id);
+            _unitOfWork.DatabaseContext.Entry(original).CurrentValues.SetValues(item);
         }
         public void Remove(RessourceAssociation item)
         {
             _dbSetRessourceAssociation.Remove(item);
+        }
+
+        public static readonly short[] BehaviorRequirementsTypes = { (short)RequirementEnumType.Default, (short)RequirementEnumType.LogicAlternative, (short)RequirementEnumType.UIAlternative };
+        public List<RessourceRequirement> GetAllBehaviorRequirementsBy(int ConceptId)
+        {
+            return _dbSetRequirement.Where(c => c.Concept.Id == ConceptId && BehaviorRequirementsTypes.Contains(c.RequirementEnumType) && c.IsEnabled == true).ToList();
+        }
+
+        public List<RessourceRequirement> GetAllBehaviorRequirementsFrom(int UIComponentId)
+        {
+            return _dbSetRequirement.Where(c => c.UI.Id == UIComponentId && BehaviorRequirementsTypes.Contains(c.RequirementEnumType) && c.IsEnabled == true).ToList();
         }
 
     }

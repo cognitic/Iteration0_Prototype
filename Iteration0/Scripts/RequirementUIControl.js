@@ -27,7 +27,7 @@ var RequirementUIControl = /** @class */ (function () {
     RequirementUIControl.prototype.OnRequirementSaveClick = function (response, context) {
         var VM = new RequirementViewModel();
         //VM.RessourceID = context.RessourceID; VM.RequirementID = parseInt($("#formHiddenID").val()); VM.RequirementEnumType = RequirementEnumType.UseCase;
-        //VM.Name = $.trim($("#formDefName").val()); VM.Definition = $.trim($("#formDefBrief").val()); VM.Category = $.trim($("#formDefCodeName").val());
+        //VM.Name = $.trim($("#formDefName").val()); VM.Definition = $.trim($("#formDefVision").val()); VM.Category = $.trim($("#formDefCodeName").val());
         var isOK = true;
         //if ((context.FieldIsBlank(VM.Name))) { isOK = false; context.app.ShowAlert("Name is mandatory !"); }
         //if ((context.FieldIsBlank(VM.Category))) { isOK = false; context.app.ShowAlert("Context is mandatory !"); }
@@ -90,7 +90,7 @@ var RequirementUIControl = /** @class */ (function () {
         var html = "";
         jQuery.each(this.VariationPoints, function () {
             html += "<div><input type='text' TypeId='" + this.Name + "' class='texttype context-field' maxlength='50' style='width: 300px;' value=''>";
-            html = '<div class="app-profile-options-dropdown dropdown"><button class="square dropbtn">Select ' + this.Name + '</button><div class="dropdown-content">';
+            html = '<div class="app-profile-options-dropdown dropdown"><button class="square smallbtn">Select ' + this.Name + '</button><div class="dropdown-content">';
             jQuery.each(this.Contexts, function () {
                 html += "<a href='/' class='context-CB' TypeId='" + this.ContextTypeID + "' CBId='" + this.ContextID + "'>" + this.Name + "</a>";
             });
@@ -104,7 +104,7 @@ var RequirementUIControl = /** @class */ (function () {
         var title = ((requirement.RequirementID > 0) ? "Edit Requirement" : "Define New Requirement");
         var formHtml = this.BuildHtmlButtonSelector();
         formHtml += "<div><input type='text' id='formDefNamex' class='texttype;' maxlength='50' style='width: 300px;' value='ALL'><button class='square'>Select Group..</button></div></div>";
-        formHtml += "<div>&nbsp;</div><div class='form-element-group'><div><label class='filter'>Description : </label></div><div><textarea id='formDefBrief' type='textarea' name='textarea-brief' maxlength='1000' style='width: 500px; Height:160px;' placeholder='Specific System Behavior..'>" + requirement.Description + "</textarea></div></div>";
+        formHtml += "<div>&nbsp;</div><div class='form-element-group'><div><label class='filter'>Description : </label></div><div><textarea id='formDefVision' type='textarea' name='textarea-Vision' maxlength='1000' style='width: 500px; Height:160px;' placeholder='Specific System Behavior..'>" + requirement.Description + "</textarea></div></div>";
         formHtml += "<div class='form-element-group'><div><label class='filter'>Priority : </label></div><div>" + this.BuildDropDownHtmlWith("formPriority", PriorityLevels, "Select Priority", requirement.Priority.toString()) + "</div></div>";
         formHtml += "<div class='form-element-group'><div><label class='filter'>Related Work Item : </label></div><div><input type='text' id='formWorkItemURL' class='texttype' maxlength='50' style='width: 300px;' placeholder='URL' value='" + requirement.WorkItemURL + "'></div></div>";
         this.app.ShowCustomMessage("<div class='form-group'>" + formHtml + "</div>", title, this.OnRequirementSaveClick, null, this, null);

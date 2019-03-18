@@ -19,6 +19,7 @@ namespace Iteration0.Data.Repositories
         private  DbSet<ProjectContext> _dbSetProjectContext;
         private  DbSet<ProjectContextType> _dbSetProjectContextType;
         private DbSet<RessourceDefinition> _dbSetProjectRessourceDefinition;
+        private DbSet<RessourceAssociation> _dbSetProjectRessourceAssociation;
         private DbSet<RessourceRequirement> _dbSetRequirement;
         private DbSet<Event> _dbSetProjectEvent;
         private DbSet<ProjectVersion> _dbSetProjectVersion;
@@ -30,6 +31,7 @@ namespace Iteration0.Data.Repositories
             _dbSetProjectContext = unitOfWork.DatabaseContext.Set<ProjectContext>();
             _dbSetProjectContextType = unitOfWork.DatabaseContext.Set<ProjectContextType>();
             _dbSetProjectRessourceDefinition = unitOfWork.DatabaseContext.Set<RessourceDefinition>();
+            _dbSetProjectRessourceAssociation = unitOfWork.DatabaseContext.Set<RessourceAssociation>();
             _dbSetRequirement = unitOfWork.DatabaseContext.Set<RessourceRequirement>();
             _dbSetProjectEvent = unitOfWork.DatabaseContext.Set<Event>();
             _dbSetProjectVersion = unitOfWork.DatabaseContext.Set<ProjectVersion>();
@@ -98,9 +100,11 @@ namespace Iteration0.Data.Repositories
         public List<DomainConceptFacade> GetAllDomainConcepts(int id)
         {
             var result = new List<DomainConceptFacade>();
+            var Aggregations = new List<RessourceAssociation>();
+            var BehaviorRequirements = new List<RessourceRequirement>();
             foreach (RessourceDefinition def in GetAllConceptDefinitionsFor(id))
             {
-                result.Add(new DomainConceptFacade(new Ressource(def)));
+                result.Add(new DomainConceptFacade(new Ressource(def), Aggregations, Aggregations, BehaviorRequirements));
             }
             return result;
         }
@@ -118,9 +122,10 @@ namespace Iteration0.Data.Repositories
         public List<UIComponentFacade> GetAllUIComponents(int id)
         {
             var result = new List<UIComponentFacade>();
+            var BehaviorRequirements = new List<RessourceRequirement>();
             foreach (RessourceDefinition def in _dbSetProjectRessourceDefinition.Where(c => c.Project.Id == id && c.RessourceEnumType == (short)RessourceEnumType.Component && c.IsEnabled == true).ToList())
             {
-                result.Add(new UIComponentFacade(new Ressource(def)));
+                result.Add(new UIComponentFacade(new Ressource(def), BehaviorRequirements));
             }
             return result;
         }
@@ -137,12 +142,12 @@ namespace Iteration0.Data.Repositories
 
         public List<ProjectContextType> GetAllVariationPointsFor(int id)
         {
-            return _dbSetProjectContextType.Where(c => (c.Project.Id == id) && c.IsEnabled == true && c.ContextEnumType == (short)ContextEnumType.RequirementVariation).ToList();
+            return _dbSetProjectContextType.Where(c => (c.Project.Id == id) && c.IsEnabled == true && c.ContextEnumType == (short)ContextEnumType.VariationPoint).OrderBy(p => p.ScaleOrder).ToList();
         }
 
         public List<ProjectContext> GetAllVariantsFor(int id)
         {
-            return _dbSetProjectContext.Where(c => c.Project.Id == id && c.IsEnabled == true && c.Type.ContextEnumType == (short)ContextEnumType.RequirementVariation).ToList();
+            return _dbSetProjectContext.Where(c => c.Project.Id == id && c.IsEnabled == true && c.Type.ContextEnumType == (short)ContextEnumType.VariationPoint).ToList();
         }
         
         public List<ProjectContext> GetAllDomainContexts(int id)
@@ -164,6 +169,16 @@ namespace Iteration0.Data.Repositories
         {
             return _dbSetProjectProduct.Where(c => c.Project.Id == id && c.IsEnabled == true).ToList();
         }
+
+        public List<RessourceDefinition> GetAllInfrastructuresFor(int id)
+        {
+            return _dbSetProjectRessourceDefinition.Where(c => c.Project.Id == id && c.RessourceEnumType == (short)RessourceEnumType.Infrastructure && c.IsEnabled == true).ToList();
+        }
+        public List<RessourceAssociation> GetAllAssociationsFor(int id)
+        {
+            return _dbSetProjectRessourceAssociation.Where(c => c.Ressource.Project.Id == id).ToList();
+        }
+        
         public List<ProjectVersion> GetAllVersionFor(int id)
         {
             return _dbSetProjectVersion.Where(c => c.Product.Project.Id == id && c.IsEnabled == true).ToList();
@@ -171,21 +186,21 @@ namespace Iteration0.Data.Repositories
 
         public List<RessourceDefinition> GetAllConceptDefinitionsFor(int id)
         {
-            return _dbSetProjectRessourceDefinition.Where(c => c.Project.Id == id && c.RessourceEnumType == (short)RessourceEnumType.Domain && c.IsEnabled == true).ToList();
+            return _dbSetProjectRessourceDefinition.Where(c => c.Project.Id == id && c.RessourceEnumType == (short)RessourceEnumType.Domain && c.IsEnabled == true).OrderBy(x => x.Name).ToList();
         }
 
         public List<RessourceDefinition> GetAllUseCaseDefinitionsFor(int id)
         {
-            return _dbSetProjectRessourceDefinition.Where(c => c.Project.Id == id && c.RessourceEnumType == (short)RessourceEnumType.UseCase && c.IsEnabled == true).ToList();
+            return _dbSetProjectRessourceDefinition.Where(c => c.Project.Id == id && c.RessourceEnumType == (short)RessourceEnumType.UseCase && c.IsEnabled == true).OrderBy(x => x.Name).ToList();
         }
         public List<RessourceDefinition> GetAllUIDefinitionsFor(int id)
         {
-            return _dbSetProjectRessourceDefinition.Where(c => c.Project.Id == id && c.RessourceEnumType == (short)RessourceEnumType.Component && c.IsEnabled == true).ToList();
+            return _dbSetProjectRessourceDefinition.Where(c => c.Project.Id == id && c.RessourceEnumType == (short)RessourceEnumType.Component && c.IsEnabled == true).OrderBy(x => x.Name).ToList();
         }
 
         public List<RessourceRequirement> GetAllRequirementsFor(int id)
         {
-            return _dbSetRequirement.Where(c => c.Ressource.Project.Id == id && c.RequirementEnumType == (short)RequirementEnumType.Rule && c.IsEnabled == true).ToList();
+            return _dbSetRequirement.Where(c => c.Project.Id == id && c.RequirementEnumType == (short)RequirementEnumType.Default && c.IsEnabled == true).ToList();
         }
         public ProjectContextType GetContextType(int id)
         {
@@ -195,6 +210,11 @@ namespace Iteration0.Data.Repositories
         public ProjectVersion GetVersion(int id)
         {
             return _dbSetProjectVersion.Where(c => c.Id == id && c.IsEnabled == true).FirstOrDefault();
+        }
+
+        public RessourceRequirement GetRequirement(int id)
+        {
+            return _dbSetRequirement.Where(c => c.Id == id  && c.IsEnabled == true).FirstOrDefault();
         }
 
         public void Add(ProjectContext item)
@@ -209,8 +229,8 @@ namespace Iteration0.Data.Repositories
 
         public void Update(ProjectVersion item)
         {
-            _unitOfWork.DatabaseContext.Entry(item).State = EntityState.Modified;
-            _dbSetProjectVersion.Attach(item);
+            var original = _dbSetProjectVersion.Find(item.Id);
+            _unitOfWork.DatabaseContext.Entry(original).CurrentValues.SetValues(item);
         }
 
         public ProjectContext GetContext(int id)
@@ -235,5 +255,6 @@ namespace Iteration0.Data.Repositories
             //_unitOfWork.DatabaseContext.Entry(item).State = EntityState.Modified;
             //_dbSetProjectProduct.Attach(item);
         }
+
     }
 }

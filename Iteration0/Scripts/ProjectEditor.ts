@@ -11,6 +11,7 @@ class ProjectEditorUIControl extends RequirementUIControl {
     businessProcessesWrapper: JQuery;
     featuresWrapper: JQuery;
     productsWrapper: JQuery;
+    infrastructuresWrapper: JQuery;
     editorURL: string = "/Project/ProjectEditor?ProjectId=";
     saveURL: string = "/Project/CreateEditProject";
     contextTypeSaveURL: string = "/Project/CreateEditProjectContextTypes";
@@ -19,6 +20,8 @@ class ProjectEditorUIControl extends RequirementUIControl {
     removeContextURL: string = "/Project/RemoveProjectContexts";
     ProductSaveURL: string = "/Project/CreateEditProjectProduct";
     removeProductURL: string = "/Project/RemoveProjectProduct";
+    InfrastructureSaveURL: string = "/Project/CreateEditProjectInfrastructure";
+    removeInfrastructureURL: string = "/Project/RemoveRessourceDefinition";
     Contexts = []; ContextIds = [];
 
     constructor(formVM: ProjectEditorViewModel) {
@@ -29,6 +32,7 @@ class ProjectEditorUIControl extends RequirementUIControl {
         this.businessProcessesWrapper = $("#editor-processes-wrapper");
         this.featuresWrapper = $("#editor-features-wrapper");
         this.productsWrapper = $("#editor-products-wrapper");
+        this.infrastructuresWrapper = $("#editor-infrastructures-wrapper");
         this.Start();
     }
     public Start() {
@@ -38,6 +42,7 @@ class ProjectEditorUIControl extends RequirementUIControl {
         $("#add-process-link").click((e => { this.ShowNewContextForm(this.project.BusinessProcessesId, ContextEnumType.BusinessProcess); return false }));
         $("#add-feature-link").click((e => { this.ShowNewContextForm(this.project.FeaturesId, ContextEnumType.Feature); return false }));
         $("#add-product-link").click((e => { this.ShowNewProductForm(); return false }));
+        $("#add-infrastructure-link").click((e => { this.ShowNewInfrastructureForm(); return false }));
         $('#app-page-main-action-button').click((e => { this.ShowNewVariationPointForm(); return false }));
     }
     public Build() {
@@ -53,26 +58,28 @@ class ProjectEditorUIControl extends RequirementUIControl {
                 editor.variationWrapper.html(html);
                 jQuery.each(this.project.VariationPoints, function (index) {
                     editor.Contexts.push(this.Contexts); editor.ContextLabels.push(this.Name); editor.ContextIds.push(this.ContextTypeID);
-                    editor.BuildContexts($("#editor-variants" + this.ContextTypeID.toString() + "-wrapper"), ContextEnumType.RequirementVariation + index);
-                    $("#add-variation" + this.ContextTypeID.toString() + "-link").click((e => { editor.ShowNewContextForm(this.ContextTypeID, ContextEnumType.RequirementVariation + index); return false }));
+                    editor.BuildContexts($("#editor-variants" + this.ContextTypeID.toString() + "-wrapper"), ContextEnumType.VariationPoint + index);
+                    $("#add-variation" + this.ContextTypeID.toString() + "-link").click((e => { editor.ShowNewContextForm(this.ContextTypeID, ContextEnumType.VariationPoint + index); return false }));
                 });
             } 
+            this.BuildProducts();
             this.BuildContexts(this.domainContextsWrapper, ContextEnumType.DomainContext);
             this.BuildContexts(this.businessProcessesWrapper, ContextEnumType.BusinessProcess);
             this.BuildContexts(this.featuresWrapper, ContextEnumType.Feature);
-            this.BuildProducts();
+            this.BuildInfrastructures();
             $(".edit-variation-link").click((e => { this.ShowEditVariationForm(parseInt($(e.target).attr('linkid'))); return false }));
             $(".remove-variation-link").click((e => { this.ShowRemoveVariationForm(parseInt($(e.target).attr('linkid'))); return false }));
             $(".edit-product-link").click((e => { this.ShowEditProductForm(parseInt($(e.target).attr('linkid'))); return false }));
             $(".remove-product-link").click((e => { this.ShowRemoveProductForm(parseInt($(e.target).attr('linkid'))); return false }));
             $(".edit-context-link").click((e => { this.ShowEditContextForm(parseInt($(e.target).attr('linkid')), parseInt($(e.target).attr('typeid'))); return false }));
             $(".remove-context-link").click((e => { this.ShowRemoveContextForm(parseInt($(e.target).attr('linkid'))); return false }));
+            $(".edit-infrastructure-link").click((e => { this.ShowEditInfrastructureForm(parseInt($(e.target).attr('linkid'))); return false }));
+            $(".remove-infrastructure-link").click((e => { this.ShowRemoveInfrastructureForm(parseInt($(e.target).attr('linkid'))); return false }));
         }
     }
     public BuildDefinition() {
-        $("#editor-definition-zone").html((this.FieldIsBlank(this.project.Definition.Brief)) ? "No<br/>Definition<br/>yet" : this.project.Definition.Brief.replace(/\n/gim, "<br/>"));
-        $("#editor-definition-category").html("Projects");
-        $("#editor-definition-code").html(this.project.Definition.CodeName);
+        $(".editor-header-bubble-title").html(this.project.Definition.Title + (this.FieldIsBlank(this.project.Definition.CodeName) ? "": " - " + this.project.Definition.CodeName));
+        $(".editor-header-bubble-definition").html((this.FieldIsBlank(this.project.Definition.Brief)) ? "No Definition yet" : this.project.Definition.Brief.replace(/\n/gim, "<br/>"));
     }
     public ShowNewDefinitionForm() {
         var newVM = new ProjectDefinitionFormViewModel();
@@ -82,6 +89,20 @@ class ProjectEditorUIControl extends RequirementUIControl {
     }
     public ShowEditDefinitionForm() {
         this.ShowDefinitionForm(this.project.Definition);
+    }
+    public BuildInfrastructures() {
+        var Context = this;
+        if (this.project.Infrastructures.length > 0) {
+            var html = '<div class="editor-list"><ol>';
+            jQuery.each(this.project.Infrastructures, function () {
+                html += '<li><h3>' + this.Label + '</h3> <div class="comment">' + ((Context.FieldIsBlank(this.Tooltip)) ? "" : this.Tooltip) + ' <a class="edit-infrastructure-link action-link" linkid="' + this.KeyValue + '" href="/">Edit</a><span class="action-text"> / </span><a class="remove-infrastructure-link action-link" linkid="' + this.KeyValue + '" href="/">Remove</a></div></li>';
+            });
+            html += '';
+            html += '</ol></div>';
+            this.infrastructuresWrapper.html(html);
+        } else {
+            this.infrastructuresWrapper.html('<div class="tac">No Infrastructures yet</div>');
+        }
     }
     public BuildProducts() {
         var Context = this;
@@ -117,10 +138,10 @@ class ProjectEditorUIControl extends RequirementUIControl {
         //this.app.AddControl(new PopUpUIControl('', "#popUpMessage"));
         var title = ((this.project.Definition.ProjectID > 0) ? "Edit Project Definition" : "Define New Project");
         //var saveButtonLabel = ((this.project.Definition.ProjectID > 0) ? "Save Definition" : "Start Project Modelling");
-        var formHtml = "<div class='form-element-group'><div><label class='filter'>Title : </label></div><div><input type='text' id='formDefName' class='texttype' maxlength='50' style='width: 300px;' value='" + this.project.Definition.Title + "'></div></div>";
-        formHtml += "<div class='form-element-group'><div><label class='filter'>Brief : </label></div><div><textarea id='formDefBrief' type='textarea' name='textarea-brief' maxlength='1000' style='width: 500px; Height:160px;' placeholder='Domain Problems and Business’s Needs that Software must solve..'>" + this.project.Definition.Brief + "</textarea></div></div>";
-        formHtml += "<div class='form-element-group'><div><label class='filter'>Code Name # : </label></div><div><input type='text' id='formDefCodeName' class='texttype' maxlength='20' style='width: 200px;' value='" + this.project.Definition.CodeName + "'></div></div>";
-            //formHtml += "<div class='filter-group'><label class='filter'>Is Only Visible By Owner : </label><input type='checkbox' id='IsPrivateCB'></div>";
+        var formHtml = "<div class='form-element-group'><div><label >Title : </label></div><div><input type='text' id='formDefName' class='texttype' maxlength='50' style='width: 300px;' value='" + this.project.Definition.Title + "'></div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Brief : </label></div><div><textarea id='formDefBrief' type='textarea' name='textarea-brief' maxlength='1000' style='width: 500px; Height:160px;' placeholder='Domain Problems and Business’s Needs that Software must solve..'>" + this.project.Definition.Brief + "</textarea></div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Code Name # : </label></div><div><input type='text' id='formDefCodeName' class='texttype' maxlength='20' style='width: 200px;' value='" + this.project.Definition.CodeName + "'></div></div>";
+            //formHtml += "<div class='filter-group'><label >Is Only Visible By Owner : </label><input type='checkbox' id='IsPrivateCB'></div>";
         this.app.ShowCustomMessage("<div class='form-group'>" + formHtml + "</div>", title, this.OnDefinitionSaveClick, null, this, null);
         //$('#ProductEnabledCB').prop('checked', IsActive);
         return false;
@@ -143,7 +164,7 @@ class ProjectEditorUIControl extends RequirementUIControl {
         }
     }    
     public ShowNewVariationPointForm() {
-        var newVM = new ProjectContextTypeViewModel(); newVM.ContextTypeID = -1, newVM.Name = "New Variation Point", newVM.ScaleOrder = 3;
+        var newVM = new ProjectContextTypeViewModel(); newVM.ContextTypeID = -1, newVM.Name = "New Variation Point", newVM.ScaleOrder = 3, newVM.UsedAsProductAlternative = false;
         this.ShowVariationForm(newVM);
     }
     public ShowEditVariationForm(contextTypeID: Number) {
@@ -153,17 +174,20 @@ class ProjectEditorUIControl extends RequirementUIControl {
     }
     public ShowVariationForm(contextType: ProjectContextTypeViewModel) {
         var title = ((contextType.ContextTypeID > 0) ? "Edit Variation Point" : "Define New Variation Point");
-        var formHtml = "<div class='form-element-group'><div><label class='filter'>Variation Name : </label></div><div><input type='text' id='formName' class='texttype' maxlength='50' style='width: 300px;' value='" + contextType.Name + "'></div></div>";
-        formHtml += "<div class='form-element-group'><div><label class='filter'>Precision Scale : </label></div><div>" + this.BuildDropDownHtmlWith("formScaleOrder", PrecisionScale, "Select Scale", contextType.ScaleOrder.toString()) + "</div></div>";
+        var formHtml = "<div class='form-element-group'><div><label >Variation Name : </label></div><div><input type='text' id='formName' class='texttype' maxlength='50' style='width: 300px;' value='" + contextType.Name + "'></div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Precision Scale : </label></div><div>" + this.BuildDropDownHtmlWith("formScaleOrder", PrecisionScale, "Select Scale", contextType.ScaleOrder.toString()) + "</div></div>";
+        formHtml += "<div class='form-element-group'><label >Used as Product Alternative : </label><input type='checkbox' id='IsProductAlternativeCB'></div>";
 
         this.app.ShowCustomMessage("<div class='Item-form form-group'  typeid='" + contextType.ContextTypeID + "'>" + formHtml + "</div>", title, this.OnContextTypeSaveClick, null, this, null);
+        $('#IsProductAlternativeCB').prop('checked', contextType.UsedAsProductAlternative);
         return false;
     }
     public OnContextTypeSaveClick(context: ProjectEditorUIControl) {
-        var VM = new ProjectContextTypeViewModel(); VM.ContextEnumType = ContextEnumType.RequirementVariation;
+        var VM = new ProjectContextTypeViewModel(); VM.ContextEnumType = ContextEnumType.VariationPoint;
         VM.ContextTypeID = parseInt($.trim($(".context-form").attr('typeid')));
         VM.Name = $.trim($("#formName").val()); 
         VM.ScaleOrder = parseInt($.trim($("#formScaleOrder").val()));
+        VM.UsedAsProductAlternative = $("#IsProductAlternativeCB").is(':checked');
 
         var isOK = true;
         if ((context.FieldIsBlank(VM.Name))) { isOK = false; context.app.ShowAlert("Name is mandatory !"); }
@@ -198,10 +222,10 @@ class ProjectEditorUIControl extends RequirementUIControl {
     public ShowContextForm(context: ProjectContextViewModel, ContextEnum: ContextEnumType) {
         var Label = this.ContextLabels[ContextEnum];
         var title = ((context.ContextID > 0) ? "Edit " + Label : "Define New " + Label);
-        var formHtml = "<div class='form-element-group'><div><label class='filter'>Name : </label></div><div><input ='text' id='formName' class='text' maxlength='50' style='width: 300px;' value='" + context.Name + "'></div></div>";
-        formHtml += "<div class='form-element-group'><div><label class='filter'>Comment : </label></div><div><input ='text' id='formComment' class='text' maxlength='50' style='width: 300px;' value='" + context.Comment + "'></div></div>";
-        formHtml += "<div class='form-element-group'><div><label class='filter'>Code Name : </label></div><div><input ='text' id='formCodeName' class='text' maxlength='4' style='width: 100px;' value='" + context.CodeName + "'></div></div>";
-        formHtml += "<div class='form-element-group'><div><label class='filter'>Sort Order : </label></div><div><input  type='number' min='1' max='99' id='formSortOrder'  style='width: 60px;' value='" + context.SortOrder + "'></div></div>";
+        var formHtml = "<div class='form-element-group'><div><label >Name : </label></div><div><input ='text' id='formName' class='text' maxlength='50' style='width: 300px;' value='" + context.Name + "'></div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Comment : </label></div><div><input ='text' id='formComment' class='text' maxlength='50' style='width: 300px;' value='" + context.Comment + "'></div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Code Name : </label></div><div><input ='text' id='formCodeName' class='text' maxlength='4' style='width: 100px;' value='" + context.CodeName + "'></div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Sort Order : </label></div><div><input  type='number' min='1' max='99' id='formSortOrder'  style='width: 60px;' value='" + context.SortOrder + "'></div></div>";
 
         this.app.ShowCustomMessage("<div class='context-form form-group' formid='" + context.ContextID + "' typeid='" + this.ContextIds[ContextEnum] + "'>" + formHtml + "</div>", title, this.OnContextSaveClick, null, this, null);
         return false;
@@ -237,8 +261,8 @@ class ProjectEditorUIControl extends RequirementUIControl {
     }
     public ShowProductForm(Product: ItemViewModel) {
         var title = ((Product.KeyValue.length > 0) ? "Edit Product" : "Define New Product");
-        var formHtml = "<div class='form-element-group'><div><label class='filter'>Name : </label></div><div><input ='text' id='formName' class='text' maxlength='50' style='width: 300px;' value='" + Product.Label + "'></div></div>";
-        formHtml += "<div class='form-element-group'><div><label class='filter'>Comment : </label></div><div><input ='text' id='formComment' class='text' maxlength='50' style='width: 300px;' value='" + Product.Tooltip + "'></div></div>";
+        var formHtml = "<div class='form-element-group'><div><label >Name : </label></div><div><input ='text' id='formName' class='text' maxlength='50' style='width: 300px;' value='" + Product.Label + "'></div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Comment : </label></div><div><input ='text' id='formComment' class='text' maxlength='50' style='width: 300px;' value='" + Product.Tooltip + "'></div></div>";
 
         this.app.ShowCustomMessage("<div class='Product-form form-group' formid='" + Product.KeyValue + "'>" + formHtml + "</div>", title, this.OnProductSaveClick, null, this, null);
         return false;
@@ -251,6 +275,40 @@ class ProjectEditorUIControl extends RequirementUIControl {
         if ((Product.FieldIsBlank(VM.Label))) { isOK = false; Product.app.ShowAlert("Name is mandatory !"); }
         if (isOK) {
             Product.AjaxCall(Product.ProductSaveURL, JSON.stringify({ formVM: VM, ProjectID: Product.project.Definition.ProjectID }), Product.OnEditorSaved, Product);
+        }
+    }
+    public ShowNewInfrastructureForm() {
+        var newVM = new ItemViewModel("My New Infrastructure", ""); newVM.Tooltip = "";
+        this.ShowInfrastructureForm(newVM);
+    }
+    public ShowEditInfrastructureForm(InfrastructureID: Number) {
+        var VM: ItemViewModel;
+        jQuery.each(this.project.Infrastructures, function () { if (this.KeyValue == InfrastructureID.toString()) { VM = this; return false; } });
+        this.ShowInfrastructureForm(VM);
+    }
+    public ShowRemoveInfrastructureForm(InfrastructureID: Number) {
+        this.removePendingID = InfrastructureID;
+        this.app.ShowCustomMessage("Are you sure you want to delete this item ?", "Remove Infrastructure", this.OnInfrastructureRemoveClick, null, this, null);
+    }
+    public OnInfrastructureRemoveClick(context: ProjectEditorUIControl) {
+        context.AjaxCall(context.removeInfrastructureURL, JSON.stringify({ contextID: context.removePendingID, ProjectID: context.project.Definition.ProjectID }), context.OnEditorSaved, context);
+    }
+    public ShowInfrastructureForm(Infrastructure: ItemViewModel) {
+        var title = ((Infrastructure.KeyValue.length > 0) ? "Edit Infrastructure" : "Define New Infrastructure");
+        var formHtml = "<div class='form-element-group'><div><label >Name : </label></div><div><input ='text' id='formName' class='text' maxlength='50' style='width: 300px;' value='" + Infrastructure.Label + "'></div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Comment : </label></div><div><input ='text' id='formComment' class='text' maxlength='50' style='width: 300px;' value='" + Infrastructure.Tooltip + "'></div></div>";
+
+        this.app.ShowCustomMessage("<div class='infrastructure-form form-group' formid='" + Infrastructure.KeyValue + "'>" + formHtml + "</div>", title, this.OnInfrastructureSaveClick, null, this, null);
+        return false;
+    }
+    public OnInfrastructureSaveClick(Infrastructure: ProjectEditorUIControl) {
+        var VM = new ItemViewModel($.trim($("#formName").val()), $(".infrastructure-form").attr('formid'));
+        VM.Tooltip = $.trim($("#formComment").val());
+
+        var isOK = true;
+        if ((Infrastructure.FieldIsBlank(VM.Label))) { isOK = false; Infrastructure.app.ShowAlert("Name is mandatory !"); }
+        if (isOK) {
+            Infrastructure.AjaxCall(Infrastructure.InfrastructureSaveURL, JSON.stringify({ formVM: VM, ProjectID: Infrastructure.project.Definition.ProjectID }), Infrastructure.OnEditorSaved, Infrastructure);
         }
     }
     public OnEditorSaved(response, context: ProjectEditorUIControl) {

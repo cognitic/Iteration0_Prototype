@@ -12,6 +12,8 @@ namespace Iteration0.Business.Domain.Entities
         public string Title { get; set; }
         public string CodeName { get; set; }
         public string Brief { get; set; }
+        public string ExternalCode { get; set; }
+        public string ExternalURL { get; set; }
         public int OwnedBy { get; set; }
         public bool IsPrivateOnly { get; set; }
         public bool IsEnabled { get; set; } = true;

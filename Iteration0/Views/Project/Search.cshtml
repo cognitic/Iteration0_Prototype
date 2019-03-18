@@ -1,19 +1,55 @@
 ﻿@{
-    ViewBag.Title = "Search";
-    ViewBag.AddButtonLabel = "Search";
+    ViewBag.Title = "Search For ";
+    ViewBag.AddButtonLabel = "";
 }
 
 <div class="app-page-index">
-    <div class="underlined-row">
-        <div><h1>RESULTS</h1></div>
-    </div>
-    <p>WORK IN PROGRESS</p>
-    <div class="underlined-row">
-    </div>
+    @{
+        if (ViewBag.SearchResults.Count > 0)
+        {
+            foreach (var item in ViewBag.SearchResults)
+            {
+                <div class="search-result">
+    @{
+                <div class="search-result-header">
+                    <a class="u" href="/Project/RessourceEditor?RessourceID=@item.RessourceId">@@@item.RessourceName</a>
+                </div>
+
+                if (@item.HasSearchResultInDefinition)
+                {
+                    if (item.DefinitionExtract.Length > 0)
+                    {
+                        <p>@item.DefinitionExtract</p>
+                    }
+                    else
+                    {
+                        <p>No Definition Yet</p>
+                    }
+                }
+                if (@item.HasSearchResultInRequirement)
+                {
+                    <p>
+    @{
+                    <span class="req-tag"><a href="/Project/UseCaseEditor?FunctionID=@(item.RessourceId + "#r" + @item.RequirementId)"># @item.RequirementId </a></span>
+                    if (@item.RequirementExtract.Length > 0)
+                    {
+                        @item.RequirementExtract
+                    }
+                    else
+                    {
+                            @("No Behavior Description Yet")
+                            }
+                }
+                        </p>
+                }
+            }
+                </div>
+            }
+        }
+        else
+        {
+            <div class="tac">No Results Found !</div>
+        }
+    }
 </div>
-<script type="text/javascript">
-    $('#app-page-main-action-button').click(function (e) {
-        Iteration0APP.ShowAlert('Coming soon !');
-        return false;
-        });
-</script>
+

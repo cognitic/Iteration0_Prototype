@@ -20,7 +20,7 @@ namespace Iteration0
     {
         protected void Application_Start()
         {
-            Automapper_start();
+            MappingService.InitializeAutoMapper();
             // Register MVC-related dependencies.
             var builder = new ContainerBuilder();
             builder.RegisterType<ProjectRepository>().As<IProjectRepository>();
@@ -86,70 +86,6 @@ namespace Iteration0
             //{
             //    HttpContext.Current.AddError(exceptionToThrow);
             //}
-        }
-
-        void Automapper_start()
-        {
-            // Register View Models-related datamapping
-            Mapper.Initialize(cfg => {
-                //cfg.AddProfile<AppProfile>();
-                cfg.CreateMap<ProjectDefinition, ProjectDefinitionFormViewModel>()
-                    .ForMember(dest => dest.ProjectID, opts => opts.MapFrom(src => src.Id))
-                    .ReverseMap();
-                cfg.CreateMap<ProjectContextType, ProjectContextTypeViewModel>()
-                    .ForMember(dest => dest.ContextTypeID, opts => opts.MapFrom(src => src.Id))
-                    .ReverseMap();
-                cfg.CreateMap<ProjectContextType, ItemViewModel>()
-                    .ForMember(dest => dest.KeyValue, opts => opts.MapFrom(src => src.Id))
-                    .ForMember(dest => dest.Label, opts => opts.MapFrom(src => src.Name))
-                    .ReverseMap();
-                cfg.CreateMap<ProjectContext, ProjectContextViewModel>()
-                    .ForMember(dest => dest.ContextID, opts => opts.MapFrom(src => src.Id))
-                    .ReverseMap();
-                cfg.CreateMap<ProjectContext, ItemViewModel>()
-                    .ForMember(dest => dest.ParentKeyValue, opts => opts.MapFrom(src => src.Type.Id))
-                    .ForMember(dest => dest.KeyValue, opts => opts.MapFrom(src => src.Id))
-                    .ForMember(dest => dest.Label, opts => opts.MapFrom(src => src.Name))
-                    .ForMember(dest => dest.SortOrder, opts => opts.MapFrom(src => src.SortOrder))
-                    .ReverseMap();
-                cfg.CreateMap<RessourceDefinition, RessourceDefinitionViewModel>()
-                    .ForMember(dest => dest.RessourceID, opts => opts.MapFrom(src => src.Id))
-                    .ReverseMap();
-                cfg.CreateMap<RessourceRequirement, RequirementViewModel>()
-                    .ForMember(dest => dest.RequirementID, opts => opts.MapFrom(src => src.Id))
-                    .ForMember(dest => dest.RessourceID, opts => opts.MapFrom(src => src.Ressource.Id))
-                    .ReverseMap();
-                cfg.CreateMap<RessourceDefinition, ItemViewModel>()
-                    .ForMember(dest => dest.KeyValue, opts => opts.MapFrom(src => src.Id))
-                    .ForMember(dest => dest.Label, opts => opts.MapFrom(src => src.Name))
-                    .ReverseMap();
-                //cfg.CreateMap<RequiremenContext, RequirementViewModel>()
-                //    .ForMember(dest => dest.RequirementID, opts => opts.MapFrom(src => src.Id))                  
-                //    .ReverseMap();
-                cfg.CreateMap<RessourceAssociation, RessourceAssociationViewModel>()
-                    .ForMember(dest => dest.AssociationId, opts => opts.MapFrom(src => src.Id))
-                    .ForMember(dest => dest.RessourceID, opts => opts.MapFrom(src => src.Ressource.Id))
-                    .ForMember(dest => dest.ParentID, opts => opts.MapFrom(src => src.Parent.Id))
-                    .ReverseMap();
-                cfg.CreateMap<ProjectVersion, VersionViewModel>()
-                    .ForMember(dest => dest.VersionID, opts => opts.MapFrom(src => src.Id))
-                    .ReverseMap();
-                cfg.CreateMap<ProjectProduct, ItemViewModel>()
-                    .ForMember(dest => dest.KeyValue, opts => opts.MapFrom(src => src.Id))
-                    .ForMember(dest => dest.Tooltip, opts => opts.MapFrom(src => src.Mission))
-                    .ForMember(dest => dest.Label, opts => opts.MapFrom(src => src.Name))
-                    .ReverseMap();
-                cfg.CreateMap<RessourceDefinition, BoardItemViewModel>()
-                .ForMember(dest => dest.ItemID, opts => opts.MapFrom(src => src.Id))
-                .ForMember(dest => dest.PoolID, opts => opts.MapFrom(src => src.Context.Id))
-                .ForMember(dest => dest.ItemType, opts => opts.MapFrom(src => src.RessourceEnumType))
-                .ReverseMap();
-                //rsc.Name = formVM.Name; rsc.ProjectContextId = formVM.PoolID; rsc.ScaleOrder = formVM.ScaleOrder; rsc.StepOrder = formVM.StepOrder; rsc.SortOrder = formVM.SortOrder;
-                //cfg.CreateMap<VersionRequirement, VersionRequirementViewModel>()
-                //    .ForMember(dest => dest.VersionID, opts => opts.MapFrom(src => src.Version.Id))
-                //    .ForMember(dest => dest.RequirementID, opts => opts.MapFrom(src => src.Requirement.Id))
-                //    .ReverseMap();
-            });
         }
 
     }

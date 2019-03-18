@@ -58,7 +58,7 @@ namespace Iteration0.Controllers
         {
             ViewBag.ProjectID = ProjectID;
             ProjectEditorViewModel editorVM = _projectService.GetProjectEditorViewModelFor(ProjectID);
-            ViewBag.EditorTitle = editorVM.Definition.Title;
+            //ViewBag.EditorTitle = editorVM.Definition.Title;
             ViewBag.editorVMAsJson = new JavaScriptSerializer().Serialize(editorVM);
             return View();
         }
@@ -69,7 +69,23 @@ namespace Iteration0.Controllers
             //ViewBag.AllItems = _projectService.SummarizeAllConceptsFor(ProjectID);
             ViewBag.editorVMAsJson = new JavaScriptSerializer().Serialize(_projectService.GetDomainConceptsBoardEditorViewModelFor(ProjectID));
             return View();
-        }
+        }      
+
+        //[HttpGet]// GET: /Project/Scaffold
+        //public FileResult Scaffold(int ProjectID)
+        //{
+        //    //GenerateScaffoldZIPFileFor
+        //    //ViewBag.ProjectID = ProjectID;
+        //    //using (ZipFile zip = new ZipFile())
+        //    //{
+        //    //    zip.AddDirectory(Server.MapPath("~/Directories/hello"));
+        //    //    MemoryStream output = new MemoryStream();
+        //    //    zip.Save(output);
+        //    //    return File(output.ToArray(), "application/zip", "scaffold.zip");
+        //    //}
+        //    return File();
+        //}
+
         // GET: /Project/DomainConceptEditor
         public ActionResult DomainConceptEditor(int ConceptID)
         {
@@ -113,11 +129,11 @@ namespace Iteration0.Controllers
             ViewBag.editorVMAsJson = new JavaScriptSerializer().Serialize(editorVM);
             return View();
         }
-        // GET: /Project/Roadmap
-        public ActionResult Roadmap(int ProjectID)
+        // GET: /Project/ProductLine
+        public ActionResult ProductLine(int ProjectID)
         {
             ViewBag.ProjectID = ProjectID;
-            ViewBag.AllItems = _projectService.GetProductViewModelFor( ProjectID);
+            ViewBag.AllItems = _projectService.GetProductViewModelsFor( ProjectID);
             var ProductItems = new List<ItemViewModel>();
             foreach (ProductViewModel prod in ViewBag.AllItems)
             {
@@ -153,8 +169,11 @@ namespace Iteration0.Controllers
             return View();
         }
         // GET: Project/Search
-        public ActionResult Search()
+        public ActionResult Search(int ProjectID, string Query)
         {
+            ViewBag.ProjectID = ProjectID;
+            ViewBag.EditorTitle = Query;
+            ViewBag.SearchResults = _projectService.GetSearchResultViewModelsFor(ProjectID, Query);
             return View();
         }
         // GET: Project/About
@@ -225,9 +244,9 @@ namespace Iteration0.Controllers
                 return Json(editorVM);
             }
         }
-        // POST: /Project/RemoveRessouceDefinition
+        // POST: /Project/RemoveRessourceDefinition
         [HttpPost]
-        public JsonResult RemoveRessouceDefinition(int ressourceID, int projectID)
+        public JsonResult RemoveRessourceDefinition(int ressourceID, int projectID)
         {
             if (true)
             {
@@ -321,7 +340,7 @@ namespace Iteration0.Controllers
         [HttpPost]
         public JsonResult CreateEditVersionRequirementWith(ItemViewModel formVM, int ProjectID)
         {
-            createEditDelegate<ItemViewModel> editorDelegate = _projectService.CreateEditVersionRequirementWithWith;
+            createEditDelegate<ItemViewModel> editorDelegate = _projectService.CreateEditVersionRequirementWith;
             string result = GetControllerStatusForDelegate<ItemViewModel>(editorDelegate, ref formVM, ProjectID);
             if (result == "OK")
             {
@@ -350,7 +369,17 @@ namespace Iteration0.Controllers
                 return Json(result);
             }
         }
-
+        // POST: /Project/CreateEditProjectInfrastructure
+        [HttpPost]
+        public JsonResult CreateEditProjectInfrastructure(ItemViewModel formVM, int ProjectID)
+        {
+            int InfrastructureId = 0;
+            if (formVM.KeyValue != null) int.Parse(formVM.KeyValue);
+            RessourceDefinitionViewModel rsc = (InfrastructureId > 0) ? _projectService.GetRessourceDefinitionFor(InfrastructureId) : new RessourceDefinitionViewModel();
+            rsc.Name = formVM.Label; rsc.Definition = formVM.Tooltip; rsc.RessourceEnumType = (short)RessourceEnumType.Infrastructure; rsc.ScaleOrder = 3; rsc.StepOrder = 3; rsc.SortOrder = 99;
+            return CreateEditRessourceDefinition(rsc, ProjectID);
+        }
+        
         // POST: /Project/CreateEditProjectVersion
         [HttpPost]
         public JsonResult CreateEditProjectVersion(VersionViewModel formVM, int ProjectID)
@@ -372,9 +401,12 @@ namespace Iteration0.Controllers
         [HttpPost]
         public JsonResult CreateEditBoardItem(BoardItemViewModel formVM, int ProjectID)
         {
-            RessourceDefinitionViewModel rsc=(formVM.ItemID > 0) ? _projectService.GetRessourceDefinitionFor(formVM.ItemID) : new RessourceDefinitionViewModel();
-            rsc.Name = formVM.Name; rsc.ProjectContextId = formVM.PoolID; rsc.RessourceEnumType = (short)formVM.ItemType ; rsc.ScaleOrder = formVM.ScaleOrder; rsc.StepOrder = formVM.StepOrder; rsc.SortOrder = formVM.SortOrder;
-            createEditDelegate<RessourceDefinitionViewModel> editorDelegate = _projectService.CreateEditRessouceDefinitionWith;
+            RessourceDefinitionViewModel rsc = (formVM.ItemID > 0) ? _projectService.GetRessourceDefinitionFor(formVM.ItemID) : new RessourceDefinitionViewModel();
+            rsc.Name = formVM.Name; rsc.ProjectContextId = formVM.PoolID; rsc.RessourceEnumType = (short)formVM.ItemType; rsc.ScaleOrder = formVM.ScaleOrder; rsc.StepOrder = formVM.StepOrder; rsc.SortOrder = formVM.SortOrder;
+            return CreateEditRessourceDefinition(rsc, ProjectID);
+        }
+        public JsonResult CreateEditRessourceDefinition(RessourceDefinitionViewModel rsc, int ProjectID)
+            {createEditDelegate<RessourceDefinitionViewModel> editorDelegate = _projectService.CreateEditRessouceDefinitionWith;
             string result = GetControllerStatusForDelegate<RessourceDefinitionViewModel>(editorDelegate, ref rsc, ProjectID);
             if (result == "OK")
             {
@@ -386,6 +418,8 @@ namespace Iteration0.Controllers
                         return Json(_projectService.GetUseCasesBoardEditorViewModelFor(ProjectID));
                     case (short)RessourceEnumType.Component:
                         return Json(_projectService.GetUIComponentsBoardEditorViewModelFor(ProjectID));
+                    case (short)RessourceEnumType.Infrastructure:
+                        return Json(_projectService.GetProjectEditorViewModelFor(ProjectID));
                     default:
                         return Json("Wrong Ressource Id !");
                 }
@@ -436,7 +470,8 @@ namespace Iteration0.Controllers
             string result = GetControllerStatusForDelegate<RequirementViewModel>(editorDelegate, ref formVM, ProjectID);
             if (result == "OK")
             {
-                var editorVM = _projectService.GetRessourceEditorViewModelFor(formVM.RessourceID);
+                //var editorVM = _projectService.GetRessourceEditorViewModelFor(formVM.RessourceID);
+                var editorVM = _projectService.GetUseCaseEditorViewModelFor(formVM.UseCaseID);
                 return Json(editorVM);
             }
             else

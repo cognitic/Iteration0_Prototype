@@ -11,6 +11,7 @@ namespace Iteration0.Business.Domain.Entities
         public string Name { get; set; }
         public short ContextEnumType { get; set; }
         public short ScaleOrder { get; set; }
+        public bool UsedAsProductAlternative { get; set; }
         public bool IsEnabled { get; set; } = true;
 
         public virtual ICollection<ProjectContext> Contexts { get; set; }

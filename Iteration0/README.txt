@@ -41,7 +41,7 @@ How to set up your Iteration0 Plateform:
 				Fields +
 				Requirements +
 					Variation Point *	
-	>Roadmap
+	>ProductLine
 		Overview
 			Released UC
 			Variability UC with Variant on Total		

@@ -7,23 +7,28 @@ namespace Iteration0.Business.Domain.Entities
     public class RessourceRequirement : IEntity
     {
         public short RequirementEnumType { get; set; }
-        public int Priority { get; set; }
-        public string Title { get; set; }
+        public string Behavior { get; set; }
         public string Description { get; set; }
-        public string Attribute1Value { get; set; }
-        public string Attribute2Value { get; set; }
-        public string Attribute3Value { get; set; }
-        public string Attribute4Value { get; set; }
-        public string Attribute5Value { get; set; }
+        public int Priority { get; set; }
+        public string ExternalCode { get; set; }
+        public string ExternalURL { get; set; }
+        public string FieldValue1 { get; set; }
+        public string FieldValue2 { get; set; }
+        public string FieldValue3 { get; set; }
+        public string FieldValue4 { get; set; }
+        public string FieldValue5 { get; set; }
+        public bool IsAlternative { get { return (RequirementEnumType == (short)Services.RequirementEnumType.LogicAlternative || RequirementEnumType == (short)Services.RequirementEnumType.UIAlternative); } }
         public bool IsEnabled { get; set; } = true;
         public int SortOrder { get; set; }
-        public string WorkItemURL { get; set; }
 
-        //public virtual RessourceDefinition Ressource { get; set; }
-        public virtual RessourceDefinition Ressource { get; set; }
-        public virtual ICollection<ProjectContext> Contexts { get; set; }
+        public virtual ProjectDefinition Project { get; set; }
+        public virtual RessourceDefinition UseCase { get; set; }
+        public virtual RessourceDefinition Concept { get; set; }
+        public virtual RessourceDefinition UI { get; set; }
+        public virtual RessourceDefinition Infrastructure { get; set; }
+        public virtual ICollection<ProjectContext> Variants { get; set; }
         public virtual ICollection<ProjectVersion> Versions { get; set; }
-        //public virtual ICollection<RequiremenContext> Contexts { get; set; }
-        //public virtual ICollection<VersionRequirement> Versions { get; set; }
+        public virtual ICollection<RessourceRequirement> Alternatives { get; set; }
+        public virtual RessourceRequirement DefaultBehavior { get; set; }
     }
 }

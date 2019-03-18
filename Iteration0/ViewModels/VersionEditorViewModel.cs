@@ -28,6 +28,10 @@ namespace Iteration0.ViewModels
         public short VersionEnumType { get; set; }
         public short ReleasedMonth { get; set; }
         public int ReleasedYear { get; set; }
-        public List<ItemViewModel> Requirements { get; set; }
+        public bool IsInProgress { get; set; }
+        public int CompletedAlternativeCount { get; set; }
+        public int AlternativeCount { get; set; }
+        public string ProgressName { get; set; }
+        public string MonthName { get; set; }
     }
 }

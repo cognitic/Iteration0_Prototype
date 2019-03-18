@@ -1,12 +1,12 @@
 ﻿@{
     ViewBag.Title = "Use Cases Board";
     ViewBag.AddButtonLabel = "Add New Use Case";
-    ViewBag.GeneratorTitle = "Download Documentation";
+    ViewBag.GeneratorTitle = "Download Requirements";
 }
 
 <div id="board" class="processes-board"></div>
 
 <script type="text/javascript">
-    var boardItemAPI = { ItemEditorURL: "/Project/UseCaseEditor?FunctionID=", ItemSaveURL: "/Project/CreateEditBoardItem", ItemRemoveURL: "/Project/RemoveRessouceDefinition" };
+    var boardItemAPI = { ItemEditorURL: "/Project/UseCaseEditor?FunctionID=", ItemSaveURL: "/Project/CreateEditBoardItem", ItemRemoveURL: "/Project/RemoveRessourceDefinition" };
     Iteration0APP.AddControl(new BoardEditorUIControl(@Html.Raw(ViewBag.editorVMAsJson), boardItemAPI));
 </script>

@@ -17,25 +17,29 @@ namespace Iteration0.Business.Interfaces
     public interface IProjectService
     {
         void ConfigureDependencies(IProjectRepository SvcProjectRepository, IRessourceRepository ressourceRepository, IMappingService SvcMapperService);
-        //bool Validate(ProjectEditorViewModel projectEditorViewModel);
+
         //Reader
         List<ProjectSummaryViewModel> SummarizeAllProjects();
         BoardEditorViewModel GetDomainConceptsBoardEditorViewModelFor(int ProjectId);
         BoardEditorViewModel GetUseCasesBoardEditorViewModelFor(int ProjectId);
         BoardEditorViewModel GetUIComponentsBoardEditorViewModelFor(int ProjectId);
-        //List<ConceptSummaryViewModel> SummarizeAllConceptsFor(int ProjectId);
-        //List<FunctionSummaryViewModel> SummarizeAllUseCasesFor(int ProjectId);
-        //List<ComponentSummaryViewModel> SummarizeAllUIComponentFor(int ProjectId);
-        //List<ProjectHistoryViewModel> SummarizeProjectHistoryFor(int ProjectId);
-        List<ProductViewModel> GetProductViewModelFor(int  ProjectID);
+        List<ProductViewModel> GetProductViewModelsFor(int  ProjectID);
         RessourceDefinitionViewModel GetRessourceDefinitionFor(int RessourceId);
         ProjectEditorViewModel GetProjectEditorViewModelFor(int ProjectId);
         VersionEditorViewModel GetVersionEditorViewModelFor(int VersionId);
+        List<SearchResultViewModel> GetSearchResultViewModelsFor(int ProjectId, string Query);
         dynamic GetRessourceEditorViewModelFor(int RessourceId);
         DomainConceptEditorViewModel GetDomainConceptEditorViewModelFor(int ConceptId);
         UseCaseEditorViewModel GetUseCaseEditorViewModelFor(int UseCaseId);
+        RequirementViewModel GetRequirementViewModelFor(int requirementID);
         UIComponentEditorViewModel GetUIComponentEditorViewModelFor(int UIComponentId);
         List<ItemViewModel> GetAllProjectAsItemViewModel();
+        List<ItemViewModel> GetAllUseCaseViewModelsFor(int ProjectId);
+        List<ItemViewModel> GetAllRequirementViewModelsFor(int ProjectId);
+        List<RessourceAssociationViewModel> GetAllAssociationViewModelsFor(int ProjectId);
+        List<VersionViewModel> GetAllVersionViewModelsFor(int ProjectId);
+
+
 
         //Writer
         void RemoveProjectContextWith(int contextID, int ProjectID, int UserId);
@@ -50,11 +54,10 @@ namespace Iteration0.Business.Interfaces
         void CreateEditRessouceDefinitionWith(ref RessourceDefinitionViewModel viewModel, int UserId, int ProjectID);
         void CreateEditRessouceAssociationWith(ref RessourceAssociationViewModel viewModel, int UserId, int ProjectID);
         void CreateEditRessourceRequirementWith(ref RequirementViewModel viewModel, int UserId, int ProjectID);
-        //void CreateEditRessourceAssociationWith(RessourceDefinitionViewModel viewModel, int UserId);
         void CreateEditProjectContextTypesWith(ref ProjectContextTypeViewModel viewModel, int UserId, int ProjectID);
         void CreateEditProjectContextsWith(ref ProjectContextViewModel viewModel, int UserId, int ProjectID);
         void CreateEditProjectProductWith(ref ItemViewModel viewModel, int UserId, int ProjectID);
-        void CreateEditVersionRequirementWithWith(ref ItemViewModel viewModel, int UserId, int ProjectID);        
+        void CreateEditVersionRequirementWith(ref ItemViewModel viewModel, int UserId, int ProjectID);        
         void CreateEditProjectVersionsWith(ref VersionViewModel viewModel, int UserId, int ProjectID);
     }
     public interface IMockUpGeneratorService
@@ -72,12 +75,13 @@ namespace Iteration0.Business.Interfaces
         List<RessourceDefinitionViewModel> BuildRessourceDefinitionViewModelFor(List<RessourceDefinition> source);
         List<RessourceAssociationViewModel> BuildRessourceAssociationViewModelFor(List<RessourceAssociation> source);
         RequirementViewModel BuildRequirementViewModelFor(RessourceRequirement source);
-        List<RequirementViewModel> BuildRequirementViewModelFor(List<RessourceRequirement> source);
+        List<RequirementViewModel> BuildRequirementViewModelFor(List<RessourceRequirement> source, List<ProjectProduct> ProjectProducts, List<ProjectContextType> VariationPoints);
         List<ProjectContextViewModel> BuildProjectContextViewModelFor(List<ProjectContext> source);
         List<ItemViewModel> BuildItemViewModelFor(List<ProjectContextType> source);
         List<ItemViewModel> BuildItemViewModelFor(List<ProjectContext> source);
         List<ItemViewModel> BuildItemViewModelFor(List<RessourceDefinition> source);
         List<ItemViewModel> BuildItemViewModelFor(List<ProjectProduct> source);
+        List<ItemViewModel> BuildItemViewModelFor(List<RessourceRequirement> source);
         List<BoardPoolViewModel> BuildBoardPoolViewModelFor(List<ItemViewModel> Pools, List<RessourceDefinition> Ressources);
 
         //->BUSINESS
@@ -87,6 +91,7 @@ namespace Iteration0.Business.Interfaces
         ProjectVersion ReBuildProjectContextTypeWithViewModel(VersionViewModel source);
         //VersionRequirement ReBuildVersionRequirementWithViewModel(VersionRequirementViewModel source);
         RessourceDefinition ReBuildRessourceDefinitionWithViewModel(RessourceDefinitionViewModel source);
+        RessourceDefinition ReBuildRessourceDefinitionWithViewModel(ItemViewModel source);
         RessourceAssociation ReBuildRessourceAssociationWithViewModel(RessourceAssociationViewModel source);
         RessourceRequirement ReBuildRessourceRequirementWithViewModel(RequirementViewModel source);
         //RequiremenContext ReBuildRessourceRequirementContextWithViewModel(RequirementViewModel source);

@@ -16,8 +16,9 @@ namespace Iteration0.Business.Domain
             this._ressource = ressource;
             this.Definition = ressource.Definition;
             this._Scenarios = ressource.Requirements.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Scenario).OrderBy(x => x.SortOrder).ToList();
-            this._UISteps = ressource.Associations.Where( x => x.AssociationEnumType == (short)AssociationEnumType.UISteps).OrderBy(x => x.SortOrder).ToList();
-            this._Requirements = ressource.Requirements.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Rule).OrderBy(x => x.SortOrder).ToList();
+            //this._UISteps = ressource.Associations.Where( x => x.AssociationEnumType == (short)AssociationEnumType.UISteps).OrderBy(x => x.SortOrder).ToList();
+            this._Requirements = ressource.Requirements.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Default).OrderBy(x => x.SortOrder).ToList();
+            this._Alternatives = ressource.Requirements.Where(x => x.IsEnabled == true && x.IsAlternative == true).OrderBy(x => x.SortOrder).ToList();
         }
     
     private List<RessourceRequirement> _Scenarios = new List<RessourceRequirement>();
@@ -45,6 +46,15 @@ namespace Iteration0.Business.Domain
             return _Requirements;
         }
     }
+    private List<RessourceRequirement> _Alternatives = new List<RessourceRequirement>();
+    public List<RessourceRequirement> Alternatives
+        {
+        get
+        {
+            return _Alternatives;
+        }
+    }
         
+
     }
 }

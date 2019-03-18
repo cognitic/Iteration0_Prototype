@@ -3,42 +3,44 @@
     ViewBag.AddButtonLabel = "";
 }
 
-<div id="editor">
-    <div class="editor-section">
-        <div>
-            <span class="l"><a id="edit-definition-link" href="/">Edit</a></span><div class="cb"></div>
-        </div>
-        <div class="editor-definition-wrapper">
-            <div class="definition-speech">
-                <div id="editor-definition-category" class="context-tag"></div><div id="editor-definition-code" class="req-tag"></div>
-                <p id="editor-definition-zone" style="Line-Height:34px; margin-top:8px;"></p>
+<div class="editor-header-background">
+    <div class="tac">
+        <div class="editor-header-bubble">
+            <h1 class="editor-header-bubble-title"></h1>
+            <div class="tac"><div class="screenshot">No Screenshots</div></div>
+            <div>
+                <p class="editor-header-bubble-definition"></p>
+                <a id="add-screen-link" class="u action-link" href="/">Upload Screens</a> &nbsp; 
+                <a id="edit-definition-link" class="u action-link" href="/">Edit</a>
             </div>
         </div>
     </div>
-
-    <div class="editor-section">
-        <div><span class="r"><a id="add-screen-link" href="/">Add +</a></span><h2>Screens</h2></div>
-        <div class="underlined-row">
-        </div>
-        <div id="editor-screens-wrapper">
-            <div class="tac"><div class="screenshot">No Screens yet</div></div>
-        </div>
-    </div>
-
+</div>
+<div id="editor">
     <div class="editor-section">
         <div><span class="r"><a id="add-field-link" href="/">Add +</a></span><h2>Fields</h2></div>
         <div class="underlined-row">
         </div>
-        <div id="editor-fields-wrapper">            
+        <div id="editor-fields-wrapper">
             <table style="width:100%">
                 <thead>
                     <tr>
-                        <th>Field</th><th>Type</th><th>Required</th><th>Default</th><th>Validation</th><th></th>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Default</th>
+                        <th>Validation</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>No Fields yet</td><td>-</td><td>-</td><td></td><td></td><td></td>
+                        <td>No Fields yet</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                     </tr>
                 </tbody>
             </table>
@@ -46,13 +48,23 @@
     </div>
 
     <div class="editor-section">
-        <div><span class="r"><a id="add-requirement-link" href="/">Add +</a></span><h2>Requirements</h2></div>
+        <div><h2>Required Behaviors</h2></div>
         <div class="underlined-row">
         </div>
         <div id="editor-requirements-wrapper">
-            <div class="tac">No Requirements yet</div>
+            <div class="tac">No Behaviors yet</div>
         </div>
     </div>
+
+    <div class="editor-section">
+        <div><h2>Alternative Behaviors</h2></div>
+        <div class="underlined-row">
+        </div>
+        <div id="editor-alternatives-wrapper">
+            <div class="tac">No Alternatives yet</div>
+        </div>
+    </div>
+
 
 
 </div>

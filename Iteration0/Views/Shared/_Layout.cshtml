@@ -6,7 +6,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title>Iteration0 | @ViewBag.Title</title>
+    @if (@ViewBag.EditorTitle != null)
+    {
+    <title>Iteration0 | @ViewBag.EditorTitle</title>
+    }
+    else { 
+        <title>Iteration0 | @ViewBag.Title</title>
+    }
     @*<link href="/Styles/css/semantic/semantic.min.css" rel="stylesheet" />
         <link href="/Styles/css/semantic/components/popup.min.css" rel="stylesheet" />
         <link href="/Styles/css/semantic/components/transition.min.css" rel="stylesheet" />
@@ -18,7 +24,7 @@
         @Html.Raw(@Session["CustomCSSRules"])
     </style>
     <script type="text/javascript">
-                Iteration0APP=new Iteration0();
+        Iteration0APP = new Iteration0();
     </script>
 </head>
 <body>
@@ -34,7 +40,14 @@
                             <a href="/Project/About">About Iteration0</a>
                         </div>
                     </div>
-                    <input type='text' id='app-search-field' class='texttype' maxlength='30' placeholder=' &#8981; Search Name or Tag Operator..' />
+                    @if (@ViewBag.ProjectID > 0)
+                    {
+                    <form class="search-box" action="/Project/Search" method="get">
+                        <input name="ProjectID" type='number' class='h' value="@ViewBag.ProjectID" />
+                        <input name="Query" type='text' id='app-search-field' class='texttype' maxlength='30' placeholder=' &#8981; Search Name or Tag Operator..' />
+                        <input type="submit"  class='h' />
+                    </form>
+                    }
                 </div>
                 <a class="logo l" href="/Project/index">Iteration<img src="~/Styles/images/zero_logo.png" /></a>
             </div>
@@ -46,7 +59,7 @@
                 <li><a href="/Project/DomainConcepts?ProjectID=@ViewBag.ProjectID">DOMAIN</a></li>
                 <li><a href="/Project/UseCases?ProjectID=@ViewBag.ProjectID">USE CASES</a></li>
                 <li><a href="/Project/UIComponents?ProjectID=@ViewBag.ProjectID">UI</a></li>
-                <li><a href="/Project/Roadmap?ProjectID=@ViewBag.ProjectID">ROADMAP</a></li>
+                <li><a href="/Project/ProductLine?ProjectID=@ViewBag.ProjectID">PRODUCT LINE</a></li>
 }
                 </ul>
             </div>
@@ -71,7 +84,7 @@
                 @if (@ViewBag.EditorTitle != null)
                 {
                 <div class="app-page-title l">
-                    <h1>@ViewBag.Title / <span class="fmin2">@ViewBag.EditorTitle</span></h1>
+                    <h1>@ViewBag.Title / <span class="fmin">@ViewBag.EditorTitle</span></h1>
                 </div>
                     <div class="cb"></div>
                 }

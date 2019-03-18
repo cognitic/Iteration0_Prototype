@@ -16,6 +16,7 @@ namespace Iteration0.ViewModels
         public List<ProjectContextViewModel> BusinessProcesses { get; set; }
         public List<ProjectContextViewModel> Features { get; set; }
         public List<ItemViewModel> Products { get; set; }
+        public List<ItemViewModel> Infrastructures { get; set; }
     }
     public class ProjectDefinitionFormViewModel 
     {
@@ -32,6 +33,7 @@ namespace Iteration0.ViewModels
         public short ContextEnumType { get; set; }
         public string Name { get; set; }
         public int ScaleOrder { get; set; }
+        public bool UsedAsProductAlternative { get; set; } 
         public List<ProjectContextViewModel> Contexts { get; set; }
     }
     public class ProjectContextViewModel

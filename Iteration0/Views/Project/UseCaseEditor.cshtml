@@ -3,45 +3,65 @@
     ViewBag.AddButtonLabel = "";
 }
 
-<div id="editor">
-    <div class="editor-section">
-        <div>
-            <span class="l"><a id="edit-definition-link" href="/">Edit</a></span><div class="cb"></div>
-        </div>
-        <div class="editor-definition-wrapper">
-            <div class="definition-speech">
-                <div id="editor-definition-category" class="context-tag"></div><div id="editor-definition-code" class="req-tag"></div>
-                <p id="editor-definition-zone" style="Line-Height:34px; margin-top:8px;"></p>
+<div class="editor-header-background">
+    <div class="tac">
+        <div class="editor-header-bubble">
+            <h1 class="editor-header-bubble-title"></h1>
+            <div>
+                <p class="editor-header-bubble-definition"></p>
+                <a id="edit-definition-link" class="u action-link" href="/">Edit</a>
             </div>
         </div>
     </div>
+</div>
+
+<div id="editor">
+
+    @*<div class="editor-section">
+            <div><span class="r"><a id="add-scenario-link" href="/">Add +</a></span><h2>Scenarios</h2></div>
+            <div class="underlined-row">
+            </div>
+            <div id="editor-scenarios-wrapper">
+                <div class="tac">No Scenarios yet</div>
+            </div>
+        </div>
+
+        <div class="editor-section">
+            <div><span class="r"><a id="add-uistep-link" href="/">Add +</a></span><h2>UI Steps</h2></div>
+            <div class="underlined-row">
+            </div>
+            <div id="editor-uisteps-wrapper">
+                <div class="tac">No UI Steps yet</div>
+            </div>
+        </div>*@
 
     <div class="editor-section">
-        <div><span class="r"><a id="add-scenario-link" href="/">Add +</a></span><h2>Scenarios</h2></div>
-        <div class="underlined-row">
-        </div>
-        <div id="editor-scenarios-wrapper">
-            <div class="tac">No Scenarios yet</div>
-        </div>
-    </div>
-
-    <div class="editor-section">
-        <div><span class="r"><a id="add-uistep-link" href="/">Add +</a></span><h2>UI Steps</h2></div>
-        <div class="underlined-row">
-        </div>
-        <div id="editor-uisteps-wrapper">
-            <div class="tac">No UI Steps yet</div>
-        </div>
-    </div>
-
-    <div class="editor-section">
-        <div><span class="r"><a id="add-requirement-link" href="/">Add +</a></span><h2>Requirements</h2></div>
+        <div><span class="r"><a id="add-requirement-link" href="/">Add +</a></span><h2>Required Behaviors</h2></div>
         <div class="underlined-row">
         </div>
         <div id="editor-requirements-wrapper">
-            <div class="tac">No Requirements yet</div>
+            <div class="tac">No Behaviors yet</div>
         </div>
     </div>
+
+    <div class="editor-section">
+        <div><span class="r"><a id="add-alternative-link" href="/">Add +</a></span><h2>Alternative Behaviors</h2></div>
+        <div class="underlined-row">
+        </div>
+        <div id="editor-alternatives-wrapper">
+            <div class="tac">No Alternatives yet</div>
+        </div>
+    </div>
+
+    <div class="editor-section">
+        <div><h2>Depreciated Behaviors</h2></div>
+        <div class="underlined-row">
+        </div>
+        <div id="editor-alternatives-wrapper">
+            <div class="tac">No Depreciated Behaviors yet</div>
+        </div>
+    </div>
+
 
 
 </div>

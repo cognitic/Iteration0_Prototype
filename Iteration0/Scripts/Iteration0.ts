@@ -18,7 +18,7 @@ class Iteration0{
     }    
     public AddControl(control: RequirementUIControl) {
         control.app = this;
-        control.Start();
+        //control.Start();
     }
     public ShowFrozenScreen() {
         if (this.backScreen == null) {
@@ -63,6 +63,7 @@ class ProjectEditorViewModel {
     BusinessProcesses: Array<ProjectContextViewModel>;
     Features: Array<ProjectContextViewModel>;
     Products: Array<ItemViewModel>;
+    Infrastructures: Array<ItemViewModel>;
     constructor() {
         this.Definition = new ProjectDefinitionFormViewModel();
     }     
@@ -79,6 +80,7 @@ class ProjectContextTypeViewModel {
     ContextEnumType: number;
     Name: string;
     ScaleOrder: number;
+    UsedAsProductAlternative: boolean;
     Contexts: Array<ProjectContextViewModel>;
 }
 class ProjectContextViewModel {
@@ -109,48 +111,71 @@ class VersionViewModel {
     VersionEnumType: number;
     ReleasedMonth: number;
     ReleasedYear: number;
-    Requirements: Array<ItemViewModel>;
+    IsInProgress : boolean;
+    CompletedAlternativeCount: number;
+    AlternativeCount: number;
+    ProgressName: string;
+    MonthName: string;
 }
 class RequirementViewModel {
     RequirementID: number;
-    RessourceID: number;
     RequirementEnumType: number;
-    Priority: number;
-    Title: string;
+    Behavior: string;
     Description: string;
-    Attribute1Value: string;
-    Attribute2Value: string;
-    Attribute3Value: string;
-    Attribute4Value: string;
-    Attribute5Value: string;
-    Variants: Array<ItemViewModel>;
-    WorkItemURL: string;
+    Priority: number;
+    //ExternalURL: string;
+    FieldValue1: string;
+    FieldValue2: string;
+    FieldValue3: string;
+    FieldValue4: string;
+    FieldValue5: string;
+    UseCaseID: number;
+    UseCase: string;
+    ConceptID: number;
+    Concept: string;
+    UIID: number;
+    UI: string;
+    InfrastructureID: number;
+    Infrastructure: string;
+    DefaultBehaviorID: number;
+    DefaultBehavior: string;
+    ScopeIDs: Array<number>;
+    ScopeSummary: string;
+    IsSelected: boolean;
+    SelectedVersionIDs: Array<number>;
+    SelectedVersionSummary: string;
 }
 class RessourceDefinitionViewModel {
     RessourceID: number;
     RessourceEnumType: number;
     Name: string;
     Definition: string;
+    Description: string;
     ScaleOrder: number;
     StepOrder: number;
     SortOrder: number;    
-    ContextID: number;
-    ContextName: string;
+    ProjectContextName: string;
+    ProjectContextId: number;
 }
 class RessourceAssociationViewModel {
     AssociationId: number;
     AssociationEnumType: number;
     ParentID: number;
+    ParentName: string;
     RessourceID: number;
+    //ParentName: string;
+    RessourceName: string;
     CustomName: string;
 }
 class DomainConceptEditorViewModel {
     ProjectID: number;
     Definition: RessourceDefinitionViewModel;
-    Attributes: Array<RessourceAssociationViewModel>;
-    HasOneAssociations: Array<RessourceAssociationViewModel>
-    HasManyAssociations: Array<RessourceAssociationViewModel>
-    Operations: Array<RessourceAssociationViewModel>;
+    HasOne: Array<RessourceAssociationViewModel>
+    HasMany: Array<RessourceAssociationViewModel>
+    PartOf: Array<RessourceAssociationViewModel>
+    PartsOf: Array<RessourceAssociationViewModel>
+    Requirements: Array<RequirementViewModel>;
+    Alternatives: Array<RequirementViewModel>;
     ProjectConcepts: Array<ItemViewModel>;
     ProjectDomainContexts: Array<ItemViewModel>;
     constructor() {
@@ -163,8 +188,13 @@ class UseCaseEditorViewModel {
     Scenarios: Array<RequirementViewModel>;
     UISteps: Array<RessourceAssociationViewModel>
     Requirements: Array<RequirementViewModel>;
+    RequirementOptions: Array<ItemViewModel>;
+    Alternatives: Array<RequirementViewModel>;
     VariationPoints: Array<ProjectContextTypeViewModel>;
     ProjectBusinessProcesses: Array<ItemViewModel>;
+    ProjectConcepts: Array<ItemViewModel>;
+    ProjectUIs: Array<ItemViewModel>;
+    ProjectInfrastructures: Array<ItemViewModel>;
     constructor() {
         this.Definition = new RessourceDefinitionViewModel();
     }     
@@ -175,6 +205,7 @@ class UIComponentEditorViewModel {
     Screens: Array<RequirementViewModel>;
     Fields: Array<RequirementViewModel>;
     Requirements: Array<RequirementViewModel>;
+    Alternatives: Array<RequirementViewModel>;
     VariationPoints: Array<ProjectContextTypeViewModel>;
     ProjectFeatures: Array<ItemViewModel>;
     constructor() {
@@ -227,10 +258,10 @@ class BoardItemViewModel {
 
 
 enum RessourceEnumType { unknown = 0, Domain = 1, UseCase = 2, Component = 3, Infrastructure = 4 };
-enum AssociationEnumType { unknown = 0, HasAttribute = 1, HasOne = 2, HasMany = 3, AggregatesWith = 4, OperatesOn = 5, HasActor = 6, UseInfrastructure = 7, HasFeatureFor = 8 };
+enum AssociationEnumType { unknown = 0, HasOne = 1, HasMany = 2};
 enum EventEnumType { unknown = 0, Create = 1, Update = 2, Delete = 3 };
-enum RequirementEnumType { unknown = 0, Rule = 1, Scenario = 2, Field = 3, Screen = 3 };
-enum ContextEnumType { unknown = 0, DomainContext = 1, BusinessProcess = 2, Feature = 3, RequirementVariation = 4 };
+enum RequirementEnumType { unknown = 0, Default = 1, LogicAlternative = 2, UIAlternative = 3, Scenario = 4, Screen = 5, Field = 6};
+enum ContextEnumType { unknown = 0, DomainContext = 1, BusinessProcess = 2, Feature = 3, VariationPoint = 4 };
 enum VersionEnumType { unknown = 0, Planned = 1, InProgress = 2, Completed = 3, Released = 4 };
 const MonthOptions = new Array<ItemViewModel>();
 MonthOptions.push(new ItemViewModel("January", "1"));
@@ -259,6 +290,7 @@ PriorityLevels.push(new ItemViewModel("Low", "1"));
 PriorityLevels.push(new ItemViewModel("Medium", "2"));
 PriorityLevels.push(new ItemViewModel("High", "3"));
 PriorityLevels.push(new ItemViewModel("Urgent", "4"));
+PriorityLevels.push(new ItemViewModel("Mandatory", "5"));
 var PrecisionScale = new Array<ItemViewModel>();
 PrecisionScale.push(new ItemViewModel("Slightly Precise", "1"));
 PrecisionScale.push(new ItemViewModel("Moderately Precise", "2"));
@@ -279,3 +311,7 @@ VersionStatusOptions.push(new ItemViewModel("Planned", "1"));
 VersionStatusOptions.push(new ItemViewModel("In Progress", "2"));
 VersionStatusOptions.push(new ItemViewModel("Completed", "3"));
 VersionStatusOptions.push(new ItemViewModel("Released", "4"));
+var CardinalityOptions = new Array<ItemViewModel>();
+CardinalityOptions.push(new ItemViewModel("Has One", "1"));
+CardinalityOptions.push(new ItemViewModel("Has Many", "2"));
+

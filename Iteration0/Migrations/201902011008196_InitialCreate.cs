@@ -36,6 +36,8 @@ namespace Iteration0.Migrations
                         Title = c.String(),
                         CodeName = c.String(),
                         Brief = c.String(),
+                        ExternalCode = c.String(),
+                        ExternalURL = c.String(),
                         OwnedBy = c.Int(nullable: false),
                         IsPrivateOnly = c.Boolean(nullable: false),
                         IsEnabled = c.Boolean(nullable: false),
@@ -52,6 +54,7 @@ namespace Iteration0.Migrations
                         Name = c.String(),
                         ContextEnumType = c.Short(nullable: false),
                         ScaleOrder = c.Short(nullable: false),
+                        UsedAsProductAlternative = c.Boolean(nullable: false),
                         IsEnabled = c.Boolean(nullable: false),
                         UpdatedDate = c.DateTime(nullable: false),
                         UpdatedBy = c.Int(nullable: false),
@@ -88,24 +91,43 @@ namespace Iteration0.Migrations
                     {
                         Id = c.Int(nullable: false, identity: true),
                         RequirementEnumType = c.Short(nullable: false),
-                        Priority = c.Int(nullable: false),
-                        Title = c.String(),
+                        Behavior = c.String(),
                         Description = c.String(),
-                        Attribute1Value = c.String(),
-                        Attribute2Value = c.String(),
-                        Attribute3Value = c.String(),
-                        Attribute4Value = c.String(),
-                        Attribute5Value = c.String(),
+                        Priority = c.Int(nullable: false),
+                        ExternalCode = c.String(),
+                        ExternalURL = c.String(),
+                        FieldValue1 = c.String(),
+                        FieldValue2 = c.String(),
+                        FieldValue3 = c.String(),
+                        FieldValue4 = c.String(),
+                        FieldValue5 = c.String(),
                         IsEnabled = c.Boolean(nullable: false),
                         SortOrder = c.Int(nullable: false),
-                        WorkItemURL = c.String(),
                         UpdatedDate = c.DateTime(nullable: false),
                         UpdatedBy = c.Int(nullable: false),
-                        Ressource_Id = c.Int(),
+                        DefaultBehavior_Id = c.Int(),
+                        RessourceDefinition_Id = c.Int(),
+                        Concept_Id = c.Int(),
+                        Infrastructure_Id = c.Int(),
+                        Project_Id = c.Int(),
+                        UI_Id = c.Int(),
+                        UseCase_Id = c.Int(),
                     })
                 .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.RessourceDefinition", t => t.Ressource_Id)
-                .Index(t => t.Ressource_Id);
+                .ForeignKey("dbo.RessourceRequirement", t => t.DefaultBehavior_Id)
+                .ForeignKey("dbo.RessourceDefinition", t => t.RessourceDefinition_Id)
+                .ForeignKey("dbo.RessourceDefinition", t => t.Concept_Id)
+                .ForeignKey("dbo.RessourceDefinition", t => t.Infrastructure_Id)
+                .ForeignKey("dbo.ProjectDefinition", t => t.Project_Id)
+                .ForeignKey("dbo.RessourceDefinition", t => t.UI_Id)
+                .ForeignKey("dbo.RessourceDefinition", t => t.UseCase_Id)
+                .Index(t => t.DefaultBehavior_Id)
+                .Index(t => t.RessourceDefinition_Id)
+                .Index(t => t.Concept_Id)
+                .Index(t => t.Infrastructure_Id)
+                .Index(t => t.Project_Id)
+                .Index(t => t.UI_Id)
+                .Index(t => t.UseCase_Id);
             
             CreateTable(
                 "dbo.RessourceDefinition",
@@ -115,6 +137,9 @@ namespace Iteration0.Migrations
                         Name = c.String(),
                         RessourceEnumType = c.Short(nullable: false),
                         Definition = c.String(),
+                        Description = c.String(),
+                        ExternalCode = c.String(),
+                        ExternalURL = c.String(),
                         ScaleOrder = c.Short(nullable: false),
                         StepOrder = c.Short(nullable: false),
                         SortOrder = c.Int(nullable: false),
@@ -225,14 +250,20 @@ namespace Iteration0.Migrations
             DropForeignKey("dbo.ProjectVersionRessourceRequirement", "ProjectVersion_Id", "dbo.ProjectVersion");
             DropForeignKey("dbo.ProjectVersion", "Product_Id", "dbo.ProjectProduct");
             DropForeignKey("dbo.ProjectProduct", "Project_Id", "dbo.ProjectDefinition");
-            DropForeignKey("dbo.RessourceRequirement", "Ressource_Id", "dbo.RessourceDefinition");
+            DropForeignKey("dbo.RessourceRequirementProjectContext", "ProjectContext_Id", "dbo.ProjectContext");
+            DropForeignKey("dbo.RessourceRequirementProjectContext", "RessourceRequirement_Id", "dbo.RessourceRequirement");
+            DropForeignKey("dbo.RessourceRequirement", "UseCase_Id", "dbo.RessourceDefinition");
+            DropForeignKey("dbo.RessourceRequirement", "UI_Id", "dbo.RessourceDefinition");
+            DropForeignKey("dbo.RessourceRequirement", "Project_Id", "dbo.ProjectDefinition");
+            DropForeignKey("dbo.RessourceRequirement", "Infrastructure_Id", "dbo.RessourceDefinition");
+            DropForeignKey("dbo.RessourceRequirement", "Concept_Id", "dbo.RessourceDefinition");
+            DropForeignKey("dbo.RessourceRequirement", "RessourceDefinition_Id", "dbo.RessourceDefinition");
             DropForeignKey("dbo.RessourceDefinition", "Project_Id", "dbo.ProjectDefinition");
             DropForeignKey("dbo.RessourceDefinition", "Context_Id", "dbo.ProjectContext");
             DropForeignKey("dbo.RessourceAssociation", "RessourceDefinition_Id", "dbo.RessourceDefinition");
             DropForeignKey("dbo.RessourceAssociation", "Ressource_Id", "dbo.RessourceDefinition");
             DropForeignKey("dbo.RessourceAssociation", "Parent_Id", "dbo.RessourceDefinition");
-            DropForeignKey("dbo.RessourceRequirementProjectContext", "ProjectContext_Id", "dbo.ProjectContext");
-            DropForeignKey("dbo.RessourceRequirementProjectContext", "RessourceRequirement_Id", "dbo.RessourceRequirement");
+            DropForeignKey("dbo.RessourceRequirement", "DefaultBehavior_Id", "dbo.RessourceRequirement");
             DropForeignKey("dbo.ProjectContextType", "Project_Id", "dbo.ProjectDefinition");
             DropForeignKey("dbo.ProjectContext", "Type_Id", "dbo.ProjectContextType");
             DropForeignKey("dbo.ProjectContext", "Project_Id", "dbo.ProjectDefinition");
@@ -247,7 +278,13 @@ namespace Iteration0.Migrations
             DropIndex("dbo.RessourceAssociation", new[] { "Parent_Id" });
             DropIndex("dbo.RessourceDefinition", new[] { "Project_Id" });
             DropIndex("dbo.RessourceDefinition", new[] { "Context_Id" });
-            DropIndex("dbo.RessourceRequirement", new[] { "Ressource_Id" });
+            DropIndex("dbo.RessourceRequirement", new[] { "UseCase_Id" });
+            DropIndex("dbo.RessourceRequirement", new[] { "UI_Id" });
+            DropIndex("dbo.RessourceRequirement", new[] { "Project_Id" });
+            DropIndex("dbo.RessourceRequirement", new[] { "Infrastructure_Id" });
+            DropIndex("dbo.RessourceRequirement", new[] { "Concept_Id" });
+            DropIndex("dbo.RessourceRequirement", new[] { "RessourceDefinition_Id" });
+            DropIndex("dbo.RessourceRequirement", new[] { "DefaultBehavior_Id" });
             DropIndex("dbo.Event", new[] { "ProjectDefinition_Id" });
             DropIndex("dbo.Event", new[] { "Ressource_Id" });
             DropIndex("dbo.Event", new[] { "Requirement_Id" });

@@ -5,6 +5,7 @@ using Iteration0.Business.Domain.Entities;
 using System.Linq.Expressions;
 using Iteration0.Data.Repositories;
 using Iteration0.Business.Services;
+using System.Linq;
 
 namespace Iteration0.Business.Interfaces
 {
@@ -23,6 +24,7 @@ namespace Iteration0.Business.Interfaces
         ProjectVersion GetVersion(int id);
         ProjectContext GetContext(int id);
         ProjectProduct GetProduct(int id);
+        RessourceRequirement GetRequirement(int id);
         List<UseCaseFacade> GetAllUseCases(int id);
         List<DomainConceptFacade> GetAllDomainConcepts(int id);
         List<UIComponentFacade> GetAllUIComponents(int id);
@@ -42,6 +44,8 @@ namespace Iteration0.Business.Interfaces
         List<ProjectContext> GetAllDomainContexts(int id);
         List<ProjectContext> GetAllBusinessProcessesFor(int id);
         List<ProjectContext> GetAllFeaturesFor(int id);
+        List<RessourceDefinition> GetAllInfrastructuresFor(int id);
+        List<RessourceAssociation> GetAllAssociationsFor(int id);
         List<ProjectVersion> GetAllVersionFor(int id);
         List<RessourceDefinition> GetAllConceptDefinitionsFor(int id);
         List<RessourceDefinition> GetAllUseCaseDefinitionsFor(int id);
@@ -52,9 +56,15 @@ namespace Iteration0.Business.Interfaces
     }
     public interface IRessourceRepository : IRepository<Ressource>
     {
+        IQueryable<RessourceDefinition> SearchAllRessourcesWith(int projectId, String content);
+        IQueryable<RessourceRequirement> SearchAllRequirementsWith(int projectId, String content);
         RessourceDefinition GetDefinition(int id);
         RessourceAssociation GetAssociation(int id);
         RessourceRequirement GetRequirement(int id);
+        List<RessourceAssociation> GetAllChildrenAggregations(int id);
+        List<RessourceAssociation> GetAllParentAggregations(int id);        
+        List<RessourceRequirement> GetAllBehaviorRequirementsBy(int ConceptId);
+        List<RessourceRequirement> GetAllBehaviorRequirementsFrom(int UIComponentId);
         void Update(RessourceDefinition item);
         void Add(RessourceAssociation item);
         void Update(RessourceAssociation item);

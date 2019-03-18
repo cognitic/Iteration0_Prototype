@@ -16,7 +16,7 @@ class VersionEditorUIControl extends RequirementUIControl {
         super("VersionEditorUIControl", "#editor");
         this.ProjectID = formVM.ProjectID;  
         this.version = formVM;
-        this.versionsWrapper = $("#editor-versions-wrapper");
+        this.versionsWrapper = $("#editor-version-requirement-wrapper");
         this.Start();
     }
     public Start() {
@@ -28,15 +28,14 @@ class VersionEditorUIControl extends RequirementUIControl {
             this.BuildRequirements();
         }
         $("#edit-definition-link").click((e => { this.ShowEditDefinitionForm(); return false }) );
-        $("#add-requirement-link").click((e => { this.ShowNewVersionRequirementForm(); return false }) );
+        $("#add-version-requirement-link").click((e => { this.ShowVersionRequirementSelectForm(); return false }) );
     }
     public BuildDefinition() {
-        $("#editor-definition-zone").html((this.FieldIsBlank(this.version.Definition.Summary)) ? "No<br/>Definition<br/>yet" : this.version.Definition.Summary.replace(/\n/gim, "<br/>"));
-        $("#editor-definition-category").html(this.version.Definition.ProductName);
-        $("#editor-definition-code").html(this.version.Definition.NumberName);
+        $(".editor-header-bubble-definition").html((this.FieldIsBlank(this.version.Definition.Summary)) ? "No<br/>Definition<br/>yet" : this.version.Definition.Summary.replace(/\n/gim, "<br/>"));
+        $(".editor-header-bubble-title").html(this.version.Definition.NumberName + ' - ' + this.version.Definition.NickName);
     }
     public ShowNewDefinitionForm(ProjectID: number, ProjectProducts: Array<ItemViewModel>) {
-        var newVM = new VersionViewModel(); newVM.VersionID = -1; newVM.ProductID = -1; newVM.NumberName = "Vx.x.x"; newVM.NickName = ""; newVM.Summary = "";
+        var newVM = new VersionViewModel(); newVM.VersionID = -1; newVM.ProductID = -1; newVM.NumberName = "V#.#"; newVM.NickName = "Green Light"; newVM.Summary = "";
         newVM.VersionEnumType = VersionEnumType.Planned; newVM.ReleasedYear = 2019; newVM.ReleasedMonth = 12;
         this.ProjectID = ProjectID;
         this.version.Definition = newVM;
@@ -51,25 +50,28 @@ class VersionEditorUIControl extends RequirementUIControl {
         this.ShowDefinitionForm(this.version.Definition);
     }
     public BuildRequirements() {
+        var Context = this;
         if (this.versionsWrapper.length > 0) {
-            //if (this.version.ProductRequirements.length > 0) {
-            //    var html = '<div><table>';
-            //    html += '<tr><th>Product</th><th>Version</th><th>Content</th><th></th></tr>';
-            //    jQuery.each(this.version.Versions, function () {
-            //        html += "<tr><td>" + this.Product + "</td><td>V2.0.0 (Not released)</td><td>No Requirement</td><td> Edit / Remove</td></tr>";
-            //        html += '<li>' + this.NumberName + '</li>';
-            //    });
-            //    html += '</table></div>';
-            //    this.versionsWrapper.html(html);
-            //} else {
-            //    this.versionsWrapper.html('<div class="tac">No Versions yet</div>');
-            //}
+            if (this.version.ProductRequirements.length > 0) {
+                var html = '<div>';
+                jQuery.each(this.version.ProductRequirements, function () {
+                html += '<div id="r' + this.RequirementID + '"  class="requirement-box">';
+                html += '<div class="r vb"><a class="remove-version-requirement-link action-link" linkid="' + this.RequirementID + '" href="/">Remove</a></div>';
+                html += Context.BuildContextTagsFor(this);
+                html += '<div class="req-tag"><a href="/Project/UseCaseEditor?FunctionID=' + this.UseCaseID + '#r' + this.RequirementID + '"># ' + this.RequirementID + '</a></div>';
+                html += '<span class="requirement-content"><span class="requirement-behavior">' + Context.BuildBehaviorSummaryFor(this) + '</span>';
+                html += '</span></div>';
+                });
+                html += '';
+                html += '</div>';
+                this.versionsWrapper.html(html);
+            } else {
+                this.versionsWrapper.html('<div class="tac">No Versions yet</div>');
+            }
+            $(".remove-version-requirement-link").click((e => { this.ShowRemoveVersionRequirementForm(parseInt($(e.target).attr('linkID'))); return false }));
         }
     }
-    public ShowNewVersionRequirementForm() {
-        this.app.ShowAlert("Coming soon !");
-    }
-    public ShowRemoveRequirementForm(versionID: Number) {
+    public ShowRemoveVersionForm(versionID: Number) {
         this.removePendingID = versionID;
         this.app.ShowCustomMessage("Are you sure you want to delete this item ?", "Remove Version", this.OnRequirementRemoveClick, null, this, null);
     }
@@ -78,15 +80,15 @@ class VersionEditorUIControl extends RequirementUIControl {
     }
     public ShowDefinitionForm(version: VersionViewModel) {
         var title = ((version.VersionID > 0) ? "Edit Version Definition" : "Define New Version"); 
-        var formHtml = "<div class='form-element-group'><div><label class='filter'>Product : </label></div><div>" + this.BuildDropDownHtmlWith("formProduct", this.version.ProjectProducts, "Select Product", version.ProductID.toString()) + "</div></div>";
-        formHtml += "<div class='form-element-group'><div><label class='filter'>Number : </label></div><div><input type='text' id='formDefName' class='texttype' maxlength='50' style='width: 300px;' value='" + version.NumberName + "'></div></div>";
-        formHtml += "<div class='form-element-group'><div><label class='filter'>Nickname : </label></div><div><input type='text' id='formNickName' class='texttype' maxlength='50' style='width: 300px;' value='" + version.NickName + "'></div></div>";
-        formHtml += "<div class='form-element-group'><div><label class='filter'>Goal : </label></div><div><textarea id='formDefGoal' type='textarea' name='textarea-goal' maxlength='1000' style='width: 300px; Height:100px;' placeholder='Benefits and reasons for creating this version'>" + this.version.Definition.Summary + "</textarea></div></div>";
-        //formHtml += "<div class='form-element-group'><div><label class='filter'>Code Name # : </label></div><div><input type='text' id='formDefCodeName' class='texttype' maxlength='20' style='width: 200px;' value='" + this.version.Definition.CodeName + "'></div></div>";
-        formHtml += "<div class='form-element-group'><div><label class='filter'>Status : </label></div><div>" + this.BuildDropDownHtmlWith("formStatus", VersionStatusOptions, "Select Status", version.VersionEnumType.toString()) + "</div></div>";
-        formHtml += "<div class='form-element-group'><div><label class='filter'>Month : </label></div><div>" + this.BuildDropDownHtmlWith("formMonth", MonthOptions, "Select Month", version.ReleasedMonth.toString()) + "</div></div>";
-        formHtml += "<div class='form-element-group'><div><label class='filter'>Year : </label></div><div>" + this.BuildDropDownHtmlWith("formYear", YearOptions, "Select Year", version.ReleasedYear.toString()) + "</div></div>";
-            //formHtml += "<div class='filter-group'><label class='filter'>Is Only Visible By Owner : </label><input type='checkbox' id='IsPrivateCB'></div>";
+        var formHtml = "<div class='form-element-group'><div><label >Product : </label></div><div>" + this.BuildDropDownHtmlWith("formProduct", this.version.ProjectProducts, "Select Product", version.ProductID.toString()) + "</div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Number : </label></div><div><input type='text' id='formDefName' class='texttype' maxlength='50' style='width: 300px;' value='" + version.NumberName + "'></div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Nickname : </label></div><div><input type='text' id='formNickName' class='texttype' maxlength='50' style='width: 300px;' value='" + version.NickName + "'></div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Goal : </label></div><div><textarea id='formDefGoal' type='textarea' name='textarea-goal' maxlength='1000' style='width: 300px; Height:100px;' placeholder='Benefits and reasons for creating this version'>" + this.version.Definition.Summary + "</textarea></div></div>";
+        //formHtml += "<div class='form-element-group'><div><label >Code Name # : </label></div><div><input type='text' id='formDefCodeName' class='texttype' maxlength='20' style='width: 200px;' value='" + this.version.Definition.CodeName + "'></div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Status : </label></div><div>" + this.BuildDropDownHtmlWith("formStatus", VersionStatusOptions, "Select Status", version.VersionEnumType.toString()) + "</div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Month : </label></div><div>" + this.BuildDropDownHtmlWith("formMonth", MonthOptions, "Select Month", version.ReleasedMonth.toString()) + "</div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Year : </label></div><div>" + this.BuildDropDownHtmlWith("formYear", YearOptions, "Select Year", version.ReleasedYear.toString()) + "</div></div>";
+            //formHtml += "<div class='filter-group'><label >Is Only Visible By Owner : </label><input type='checkbox' id='IsPrivateCB'></div>";
         this.app.ShowCustomMessage("<div class='form-group'>" + formHtml + "</div>", title, this.OnDefinitionSaveClick, null, this, null);
         //$('#ProductEnabledCB').prop('checked', IsActive);
         return false;
@@ -107,36 +109,57 @@ class VersionEditorUIControl extends RequirementUIControl {
             context.AjaxCall(context.saveURL, JSON.stringify({ formVM: context.version.Definition, ProjectID: context.ProjectID  }), context.OnEditorSaved, context);
         }
     }
-    public ShowVersionRequirementForm() {
-        this.app.ShowAlert("Coming Soon !");
-    }
-    public ShowVersionRequirementXXForm() {
-        var title = "Define Version Requirements";
-        var formHtml = "";
+    //NB: Filtrer les versions des requirements par product
+    //[Check] All Version  Order by Priority, Concept, Use Case, Feature
+    //UC-22
+    //(Tag) Behavior by ... (maxsize)(Priority)[Checkbox OR  V.0.0 (Planned) or V0.0] 
 
-        this.app.ShowCustomMessage("<div class='form-group'>" + formHtml + "</div>", title, this.OnVersionSaveClick, null, this, null);
-        //load version.versions[0].Name each
-        $('.table-select-requirement').click((e => { this.AddVersionRequirement(); return false }));
-        $('.table-remove-requirement').click((e => { this.RemoveVersionRequirement(parseInt($(e.target).attr('linkID'))); return false }));
+    public ShowVersionRequirementSelectForm() {
+        var Context = this;
+        var title = "Select New Requirements";
+        if (this.version.ProductRequirements.length > 0) {
+            var html = '<div>';
+            html += '<div class="r vb">' + this.BuildDropDownHtmlWith("formYear", YearOptions, "Select Year", "2019") + '';
+            html += this.BuildDropDownHtmlWith("formYear", YearOptions, "Select Year", "2019") + '</div><div class="cb"></div>';
+            html += '<div style="height: 400px; overflow-y: scroll;">';
+            jQuery.each(this.version.ProductRequirements, function () {
+                html += '<div>';
+                if (1 == 1) {
+                    html += '<div class="r vb"><input type="checkbox"  linkid="' + this.RequirementID + '" ></div>';
+                } else {
+                    html += '<div class="r vb">Version xxx</div>';
+                }
+                html += Context.BuildContextTagsFor(this);
+                html += '<div class="req-tag"><a href="/Project/UseCaseEditor?FunctionID=' + this.UseCaseID + '#r' + this.RequirementID + '"># ' + this.RequirementID + '</a></div>';
+                html += '<span class="requirement-content"><span class="requirement-behavior">' + Context.BuildBehaviorSummaryFor(this) + '</span>';
+                html += '</span></div>';
+            });
+            html += '</div>';
+            html += '</div>';
+        } else {
+            html = '<div class="tac">No Requirements available</div>';
+        }
+        //formHtml += "<div class='filter-group'><label >Is Only Visible By Owner : </label><input type='checkbox' id='IsPrivateCB'></div>";
+        this.app.ShowCustomMessage("<div class='form-group'>" + html + "</div>", title, this.OnDefinitionSaveClick, null, this, null);
+        //$('#ProductEnabledCB').prop('checked', IsActive);
         return false;
     }
-    public AddVersionRequirement() {
-
-    }
-    public RemoveVersionRequirement(requirementID: Number) {
-
-    }
-    public OnVersionSaveClick(context: VersionEditorUIControl) {
-        var VM = new VersionViewModel();
-        //VM.RessourceID = parseInt($("#formHiddenID").val()); VM.RessourceEnumType = RessourceEnumType.UseCase;
-        //VM.Name = $.trim($("#formDefName").val()); VM.Definition = $.trim($("#formDefVision").val()); VM.Category = $.trim($("#formDefCodeName").val());
+    public OnVersionRequirementSelectClick(context: VersionEditorUIControl) {
+        var newRequirementIDs = [];
+        //parseInt($.trim($("#formProduct").val()));
 
         var isOK = true;
-        //if ((context.FieldIsBlank(VM.Name))) { isOK = false; context.app.ShowAlert("Name is mandatory !"); }
-        //if ((context.FieldIsBlank(VM.Category))) { isOK = false; context.app.ShowAlert("Context is mandatory !"); }
+        if (newRequirementIDs.length > 0) { isOK = false; context.app.ShowAlert("No Requirements Selected !"); }
         if (isOK) {
-            context.AjaxCall(context.versionSaveURL, JSON.stringify({ formVM: VM, ProjectID: context.ProjectID }), context.OnEditorSaved, context);
+            context.AjaxCall(context.versionRequirementSaveURL, JSON.stringify({ requirementIDs: newRequirementIDs, VersionID: context.version.Definition.VersionID, ProjectID: context.ProjectID }), context.OnEditorSaved, context);
         }
+    }
+    public ShowRemoveVersionRequirementForm(requirementID: Number) {
+        this.removePendingID = requirementID;
+        this.app.ShowCustomMessage("Are you sure you want to remove this item ?", "Remove Requirement", this.OnRequirementRemoveClick, null, this, null);
+    }
+    public OnRequirementRemoveClick(context: VersionEditorUIControl) {
+        context.AjaxCall(context.removeVersionRequirementURL, JSON.stringify({ requirementID: context.removePendingID, ProjectID: context.ProjectID }), context.OnEditorSaved, context);
     }
     public OnEditorSaved(response, context: VersionEditorUIControl) {
         if (response.Definition != undefined) {

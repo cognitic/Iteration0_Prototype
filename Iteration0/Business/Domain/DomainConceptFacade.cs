@@ -12,48 +12,40 @@ namespace Iteration0.Business.Domain
         public RessourceDefinition Definition { get; set; }
 
         private Ressource _ressource;
-        public DomainConceptFacade(Ressource ressource)
+        public DomainConceptFacade(Ressource ressource, List<RessourceAssociation> childrenAggregations, List<RessourceAssociation> parentAggregations, List<RessourceRequirement> behaviors)
         {
             this._ressource = ressource;
             this.Definition = ressource.Definition;
-            this._attributes = ressource.Associations.Where(x => x.AssociationEnumType == (short)AssociationEnumType.HasAttribute).OrderBy(x => x.SortOrder).ToList();
-            this._hasOneAssociations = ressource.Associations.Where(x => x.AssociationEnumType == (short)AssociationEnumType.HasOne).OrderBy(x => x.SortOrder).ToList();
-            this._hasManyAssociations = ressource.Associations.Where(x => x.AssociationEnumType == (short)AssociationEnumType.HasMany).OrderBy(x => x.SortOrder).ToList();
-            this._operations = ressource.Associations.Where(x => x.AssociationEnumType == (short)AssociationEnumType.OperatesOn).OrderBy(x => x.SortOrder).ToList();
+            this._ChildrenAggregations = childrenAggregations;
+            this._ParentAggregations = parentAggregations;
+            this._Requirements = behaviors.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Default).OrderBy(x => x.SortOrder).ToList();
+            this._Alternatives = behaviors.Where(x => x.IsEnabled == true && x.IsAlternative == true).OrderBy(x => x.SortOrder).ToList();
         }
-
-        private List<RessourceAssociation> _attributes;
-        public List<RessourceAssociation> Attributes
+        private List<RessourceAssociation> _ChildrenAggregations;
+        public List<RessourceAssociation> GetChildrenAggregatedAs(AssociationEnumType aggregationEnum) 
+        {
+                return _ChildrenAggregations.Where(x => x.AssociationEnumType == (short)aggregationEnum).OrderBy(x => x.SortOrder).ToList();
+        }
+        private List<RessourceAssociation> _ParentAggregations;
+        public List<RessourceAssociation> GetParentAggregatedAs(AssociationEnumType aggregationEnum)
+        {
+            return _ParentAggregations.Where(x => x.AssociationEnumType == (short)aggregationEnum).OrderBy(x => x.SortOrder).ToList();
+        }
+        private List<RessourceRequirement> _Requirements = new List<RessourceRequirement>();
+        public List<RessourceRequirement> Requirements
         {
             get
             {
-                return _attributes;
+                return _Requirements;
             }
         }
-        private List<RessourceAssociation> _hasOneAssociations;
-        public List<RessourceAssociation> HasOneAssociations
+        private List<RessourceRequirement> _Alternatives = new List<RessourceRequirement>();
+        public List<RessourceRequirement> Alternatives
         {
             get
             {
-                return _hasOneAssociations;
+                return _Alternatives;
             }
         }
-        private List<RessourceAssociation> _hasManyAssociations;
-        public List<RessourceAssociation> HasManyAssociations
-        {
-            get
-            {
-                return _hasManyAssociations;
-            }
-        }
-        private List<RessourceAssociation> _operations;
-        public List<RessourceAssociation> Operations
-        {
-            get
-            {
-                return _operations;
-            }
-        }
-        
     }
 }

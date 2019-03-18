@@ -13,14 +13,16 @@ class RequirementUIControl {
     saveURL: string;
     wrapper: JQuery;
     contentWrapper: JQuery;
-    requirementWrapper: JQuery;
+    requirementsWrapper: JQuery;
+    alternativesWrapper: JQuery;
     tableHtmlTemplate: string = '<table class="ruleTable">'
     requirementSaveURL: string = "/Project/CreateEditRessourceRequirement";
     removeRequirementURL: string = "/Project/RemoveRessourceRequirement";
-    OnEditorSavedDelegate: any;
+    //OnEditorSavedDelegate: any;
     RessourceID: Number; ProjectID: Number;
     Requirements: Array<RequirementViewModel>;
-    VariationPoints: Array<ProjectContextTypeViewModel>;
+    Alternatives: Array<RequirementViewModel>;
+    RequirementUseCase: UseCaseEditorViewModel;
     editorURL: string;
     removePendingID: Number;
     ContextLabels = ["", "Domain Context", "Business Process", "Feature"];
@@ -31,7 +33,8 @@ class RequirementUIControl {
         this.type = ControlType;
         this.wrapperID = htmlWrapperID;
         this.wrapper = $(this.wrapperID);
-        this.requirementWrapper = $("#editor-requirement-wrapper");
+        this.requirementsWrapper = $("#editor-requirements-wrapper");
+        this.alternativesWrapper = $("#editor-alternatives-wrapper");
     }
     Show() { }
     Hide() { }
@@ -41,34 +44,68 @@ class RequirementUIControl {
     }
     Save() {
     }
-    public OnRequirementSaveClick(response, context: RequirementUIControl) {
-        var VM = new RequirementViewModel();
-        //VM.RessourceID = context.RessourceID; VM.RequirementID = parseInt($("#formHiddenID").val()); VM.RequirementEnumType = RequirementEnumType.UseCase;
-        //VM.Name = $.trim($("#formDefName").val()); VM.Definition = $.trim($("#formDefVision").val()); VM.Category = $.trim($("#formDefCodeName").val());
+    public BuildContextTagsFor(requirement : RequirementViewModel): String {
+        var html = '<div class="context-tag">' + requirement.ScopeSummary.replace(new RegExp('/', 'g'), '</div><div class="context-tag">') + '</div>';
+        return html;
+    }
 
-        var isOK = true;
-        //if ((context.FieldIsBlank(VM.Name))) { isOK = false; context.app.ShowAlert("Name is mandatory !"); }
-        //if ((context.FieldIsBlank(VM.Category))) { isOK = false; context.app.ShowAlert("Context is mandatory !"); }
-        if (isOK) {
-            context.AjaxCall(context.saveURL, JSON.stringify({ formVM: VM, ProjectID: context.ProjectID }), context.OnEditorSavedDelegate, context);
-        }
+    public BuildBehaviorSummaryFor(requirement: RequirementViewModel): String {
+        var html = requirement.Behavior;
+        if (!this.FieldIsBlank(requirement.Concept)) html += ' on <a class="u" href="/Project/DomainConceptEditor?ConceptID=' + requirement.ConceptID + '">@' + requirement.Concept + '</a>';
+        if (!this.FieldIsBlank(requirement.UI)) html += ' using <a class="u" href="/Project/UIComponentEditor?ComponentID=' + requirement.UIID + '">@' + requirement.UI + '</a>';
+        if (!this.FieldIsBlank(requirement.Infrastructure)) html += ' with <a class="u" href="/Project/ProjectEditor?ProjectID=' + this.ProjectID + '#infrastructures">@' + requirement.Infrastructure + '</a>';
+        return html;
     }
 
     public BuildRequirements() {
-        if (this.requirementWrapper != null) {
-
+        var Context = this;
+        if (this.requirementsWrapper != null) {
+            if (this.Requirements.length > 0) {
+                var html = '<div>';
+                jQuery.each(this.Requirements, function () {
+                    if (!Context.FieldIsBlank(this.SelectedVersionSummary)) html += '<span class="fmin2 r i">' + this.SelectedVersionSummary + "&nbsp;</span>";
+                    html += '<div id="r' + this.RequirementID + '"  class="requirement-box">';
+                    if (this.UseCaseID == Context.RessourceID) html += '<div class="r vb cb"><a class="edit-requirement-link u action-link" linkid="' + this.RequirementID + '" href="/">Edit</a><span class="action-text"> / </span><a class="remove-requirement-link u action-link" linkid="' + this.RequirementID + '" href="/">Remove</a>&nbsp;</div>';
+                    html += Context.BuildContextTagsFor(this);
+                    html += '<div class="req-tag"><a href="/Project/UseCaseEditor?FunctionID=' + this.UseCaseID + '#r' + this.RequirementID + '"># ' + this.RequirementID + '</a></div>';
+                    html += '<span class="requirement-content"><span class="requirement-behavior">' + Context.BuildBehaviorSummaryFor(this) + '</span>';
+                    if (!Context.FieldIsBlank(this.Description)) html += ' : ' + this.Description;
+                    html += '</span></div>';
+                });
+                html += '';
+                html += '</div>';
+                this.requirementsWrapper.html(html);
+            } else {
+                this.requirementsWrapper.html('<div class="tac">No Required Behaviors yet</div>');
+            }
         }
         $(".edit-requirement-link").click((e => { this.ShowEditRequirementForm(parseInt($(e.target).attr('linkID'))); return false }));
         $(".remove-requirement-link").click((e => { this.ShowRemoveRequirementForm(parseInt($(e.target).attr('linkID'))); return false }));
     }
-    public ShowNewRequirementForm() {
-        var VM = new RequirementViewModel(); VM.Priority = 1;
-        this.ShowRequirementForm(VM);
-    }
-    public ShowEditRequirementForm(requirementID: Number) {
-        var VM: RequirementViewModel;
-        jQuery.each(this.Requirements, function () { if (this.RequirementID == requirementID) { VM = this; return false; } });
-        this.ShowRequirementForm(VM);
+    public BuildAlternatives() {
+        var Context = this;
+        if (this.alternativesWrapper != null) {
+            if (this.Alternatives.length > 0) {
+                var html = '<div>';
+                jQuery.each(this.Alternatives, function () {
+                    if (!Context.FieldIsBlank(this.SelectedVersionSummary)) html += '<span class="fmin2 r i">' + this.SelectedVersionSummary + "&nbsp;</span>";
+                    html += '<div id="r' + this.RequirementID + '"  class="requirement-box">';
+                    if (this.UseCaseID == Context.RessourceID) html += '<div class="r vb cb"><a class="edit-alternative-link u action-link" linkid="' + this.RequirementID + '" href="/">Edit</a><span class="action-text"> / </span><a class="remove-alternative-link u action-link" linkid="' + this.RequirementID + '" href="/">Remove</a>&nbsp;</div>';
+                    html += Context.BuildContextTagsFor(this);
+                    html += '<div class="req-tag"><a href="/Project/UseCaseEditor?FunctionID=' + this.UseCaseID + '#r' + this.RequirementID + '"># ' + this.RequirementID + '</a></div>';
+                    html += '<span class="requirement-content"><span class="requirement-behavior">' + Context.BuildBehaviorSummaryFor(this) + '</span>';
+                    if (!Context.FieldIsBlank(this.Description)) html += ' : ' + this.Description;
+                    html += '</span></div>';
+                });
+                html += '';
+                html += '</div>';
+                this.alternativesWrapper.html(html);
+            } else {
+                this.alternativesWrapper.html('<div class="tac">No Alternative Behaviors yet</div>');
+            }
+        }
+        $(".edit-alternative-link").click((e => { this.ShowEditAlternativeForm(parseInt($(e.target).attr('linkID'))); return false }));
+        $(".remove-alternative-link").click((e => { this.ShowRemoveAlternativeForm(parseInt($(e.target).attr('linkID'))); return false }));
     }
     public ShowRemoveRequirementForm(requirementID: Number) {
         this.removePendingID = requirementID;
@@ -77,32 +114,17 @@ class RequirementUIControl {
     public OnRequirementRemoveClick(context: RequirementUIControl) {
         context.AjaxCall(context.removeRequirementURL, JSON.stringify({ requirementID: context.removePendingID, ProjectID: context.ProjectID }), context.OnEditorSaved, context);
     }
-    public OnEditorSaved(response, context: RequirementUIControl) {
-        if (response.Definition != undefined) {
-            if (context.RessourceID > 0) {
-                context.ReBuild(response);
-                //TODO feedback with ShowInsideMessage  "xxx has been saved !"
-                context.app.HideUnfreezeControls();
-            } else {
-                var rootUrl = window.location.href.substring(0, window.location.href.indexOf("/Project/"));
-                window.location.replace(rootUrl + context.editorURL + response.Definition.RessourceID);
-            }
-        }
-        else {
-            context.app.ShowAlert(response);
-        }
-    }
     public UpdateRequirementContext(requirement: RequirementViewModel) {
-        requirement.Variants = new Array<ItemViewModel>();
+        requirement.ScopeIDs = [];
         jQuery.each($('.context-CB : checked'), function () {
-            requirement.Variants.push({ KeyValue: $(this).attr('CBId') } as ItemViewModel);
+            requirement.ScopeIDs.push(parseInt($(this).attr('CBId')));
         });
         this.BuildHtmlButtonSelector();
     }
     public BuildHtmlButtonSelector(): String {
         var context = this;
         var html = "";
-        jQuery.each(this.VariationPoints, function () {
+        jQuery.each(this.RequirementUseCase.VariationPoints, function () {
             html += "<div><input type='text' TypeId='" + this.Name + "' class='texttype context-field' maxlength='50' style='width: 300px;' value=''>";
              html = '<div class="app-profile-options-dropdown dropdown"><button class="square smallbtn">Select ' + this.Name + '</button><div class="dropdown-content">';
             jQuery.each(this.Contexts, function () {
@@ -113,15 +135,60 @@ class RequirementUIControl {
         html += '</div></div>';
         return html;
     }
+    public ShowNewRequirementForm() {
+        var VM = new RequirementViewModel(); VM.Behavior = ''; VM.Description = ''; VM.Priority = 1; VM.ConceptID = 0; VM.UIID = 0; VM.InfrastructureID = 0;
+        this.ShowRequirementForm(VM);
+    }
+    public ShowEditRequirementForm(requirementID: Number) {
+        var VM: RequirementViewModel;
+        jQuery.each(this.Requirements, function () { if (this.RequirementID == requirementID) { VM = this; return false; } });
+        this.ShowRequirementForm(VM);
+    }
     public ShowRequirementForm(requirement: RequirementViewModel) {
-        var title = ((requirement.RequirementID > 0) ? "Edit Requirement" : "Define New Requirement");
-        var formHtml = this.BuildHtmlButtonSelector();
-        formHtml += "<div><input type='text' id='formDefNamex' class='texttype;' maxlength='50' style='width: 300px;' value='ALL'><button class='square'>Select Group..</button></div></div>";
-        formHtml += "<div>&nbsp;</div><div class='form-element-group'><div><label class='filter'>Description : </label></div><div><textarea id='formDefVision' type='textarea' name='textarea-Vision' maxlength='1000' style='width: 500px; Height:160px;' placeholder='Specific System Behavior..'>" + requirement.Description + "</textarea></div></div>";
-        formHtml += "<div class='form-element-group'><div><label class='filter'>Priority : </label></div><div>" + this.BuildDropDownHtmlWith("formPriority", PriorityLevels, "Select Priority", requirement.Priority.toString()) + "</div></div>";
-        formHtml += "<div class='form-element-group'><div><label class='filter'>Related Work Item : </label></div><div><input type='text' id='formWorkItemURL' class='texttype' maxlength='50' style='width: 300px;' placeholder='URL' value='" + requirement.WorkItemURL + "'></div></div>";
+        var title = ((requirement.RequirementID > 0) ? "Edit Required Behavior" : "New Required Behavior");
+        var formHtml = "<div class='form-element-group'><div><label >Behavior : </label></div><div><input type='text' id='formBehaviorVerb' class='texttype' maxlength='50' style='width: 500px;' placeholder='Behavior as Verb Phrase..' value='" + requirement.Behavior  + "'></div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Description : </label></div><div><textarea id='formBehaviorDescription' type='textarea' name='textarea-description' maxlength='1000' style='width: 500px; Height:160px;' placeholder='Expected Behavior characteristics and options that are externally observable..'>" + requirement.Description + "</textarea></div></div>";
+        formHtml += "<div class='form-element-group'><div><label >On : </label></div><div>" + this.BuildDropDownHtmlWith("formBehaviorResponsability", this.RequirementUseCase.ProjectConcepts, "Select Concept", requirement.ConceptID.toString()) + "</div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Using : </label></div><div>" + this.BuildDropDownHtmlWith("formBehaviorUI", this.RequirementUseCase.ProjectUIs, "Select UI", requirement.UIID.toString()) + "</div></div>";
+        formHtml += "<div class='form-element-group'><div><label >With : </label></div><div>" + this.BuildDropDownHtmlWith("formBehaviorInfrastructure", this.RequirementUseCase.ProjectInfrastructures, "Select Infrastructure", requirement.InfrastructureID.toString()) + "</div></div>";
+        //formHtml += "<div class='form-element-group'><div><label >Related Work Item : </label></div><div><input type='text' id='formWorkItemURL' class='texttype' maxlength='50' style='width: 300px;' placeholder='URL' value='" + requirement.ExternalURL + "'></div></div>";
+        
+        formHtml += "<div class='form-element-group'><div><label >Priority : </label></div><div>" + this.BuildDropDownHtmlWith("formBehaviorPriority", PriorityLevels, "Select Priority", requirement.Priority.toString()) + "</div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Scope : </label></div></div>";
+        formHtml += "<div>&nbsp;</div>" + this.BuildHtmlButtonSelector();
         this.app.ShowCustomMessage("<div class='form-group'>" + formHtml + "</div>", title, this.OnRequirementSaveClick, null, this, null);
-        $('.context-CB').prop("checked", (e => this.UpdateRequirementContext(requirement))); 
+        //$('.context-CB').prop("checked", (e => this.UpdateRequirementContext(requirement))); 
+    }
+    public ShowRemoveAlternativeForm(AlternativeID: Number) {
+        this.removePendingID = AlternativeID;
+        this.app.ShowCustomMessage("Are you sure you want to delete this Alternative ?", "Remove Alternative", this.OnAlternativeRemoveClick, null, this, null);
+    }
+    public OnAlternativeRemoveClick(context: RequirementUIControl) {
+        context.AjaxCall(context.removeRequirementURL, JSON.stringify({ AlternativeID: context.removePendingID, ProjectID: context.ProjectID }), context.OnEditorSaved, context);
+    }
+    public ShowNewAlternativeForm() {
+        var VM = new RequirementViewModel(); VM.DefaultBehaviorID = 0; VM.Behavior = ''; VM.Description = ''; VM.Priority = 1;
+        this.ShowAlternativeForm(VM);
+    }
+    public ShowEditAlternativeForm(RequirementID: Number) {
+        var VM: RequirementViewModel;
+        jQuery.each(this.Alternatives, function () { if (this.RequirementID == RequirementID) { VM = this; return false; } });
+        this.ShowAlternativeForm(VM);
+    }
+
+    public ShowAlternativeForm(requirement: RequirementViewModel) {
+        var title = ((requirement.RequirementID > 0) ? "Edit Behavior Alternative" : "New Behavior Alternative");
+        var formHtml = "<div class='form-element-group'><div><label >Default Behavior : </label></div><div>" + this.BuildDropDownHtmlWith("formDefaultBehavior", this.RequirementUseCase.RequirementOptions, "Select Behavior", requirement.DefaultBehaviorID.toString()) + "</div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Alternative Behavior : </label></div><div><input type='text' id='formBehaviorVerb' class='texttype' maxlength='50' style='width: 500px;' placeholder='Behavior as Verb Phrase..' value='" + requirement.Behavior + "'></div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Description : </label></div><div><textarea id='formBehaviorDescription' type='textarea' name='textarea-description' maxlength='1000' style='width: 500px; Height:160px;' placeholder='Expected Behavior characteristics and options that are externally observable..'>" + requirement.Description + "</textarea></div></div>";
+        //Alternative Type : radio button RequirementEnumType.LogicAlternative
+        //formHtml += "<div class='form-element-group'><div><label >Related Work Item : </label></div><div><input type='text' id='formWorkItemURL' class='texttype' maxlength='50' style='width: 300px;' placeholder='URL' value='" + requirement.ExternalURL + "'></div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Priority : </label></div><div>" + this.BuildDropDownHtmlWith("formBehaviorPriority", PriorityLevels, "Select Priority", requirement.Priority.toString()) + "</div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Scope : </label></div></div>";
+        formHtml += "<div>&nbsp;</div>" + this.BuildHtmlButtonSelector();
+        this.app.ShowCustomMessage("<div class='form-group'>" + formHtml + "</div>", title, this.OnRequirementSaveClick, null, this, null);
+        $("#formDefaultBehavior").width(480);
+        //$('.context-CB').prop("checked", (e => this.UpdateRequirementContext(requirement))); 
     }
 
     public BuildDropDownHtmlWith(dropDownId: String, items: Array<ItemViewModel>, defaultValue: String, selectedValue: String) {
@@ -138,6 +205,45 @@ class RequirementUIControl {
         //    kpiField.find('option:not([disabled]):selected').attr("selected", null);
         //    kpiField.find('option[value="' + kpiValue + '"]').attr("selected", "selected");
         //}
+    }
+    public OnRequirementSaveClick(response, context: RequirementUIControl) {
+        var isAlternative = $("#formDefaultBehavior").length > 0;
+        var VM = new RequirementViewModel();
+        if (isAlternative) {
+            VM.DefaultBehaviorID = parseInt($("#formDefaultBehavior").val());
+        } else {
+            VM.ConceptID = parseInt($("#formBehaviorResponsability").val()); VM.UIID = parseInt($("#formBehaviorUI").val()); VM.InfrastructureID = parseInt($("#formBehaviorInfrastructure").val());
+        }
+        VM.Behavior = $.trim($("#formBehaviorVerb").val()); VM.Description = $.trim($("#formBehaviorDescription").val()); VM.Priority = parseInt($("#formHiddenID").val()); 
+         //scope
+
+        var isOK = true;
+        if ((context.FieldIsBlank(VM.Behavior))) { isOK = false; context.app.ShowAlert("Behavior is mandatory !"); }
+        if ((context.FieldIsBlank(VM.Priority))) { isOK = false; context.app.ShowAlert("Priority is mandatory !"); }
+        if (isAlternative) {
+            if ((context.FieldIsBlank(VM.DefaultBehaviorID))) { isOK = false; context.app.ShowAlert("Default Behavior is mandatory !"); }
+            //if ((context.FieldIsBlank(VM.Scope))) { isOK = false; context.app.ShowAlert("Scope is mandatory !"); }
+        } else {
+            if ((context.FieldIsBlank(VM.ConceptID))) { isOK = false; context.app.ShowAlert("Concept is mandatory !"); }
+        }
+        if (isOK) {
+            context.AjaxCall(context.saveURL, JSON.stringify({ formVM: VM, ProjectID: context.ProjectID }), context.OnEditorSaved, context);
+        }
+    }
+    public OnEditorSaved(response, context: RequirementUIControl) {
+        if (response.Definition != undefined) {
+            if (context.RessourceID > 0) {
+                context.ReBuild(response);
+                //TODO feedback with ShowInsideMessage  "xxx has been saved !"
+                context.app.HideUnfreezeControls();
+            } else {
+                var rootUrl = window.location.href.substring(0, window.location.href.indexOf("/Project/"));
+                window.location.replace(rootUrl + context.editorURL + response.Definition.RessourceID);
+            }
+        }
+        else {
+            context.app.ShowAlert(response);
+        }
     }
     AjaxCall(postURL: string, JSONData: string, callBackFunction, callBackParameter?: any, httpMethod: string = 'POST', loadingMessage: string = 'Loading') {
         $.ajax({

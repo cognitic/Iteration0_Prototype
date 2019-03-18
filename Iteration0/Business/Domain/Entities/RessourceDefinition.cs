@@ -9,6 +9,9 @@ namespace Iteration0.Business.Domain.Entities
         public string Name { get; set; }
         public short RessourceEnumType { get; set; }    
         public string Definition { get; set; }
+        public string Description { get; set; }
+        public string ExternalCode { get; set; }
+        public string ExternalURL { get; set; }
         public short ScaleOrder { get; set; }
         public short StepOrder { get; set; }
         public int SortOrder { get; set; }  
