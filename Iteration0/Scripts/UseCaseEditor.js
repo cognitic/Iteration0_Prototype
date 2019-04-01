@@ -21,20 +21,23 @@ var UseCaseEditorUIControl = /** @class */ (function (_super) {
         _this.ProjectID = formVM.ProjectID;
         _this.RessourceID = formVM.Definition.RessourceID;
         _this.Requirements = formVM.Requirements;
-        _this.VariationPoints = formVM.VariationPoints;
+        _this.Alternatives = formVM.Alternatives;
+        _this.RequirementUseCase = formVM;
         _this.editorURL = "/Project/UseCaseEditor?FunctionID=";
         _this.useCase = formVM;
-        _this.definitionWrapper = $("#editor-definition-zone");
+        _this.definitionWrapper = $(".editor-header-bubble-definition");
         _this.scenarioWrapper = $("#editor-scenario-wrapper");
-        _this.requirementWrapper = $("#editor-requirement-wrapper");
         _this.Start();
         return _this;
     }
     UseCaseEditorUIControl.prototype.Start = function () {
         this.Build();
     };
-    UseCaseEditorUIControl.prototype.ReBuild = function (viewModel) {
-        this.useCase = viewModel;
+    UseCaseEditorUIControl.prototype.ReBuild = function (formVM) {
+        this.useCase = formVM;
+        this.Requirements = formVM.Requirements;
+        this.Alternatives = formVM.Alternatives;
+        this.RequirementUseCase = formVM;
         this.Build();
     };
     UseCaseEditorUIControl.prototype.Build = function () {
@@ -43,16 +46,17 @@ var UseCaseEditorUIControl = /** @class */ (function (_super) {
             this.BuildDefinition();
             this.BuildScenarios();
             this.BuildRequirements();
+            this.BuildAlternatives();
         }
         $("#edit-definition-link").click((function (e) { _this.ShowEditDefinitionForm(); return false; }));
         $("#add-scenario-link").click((function (e) { _this.ShowNewScenarioForm(); return false; }));
-        $("#add-uistep-link").click((function (e) { _this.ShowNewUIStepForm(); return false; }));
+        //$("#add-uistep-link").click((e => { this.ShowNewUIStepForm(); return false }));
         $("#add-requirement-link").click((function (e) { _this.ShowNewRequirementForm(); return false; }));
+        $("#add-alternative-link").click((function (e) { _this.ShowNewAlternativeForm(); return false; }));
     };
     UseCaseEditorUIControl.prototype.BuildDefinition = function () {
-        $("#editor-definition-zone").html((this.FieldIsBlank(this.useCase.Definition.Definition)) ? "No<br/>Definition<br/>yet" : this.useCase.Definition.Definition.replace(/\n/gim, "<br/>"));
-        $("#editor-definition-category").html("<a href='/Project/RessourceCategory?Name=" + this.useCase.Definition.ContextName + "'>" + this.useCase.Definition.ContextName + '</a>');
-        $("#editor-definition-code").html("<a href='/Project/RessourceEditor?RessourceID=" + this.useCase.Definition.RessourceID + "'>@" + this.useCase.Definition.RessourceID.toString() + '</a>');
+        $(".editor-header-bubble-definition").html((this.FieldIsBlank(this.useCase.Definition.Definition)) ? "No<br/>Definition<br/>yet" : this.useCase.Definition.Definition.replace(/\n/gim, "<br/>"));
+        $(".editor-header-bubble-title").html(this.useCase.Definition.Name.toString() + ' - ' + this.useCase.Definition.ProjectContextName);
     };
     //public ShowNewDefinitionForm() {
     //    if (this.useCase.ProjectBusinessProcesses.length == 0) {
@@ -96,22 +100,22 @@ var UseCaseEditorUIControl = /** @class */ (function (_super) {
     };
     UseCaseEditorUIControl.prototype.ShowDefinitionForm = function (definition) {
         var title = ((this.useCase.Definition.RessourceID > 0) ? "Edit Use Case Definition" : "Define New Use Case");
-        var formHtml = "<div class='form-element-group'><div><label class='filter'>Function : </label></div><div><input type='text' id='formDefName' class='texttype' maxlength='50' style='width: 300px;' placeholder='Verb + Noun Phrase' value='" + this.useCase.Definition.Name + "'></div></div>";
-        formHtml += "<div class='form-element-group'><div><label class='filter'>Description : </label></div><div><textarea id='formDefBrief' type='textarea' name='textarea-brief' maxlength='1000' style='width: 600px; Height:320px;' placeholder='Actors, Goals and Expected System Behavior..'>" + this.useCase.Definition.Definition + "</textarea></div></div>";
-        //formHtml += "<div class='form-element-group'><div><label class='filter'>Activity : </label></div><div><input type='text' id='formDefCodeName' class='texttype' maxlength='30' style='width: 344px;' placeholder='Decision, Control or Coordination' value='" + this.useCase.Definition.ContextName + "'></div></div>";
+        var formHtml = "<div class='form-element-group'><div><label >Function : </label></div><div><input type='text' id='formDefName' class='texttype' maxlength='50' style='width: 300px;' placeholder='Verb + Noun Phrase' value='" + this.useCase.Definition.Name + "'></div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Description : </label></div><div><textarea id='formDefVision' type='textarea' name='textarea-Vision' maxlength='1000' style='width: 600px; Height:320px;' placeholder='Actors, Goals and Expected System Behavior..'>" + this.useCase.Definition.Definition + "</textarea></div></div>";
+        //formHtml += "<div class='form-element-group'><div><label >Activity : </label></div><div><input type='text' id='formDefCodeName' class='texttype' maxlength='30' style='width: 344px;' placeholder='Decision, Control or Coordination' value='" + this.useCase.Definition.ContextName + "'></div></div>";
         this.app.ShowCustomMessage("<div class='form-group'>" + formHtml + "</div>", title, this.OnDefinitionSaveClick, null, this, null);
         //$('#ProductEnabledCB').prop('checked', IsActive);
     };
     UseCaseEditorUIControl.prototype.OnDefinitionSaveClick = function (context) {
         var VM = new RessourceDefinitionViewModel(); //VM.RessourceID = parseInt($("#formHiddenID").val()); VM.RessourceEnumType =  RessourceEnumType.UseCase;
         VM.Name = $.trim($("#formDefName").val());
-        VM.Definition = $.trim($("#formDefBrief").val()); // VM.ContextName = $.trim($("#formDefCodeName").val());
+        VM.Definition = $.trim($("#formDefVision").val()); // VM.ContextName = $.trim($("#formDefCodeName").val());
         var isOK = true;
         if ((context.FieldIsBlank(VM.Name))) {
             isOK = false;
             context.app.ShowAlert("Name is mandatory !");
         }
-        if ((context.FieldIsBlank(VM.ContextName))) {
+        if ((context.FieldIsBlank(VM.ProjectContextName))) {
             isOK = false;
             context.app.ShowAlert("Context is mandatory !");
         }
@@ -121,18 +125,18 @@ var UseCaseEditorUIControl = /** @class */ (function (_super) {
     };
     UseCaseEditorUIControl.prototype.ShowScenarioForm = function (scenario) {
         var title = ((scenario.RequirementID > 0) ? "Edit Scenario" : "Define New Scenario");
-        formHtml += "<div class='form-element-group'><div><label class='filter'>Priority : </label></div><div><input type='number'name='quantity' min='1' max='5' id='formPriority'placeholder='1 - 5' value='" + scenario.Priority + "'></div></div>";
-        var formHtml = "<div class='form-element-group'><div><label class='filter'>Name : </label></div><div><input type='text' id='formDefName' class='texttype' maxlength='50' style='width: 300px;' value='" + scenario.Title + "'></div></div>";
-        formHtml += "<div class='form-element-group'><div><label class='filter'>Given : </label></div><div><textarea id='formDefBrief' type='textarea' name='textarea-brief' maxlength='1000' style='width: 500px; Height:160px;' placeholder='Actors, Goals and Expected System Behavior..'>" + scenario.Attribute1Value + "</textarea></div></div>";
-        formHtml += "<div class='form-element-group'><div><label class='filter'>When : </label></div><div><textarea id='formDefBrief' type='textarea' name='textarea-brief' maxlength='1000' style='width: 500px; Height:160px;' placeholder='Actors, Goals and Expected System Behavior..'>" + scenario.Attribute2Value + "</textarea></div></div>";
-        formHtml += "<div class='form-element-group'><div><label class='filter'>Then : </label></div><div><textarea id='formDefBrief' type='textarea' name='textarea-brief' maxlength='1000' style='width: 500px; Height:160px;' placeholder='Actors, Goals and Expected System Behavior..'>" + scenario.Attribute3Value + "</textarea></div></div>";
-        this.app.ShowCustomMessage("<div class='form-group'>" + formHtml + "</div>", title, this.OnDefinitionSaveClick, null, this, null);
+        //formHtml += "<div class='form-element-group'><div><label >Priority : </label></div><div><input type='number'name='quantity' min='1' max='5' id='formPriority'placeholder='1 - 5' value='" + scenario.Priority + "'></div></div>";
+        //var formHtml = "<div class='form-element-group'><div><label >Name : </label></div><div><input type='text' id='formDefName' class='texttype' maxlength='50' style='width: 300px;' value='" + scenario.Title + "'></div></div>";
+        //formHtml += "<div class='form-element-group'><div><label >Given : </label></div><div><textarea id='formDefVision' type='textarea' name='textarea-Vision' maxlength='1000' style='width: 500px; Height:160px;' placeholder='Actors, Goals and Expected System Behavior..'>" + scenario.Attribute1Value + "</textarea></div></div>";
+        //formHtml += "<div class='form-element-group'><div><label >When : </label></div><div><textarea id='formDefVision' type='textarea' name='textarea-Vision' maxlength='1000' style='width: 500px; Height:160px;' placeholder='Actors, Goals and Expected System Behavior..'>" + scenario.Attribute2Value + "</textarea></div></div>";
+        //formHtml += "<div class='form-element-group'><div><label >Then : </label></div><div><textarea id='formDefVision' type='textarea' name='textarea-Vision' maxlength='1000' style='width: 500px; Height:160px;' placeholder='Actors, Goals and Expected System Behavior..'>" + scenario.Attribute3Value + "</textarea></div></div>";
+        //this.app.ShowCustomMessage("<div class='form-group'>" + formHtml + "</div>", title, this.OnDefinitionSaveClick, null, this, null);
         //$('#ProductEnabledCB').prop('checked', IsActive);
     };
     UseCaseEditorUIControl.prototype.OnScenarioSaveClick = function (context) {
         var VM = new RequirementViewModel();
         //VM.RessourceID = parseInt($("#formHiddenID").val()); VM.RessourceEnumType = RessourceEnumType.UseCase;
-        //VM.Name = $.trim($("#formDefName").val()); VM.Definition = $.trim($("#formDefBrief").val()); VM.Category = $.trim($("#formDefCodeName").val());
+        //VM.Name = $.trim($("#formDefName").val()); VM.Definition = $.trim($("#formDefVision").val()); VM.Category = $.trim($("#formDefCodeName").val());
         var isOK = true;
         //if ((context.FieldIsBlank(VM.Name))) { isOK = false; context.app.ShowAlert("Name is mandatory !"); }
         //if ((context.FieldIsBlank(VM.Category))) { isOK = false; context.app.ShowAlert("Context is mandatory !"); }

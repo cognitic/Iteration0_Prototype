@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Iteration0.Business.Identity
+namespace Iteration0.Business.Infrastructure
 {
     public class User
     {

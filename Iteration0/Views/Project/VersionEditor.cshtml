@@ -1,6 +1,6 @@
 ﻿@{
-    ViewBag.Title = "Version Requirements";
-    ViewBag.AddButtonLabel = "";
+    ViewBag.Title = "Version Editor";
+    ViewBag.AddButtonLabel = "Select Behaviors";
 }
 <div class="editor-header-background">
     <div class="tac">
@@ -14,11 +14,18 @@
     </div>
 </div>
 <div id="editor">
-    <div class="editor-section">
-        <div><span class="r"><a id="add-version-requirement-link" href="/">Select +</a></span><h2>Requirements</h2></div>
-        <div class="underlined-row">
+    <div id="editor-versions-wrapper">
+        <span id="editor-view-filter" class="r">
+        </span>
+        <div class="tab">
+            <button class="requirement-view-tab active" viewIndex="1">UC View</button>
+            <button class="requirement-view-tab" viewIndex="2">UI View</button>
         </div>
-        <div id="editor-version-requirement-wrapper">No Requirements Yet</div>
+        <table class="table-centered requirements">
+            <thead><tr><th></th><th></th><th></th><th></th></tr></thead>
+            <tbody>
+            </tbody>
+        </table>
     </div>
 </div>
 

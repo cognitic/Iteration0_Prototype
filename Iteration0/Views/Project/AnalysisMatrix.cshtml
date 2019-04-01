@@ -1,0 +1,30 @@
+﻿@{
+    ViewBag.Title = "Analysis Matrix";
+    ViewBag.AddButtonLabel = "";
+}
+<div class="editor-header-background">
+    <div class="tac">
+        <div class="editor-header-bubble">
+            <h1 class="editor-header-bubble-title"></h1>
+            <div>
+                <p class="editor-header-bubble-definition">Product Alternatives</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="matrix">
+    <div id="editor-versions-wrapper">
+        <span id="matrix-alternatives-filter" class="r">
+        </span>
+        <div id="matrix-view-filter">
+        </div>
+        <div style="width:100%;overflow-x: scroll;">
+            <table id="matrix-view" class="table-centered analysis-matrix"></table>
+        </div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+    Iteration0APP.AddControl(new AnalysisMatrixUIControl(@Html.Raw(ViewBag.editorVMAsJson), @Html.Raw(ViewBag.VersionID)));
+</script>
+

@@ -14,7 +14,6 @@ namespace Iteration0.Business.Domain
         public RessourceDefinition Definition;
         public List<RessourceAssociation> Associations = new List<RessourceAssociation>();
         //public List<RessourceDefinition> AssociatedRessources;
-        public List<RessourceRequirement> Requirements = new List<RessourceRequirement>();
         //Events
 
         public Ressource()
@@ -27,7 +26,6 @@ namespace Iteration0.Business.Domain
             Definition = ExistingDefinition;
             rootDefinition = Definition;
             if (!(Definition.Associations is null)) Associations = Definition.Associations.ToList();
-            if (!(Definition.Requirements is null)) Requirements = Definition.Requirements.ToList();
         }
         public void StartedBy(int OwnerId)
         {

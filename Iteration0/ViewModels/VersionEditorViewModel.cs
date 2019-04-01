@@ -4,6 +4,28 @@ using System.Web;
 
 namespace Iteration0.ViewModels
 {
+    public class AnalysisMatrixViewModel
+    {
+        public int ProjectID { get; set; }
+        public List<RequirementViewModel> DefaultRequirements { get; set; }
+        public List<ProductAlternativeViewModel> ProductAlternatives { get; set; }
+        public List<ItemViewModel> ProjectProducts { get; set; }
+        public List<ItemViewModel> ProjecVersions { get; set; }
+        //public List<ProjectContextTypeViewModel> VariationPoints { get; set; }
+    }
+    public class ProductAlternativeViewModel
+    {
+        public List<int> ScopeIDs { get; set; } = new List<int>();
+        public string ScopeSummary { get; set; } = "";
+        public List<RequirementViewModel> AlternativeRequirements { get; set; } = new List<RequirementViewModel>();
+    }
+    public class RequirementFunnel
+    {
+        public int RequiredUCPercent { get; set; } = 0;
+        public int PlannedPercent { get; set; } = 0;
+        public int CompletedPercent { get; set; } = 0;
+        public int ReleasedPercent { get; set; } = 0;
+    }
     public class ProductViewModel
     {
         public int ProductID { get; set; }
@@ -14,8 +36,10 @@ namespace Iteration0.ViewModels
     {
         public int ProjectID { get; set; }
         public VersionViewModel Definition { get; set; }
+        public List<RequirementViewModel> SelectedRequirements { get; set; }
+        public List<RequirementViewModel> PendingProductRequirements { get; set; }
         public List<ItemViewModel> ProjectProducts { get; set; }
-        public List<RequirementViewModel> ProductRequirements { get; set; }
+        public List<ItemViewModel> ProductAlternatives { get; set; }
     }
     public class VersionViewModel
     {

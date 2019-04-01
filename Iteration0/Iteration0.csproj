@@ -90,6 +90,8 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
     </Reference>
@@ -182,11 +184,6 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="Business\CodeGenerators\ServiceCode.cs" />
-    <Compile Include="Business\CodeGenerators\FunctionalTestCode.cs" />
-    <Compile Include="Business\CodeGenerators\DomainCode.cs" />
-    <Compile Include="Business\DocumentGenerators\FunctionnalityDocumentation.cs" />
-    <Compile Include="Business\DocumentGenerators\ComponentDocumentation.cs" />
     <Compile Include="Business\Domain\AggregateBase.cs" />
     <Compile Include="Business\Domain\Entities\ProjectProduct.cs" />
     <Compile Include="Business\Domain\Entities\ProjectVersion.cs" />
@@ -202,18 +199,19 @@
     <Compile Include="Business\Domain\MockUp.cs" />
     <Compile Include="Business\Domain\Project.cs" />
     <Compile Include="Business\Domain\UseCaseFacade.cs" />
+    <Compile Include="Business\Domain\BusinessLayerScaffold.cs" />
+    <Compile Include="Business\Infrastructure\TemporaryFolder.cs" />
+    <Compile Include="Business\Infrastructure\TextFormatter.cs" />
     <Compile Include="Business\Interfaces\IEntity.cs" />
-    <Compile Include="Business\Interfaces\IGenerator.cs" />
-    <Compile Include="Business\DocumentGenerators\TerminologyDocumentation.cs" />
     <Compile Include="Business\Interfaces\IRepository.cs" />
     <Compile Include="Business\Interfaces\IService.cs" />
     <Compile Include="Business\Services\MappingService.cs" />
     <Compile Include="Business\Services\UserService.cs" />
     <Compile Include="Business\Services\ProjectService.cs" />
-    <Compile Include="Business\Services\MockUpGeneratorService.cs" />
+    <Compile Include="Business\Services\FileStorageService.cs" />
     <Compile Include="Business\Services\ServiceBase.cs" />
     <Compile Include="Controllers\ProjectController.cs" />
-    <Compile Include="Business\Identity\UserModel.cs" />
+    <Compile Include="Business\Infrastructure\User.cs" />
     <Compile Include="Data\Managers\QueryManager.cs" />
     <Compile Include="Data\Repositories\DatabaseContextFactory .cs" />
     <Compile Include="Data\Repositories\MasterDatabaseContext.cs" />
@@ -231,6 +229,7 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\BoardEditorViewModel.cs" />
+    <Compile Include="ViewModels\DocumentViewModel.cs" />
     <Compile Include="ViewModels\SearchResultViewModel.cs" />
     <Compile Include="ViewModels\ItemViewModel.cs" />
     <Compile Include="ViewModels\ProjectEditorViewModel.cs" />
@@ -251,7 +250,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="README.txt" />
-    <Content Include="Scripts\jquery-1.11.3.min.js" />
+    <Content Include="Scripts\Libs\jquery-1.11.3.min.js" />
+    <Content Include="Scripts\Libs\jspdf.min.js" />
     <Content Include="Styles\images\checkbox.png" />
     <Content Include="Styles\images\radiobutton.png" />
     <Content Include="Styles\images\close_x.png" />
@@ -286,12 +286,19 @@
     <Content Include="Views\Project\RessourceCategory.cshtml" />
     <Content Include="Views\Project\ProductLine.cshtml" />
     <Content Include="Views\Project\VersionEditor.cshtml" />
+    <Content Include="Views\Project\AnalysisMatrix.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Business\CodeGenerators\CodeTemplates\CSharp\" />
-    <Folder Include="Business\DocumentGenerators\DocumentTemplates\" />
     <Folder Include="Business\Domain\ValueObjects\" />
+    <Folder Include="Business\Templates\Default\ScaffoldFolders\Business\Domain\Aggregates\" />
+    <Folder Include="Business\Templates\Default\ScaffoldFolders\Business\Domain\Entities\" />
+    <Folder Include="Business\Templates\Default\ScaffoldFolders\Business\Domain\Factories\" />
+    <Folder Include="Business\Templates\Default\ScaffoldFolders\Business\Infrastructure\" />
+    <Folder Include="Business\Templates\Default\ScaffoldFolders\Business\Interfaces\" />
+    <Folder Include="Business\Templates\Default\ScaffoldFolders\Business\Services\" />
+    <Folder Include="Business\Templates\Default\ScaffoldFolders\ConfigFiles\" />
+    <Folder Include="Temp\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -299,6 +306,10 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\BoardEditor.ts" />
+    <TypeScriptCompile Include="Scripts\global.d.ts" />
+    <TypeScriptCompile Include="Scripts\jspdf.d.ts" />
+    <TypeScriptCompile Include="Scripts\PDFGenerator.ts" />
+    <TypeScriptCompile Include="Scripts\AnalysisMatrix.ts" />
     <TypeScriptCompile Include="Scripts\VersionEditorUIControl.ts" />
     <TypeScriptCompile Include="Scripts\ProjectEditor.ts" />
     <TypeScriptCompile Include="Scripts\UIComponentEditor.ts" />

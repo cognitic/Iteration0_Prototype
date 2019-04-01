@@ -8,17 +8,16 @@
 <head runat="server">
     @if (@ViewBag.EditorTitle != null)
     {
-    <title>Iteration0 | @ViewBag.EditorTitle</title>
+        <title>Iteration0 | @ViewBag.EditorTitle</title>
     }
-    else { 
+    else
+    {
         <title>Iteration0 | @ViewBag.Title</title>
     }
-    @*<link href="/Styles/css/semantic/semantic.min.css" rel="stylesheet" />
-        <link href="/Styles/css/semantic/components/popup.min.css" rel="stylesheet" />
-        <link href="/Styles/css/semantic/components/transition.min.css" rel="stylesheet" />
-        <link href="/Styles/css/semantic/calendar.min.css" rel="stylesheet" />*@
+
     <link href="/Styles/iteration0.css?t=@DateTime.Now.Minute" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="/Scripts/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="/Scripts/Libs/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="/Scripts/Libs/jspdf.min.js"></script>
     <script type="text/javascript" src="/Scripts/Iteration0.js?t=@DateTime.Now.Minute"></script>
     <style>
         @Html.Raw(@Session["CustomCSSRules"])
@@ -67,19 +66,23 @@
             <div class="app-page-header">
                 <div class="app-page-toolbar r">
                     @if (@ViewBag.AddButtonLabel != "")
-                    {
-                        <button class="isEnabled" id="app-page-main-action-button">
-                            <div>
-                                <span class="b">@ViewBag.AddButtonLabel </span>
-                            </div>
-                        </button>
-                                <text>
-                                @if (@ViewBag.GeneratorTitle != null)
-                                {
-                                        <div style="margin-top:2px;"><button class="smallbtn downloadbtn">@ViewBag.GeneratorTitle</button></div>
-                                }
-                                </text>
-                    }
+    {
+                <button class="isEnabled" id="app-page-main-action-button">
+                    <div>
+                        <span class="b">@ViewBag.AddButtonLabel </span>
+                    </div>
+                </button>
+if (@ViewBag.GeneratorTitle != null)
+{
+                @Html.Raw((ViewBag.GeneratorPath != null) ? "<form method='get' action='" + ViewBag.GeneratorPath + "'><input name='ProjectID' type='text' class='h' value='" + ViewBag.ProjectID + "'>" : "")
+                <text>
+                    <div style="margin-top:2px;">
+                        <button id="app-page-generator-button" class="smallbtn downloadbtn">@ViewBag.GeneratorTitle</button>
+                    </div>
+                </text>
+                @Html.Raw((ViewBag.GeneratorPath != null) ? "</form>" : "")
+}
+}
                 </div>
                 @if (@ViewBag.EditorTitle != null)
                 {

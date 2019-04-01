@@ -47,7 +47,7 @@ namespace Iteration0.Data.Repositories
         public Project Get(int id)
         {
             var def = _dbSetProjectDefinition.Find(id);
-            return new Project(def, GetAllRequirementsFor(id));
+            return new Project(def, GetAllBehaviorRequirementsFor(id));
         }
         public ProjectDefinition GetDefinition(int id)
         {
@@ -112,9 +112,10 @@ namespace Iteration0.Data.Repositories
         public List<UseCaseFacade> GetAllUseCases(int id)
         {
             var result = new List<UseCaseFacade>();
+            var BehaviorRequirements = new List<RessourceRequirement>();
             foreach (RessourceDefinition def in GetAllUseCaseDefinitionsFor(id))
             {
-                result.Add(new UseCaseFacade(new Ressource(def)));
+                result.Add(new UseCaseFacade(new Ressource(def), BehaviorRequirements));
             }
             return result;
         }
@@ -145,11 +146,13 @@ namespace Iteration0.Data.Repositories
             return _dbSetProjectContextType.Where(c => (c.Project.Id == id) && c.IsEnabled == true && c.ContextEnumType == (short)ContextEnumType.VariationPoint).OrderBy(p => p.ScaleOrder).ToList();
         }
 
-        public List<ProjectContext> GetAllVariantsFor(int id)
+        public List<ProjectContext> GetAllVariantsFor(int id, EntityState state = EntityState.Detached)
         {
-            return _dbSetProjectContext.Where(c => c.Project.Id == id && c.IsEnabled == true && c.Type.ContextEnumType == (short)ContextEnumType.VariationPoint).ToList();
+            var result = _dbSetProjectContext.Where(c => c.Project.Id == id && c.IsEnabled == true && c.Type.ContextEnumType == (short)ContextEnumType.VariationPoint).ToList();
+            foreach (var variant in result) { _unitOfWork.DatabaseContext.Entry(variant).State = state; }
+            return result;
         }
-        
+
         public List<ProjectContext> GetAllDomainContexts(int id)
         {
             return _dbSetProjectContext.Where(c => c.Project.Id == id && c.IsEnabled == true && c.Type.ContextEnumType == (short)ContextEnumType.DomainContext).ToList();
@@ -173,6 +176,10 @@ namespace Iteration0.Data.Repositories
         public List<RessourceDefinition> GetAllInfrastructuresFor(int id)
         {
             return _dbSetProjectRessourceDefinition.Where(c => c.Project.Id == id && c.RessourceEnumType == (short)RessourceEnumType.Infrastructure && c.IsEnabled == true).ToList();
+        }
+        public List<RessourceRequirement> GetAllBehaviorRequirementsBy(int id)
+        {
+            throw new NotImplementedException();
         }
         public List<RessourceAssociation> GetAllAssociationsFor(int id)
         {
@@ -198,9 +205,20 @@ namespace Iteration0.Data.Repositories
             return _dbSetProjectRessourceDefinition.Where(c => c.Project.Id == id && c.RessourceEnumType == (short)RessourceEnumType.Component && c.IsEnabled == true).OrderBy(x => x.Name).ToList();
         }
 
-        public List<RessourceRequirement> GetAllRequirementsFor(int id)
+        public List<RessourceRequirement> GetAllBehaviorRequirementsFor(int id)
         {
-            return _dbSetRequirement.Where(c => c.Project.Id == id && c.RequirementEnumType == (short)RequirementEnumType.Default && c.IsEnabled == true).ToList();
+            return _dbSetRequirement.Where(c => c.Project.Id == id && RessourceRepository.BehaviorRequirementsTypes.Contains(c.RequirementEnumType) && c.IsEnabled == true).ToList();
+        }
+        public List<RessourceRequirement> GetAllBehaviorRequirementsFor(int id, int productId, int versionId)
+        {
+            if (versionId > 0)
+            {
+                return _dbSetProjectVersion.First(v => v.Id == versionId).Requirements.Where(c => RessourceRepository.BehaviorRequirementsTypes.Contains(c.RequirementEnumType) && c.IsEnabled == true).ToList();
+            }
+            else
+            {
+                return _dbSetRequirement.Where(c => c.Project.Id == id && c.Versions.Count == 0 && RessourceRepository.BehaviorRequirementsTypes.Contains(c.RequirementEnumType) && c.IsEnabled == true).ToList();
+            }
         }
         public ProjectContextType GetContextType(int id)
         {

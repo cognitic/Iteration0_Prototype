@@ -43,6 +43,7 @@ class PopUpUIControl extends RequirementUIControl {
         } else {
             $(this.buttonIDCancel).click((e => { cancelDelegate(cancelContext); return false }));
         } 
+        
         this.Appear();
     };
     Hide() {

@@ -47,10 +47,10 @@ namespace Iteration0.Data.Repositories
             var def = _dbSetRessourceDefinition.Find(id);
             return new Ressource(def);
         }
-        public RessourceDefinition GetDefinition(int id)
+        public RessourceDefinition GetDefinition(int id, EntityState state = EntityState.Detached)
         {
             var def = _dbSetRessourceDefinition.Find(id);
-            _unitOfWork.DatabaseContext.Entry(def).State = EntityState.Detached;
+            _unitOfWork.DatabaseContext.Entry(def).State = state;
             return def;
         }
         
@@ -79,7 +79,7 @@ namespace Iteration0.Data.Repositories
         {
             return _dbSetRessourceAssociation.Where(c => c.Parent.Id == id && (c.AssociationEnumType == (short)AssociationEnumType.HasOne || c.AssociationEnumType == (short)AssociationEnumType.HasMany)).ToList();
         }
-        public List<RessourceAssociation> GetAllParentAggregations(int id)
+        public List<RessourceAssociation> GetAllParentAggregationsFor(int id)
         {
             return _dbSetRessourceAssociation.Where(c => c.Ressource.Id == id && (c.AssociationEnumType == (short)AssociationEnumType.HasOne || c.AssociationEnumType == (short)AssociationEnumType.HasMany)).ToList();
         }
@@ -97,28 +97,40 @@ namespace Iteration0.Data.Repositories
         public void Update(RessourceAssociation item)
         {
             var original = _dbSetRessourceAssociation.Find(item.Id);
+            original.Ressource = item.Ressource;
             _unitOfWork.DatabaseContext.Entry(original).CurrentValues.SetValues(item);
         }
 
         public void Update(RessourceRequirement item)
         {
             var original = _dbSetRequirement.Find(item.Id);
+            original.Variants.Clear();
+            original.Variants = item.Variants;
+            original.UseCase = item.UseCase;
+            original.Concept = item.Concept;
+            original.UI = item.UI;
+            original.Infrastructure = item.Infrastructure;
             _unitOfWork.DatabaseContext.Entry(original).CurrentValues.SetValues(item);
         }
         public void Remove(RessourceAssociation item)
         {
-            _dbSetRessourceAssociation.Remove(item);
+            var original = _dbSetRessourceAssociation.Find(item.Id);
+            _dbSetRessourceAssociation.Remove(original);
         }
 
         public static readonly short[] BehaviorRequirementsTypes = { (short)RequirementEnumType.Default, (short)RequirementEnumType.LogicAlternative, (short)RequirementEnumType.UIAlternative };
-        public List<RessourceRequirement> GetAllBehaviorRequirementsBy(int ConceptId)
-        {
-            return _dbSetRequirement.Where(c => c.Concept.Id == ConceptId && BehaviorRequirementsTypes.Contains(c.RequirementEnumType) && c.IsEnabled == true).ToList();
-        }
-
-        public List<RessourceRequirement> GetAllBehaviorRequirementsFrom(int UIComponentId)
+        
+        public List<RessourceRequirement> GetAllBehaviorRequirementsForUI(int UIComponentId)
         {
             return _dbSetRequirement.Where(c => c.UI.Id == UIComponentId && BehaviorRequirementsTypes.Contains(c.RequirementEnumType) && c.IsEnabled == true).ToList();
+        }
+        public List<RessourceRequirement> GetAllBehaviorRequirementsForUC(int UseCaseId)
+        {
+            return _dbSetRequirement.Where(c => c.UseCase.Id == UseCaseId && BehaviorRequirementsTypes.Contains(c.RequirementEnumType) && c.IsEnabled == true).ToList();
+        }
+        public List<RessourceRequirement> GetAllBehaviorRequirementsForConcept(int UIConceptId)
+        {
+            return _dbSetRequirement.Where(c => c.Concept.Id == UIConceptId && BehaviorRequirementsTypes.Contains(c.RequirementEnumType) && c.IsEnabled == true).ToList();
         }
 
     }

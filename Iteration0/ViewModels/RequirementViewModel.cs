@@ -27,10 +27,11 @@ namespace Iteration0.ViewModels
         public string Infrastructure { get; set; }
         public int DefaultBehaviorID { get; set; }
         public string DefaultBehavior { get; set; }
-        public List<int> ScopeIDs { get; set; }
-        public string ScopeSummary { get; set; }
+        public List<int> ScopeIDs { get; set; } = new List<int>();
+        public string ScopeSummary { get; set; } = "";
         public bool IsSelected { get; set; }
-        public List<int> SelectedVersionIDs { get; set; }
-        public string SelectedVersionSummary { get; set; } = "";
+        public List<int> SelectedVersionIDs { get; set; } = new List<int>();
+        public List<string> SelectedVersions { get; set; } = new List<string>();
+        public List<int> SelectedProductIDs { get; set; } = new List<int>();
     }
 }

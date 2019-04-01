@@ -20,6 +20,5 @@ namespace Iteration0.Business.Domain.Entities
         public virtual ProjectDefinition Project { get; set; }
         public virtual ProjectContext Context { get; set; }
         public virtual ICollection<RessourceAssociation> Associations { get; set; }
-        public virtual ICollection<RessourceRequirement> Requirements { get; set; }
     }
 }

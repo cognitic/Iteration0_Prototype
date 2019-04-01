@@ -1,17 +1,19 @@
 ﻿@{
     ViewBag.Title = "Product Line";
     ViewBag.AddButtonLabel = "Add New Version";
+    ViewBag.GeneratorTitle = "Generate Scaffold";
+    ViewBag.GeneratorPath = "/Project/BusinessLayerScaffoldDownload";
 }
 <div class="editor-header-background">
     <div class="tac">
-        <div class="tac"><h2 class="board-pool-header">Requirements Funnel</h2></div>
+        <div class="tac"><h2 class="board-pool-header">Product(s) Behaviors</h2></div>
         
             <div class="funnel_outer">
                 <ul>
-                    <li class="funnel_step_4"><span><div>90% Required</div></span></li>
-                    <li class="funnel_step_5"><span><div>10% Planned</div></span> </li>
-                    <li class="funnel_step_6"><span><div>5% Completed</div></span></li>
-                    <li class="funnel_step_7"><span><div>1% Released</div></span></li>
+                    <li class="funnel_step_4"><span><div>@(ViewBag.RequirementFunnel.RequiredUCPercent)% Required</div></span></li>
+                    <li class="funnel_step_5"><span><div>@(ViewBag.RequirementFunnel.PlannedPercent)% Planned</div></span> </li>
+                    <li class="funnel_step_6"><span><div>@(ViewBag.RequirementFunnel.CompletedPercent)% Completed</div></span></li>
+                    <li class="funnel_step_7"><span><div>@(ViewBag.RequirementFunnel.ReleasedPercent)% Released</div></span></li>
                 </ul>
             </div>
 
@@ -44,9 +46,11 @@
                                             <td><span class="b">@version.MonthName @version.ReleasedYear.ToString()</span> <br /> @version.ProgressName</td>
                                             <td>
                                                 <span class="b">
-                                                    @version.CompletedAlternativeCount/@version.AlternativeCount Alternatives
-                                                </span><span class="tooltip">*<span class="tooltiptext">Alternatives with 100% of mandatory requirements</span></span>
-                                                <br /><a class="download-productline-link u action-link downloadbtn" linkID="" href="/Project/DownloadProductLine?VersionID=@version.VersionID">Download Settings</a>
+                                                    <a class="u" href="/Project/AnalysisMatrix?ProjectID=@ViewBag.ProjectID&VersionID=@version.VersionID">
+                                                        @version.CompletedAlternativeCount/@version.AlternativeCount Alternatives
+                                                    </a>
+                                                </span><span class="tooltip">*<span class="tooltiptext">Alternatives including 100% of mandatory requirements</span></span>
+                                                @*<br /><a class="download-productline-link u action-link downloadbtn" linkID="" href="/Project/DownloadProductLine?VersionID=@version.VersionID">Download Settings</a>*@
                                             </td>
                                             <td><a class="edit-variation-link u action-link" href="/Project/VersionEditor?VersionID=@version.VersionID">Edit</a></td>
                                         </tr>

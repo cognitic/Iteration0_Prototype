@@ -1,4 +1,5 @@
 ﻿/// <reference path="jquery.d.ts" />
+/// <reference path="global.d.ts" />
 /// <reference path='RequirementUIControl.ts'/>
 /// <reference path='PopUpUIControl.ts'/>
 /// <reference path='ProjectEditor.ts'/>
@@ -6,6 +7,7 @@
 /// <reference path='UseCaseEditor.ts'/>
 /// <reference path='UIComponentEditor.ts'/>
 /// <reference path='BoardEditor.ts'/>
+/// <reference path='PDFGenerator.ts'/>
 
 class Iteration0{     
     backScreen: JQuery;      
@@ -50,9 +52,45 @@ class Iteration0{
     public ShowConfirmationMessage(message: string, title: string, okDelegate, cancelDelegate) {
         this.ShowCustomMessage(message, title, okDelegate, cancelDelegate, null, null)
     }
+    pendingjsPDF: jsPDFInterface;
+    LoadDocumentURL: string = "/Project/GetDocumentViewModel"; 
+    public GeneratePDFForUseCasesSpecificationsWith(jsPDF: any, projectID: number) {
+        this.pendingjsPDF = jsPDF; var proxyControl = new PopUpUIControl("Proxy", "", 99, this); var context = this;
+        proxyControl.AjaxCall(this.LoadDocumentURL, JSON.stringify({ ProjectID: projectID, PDFType: PDFEnumType.UseCases }), this.OnViewModelLoaded, context);
+    }
+    public GeneratePDFForUISpecificationsWith(jsPDF: any, projectID: number) {
+        this.pendingjsPDF = jsPDF; var proxyControl = new PopUpUIControl("Proxy", "", 99, this); var context = this;
+        proxyControl.AjaxCall(this.LoadDocumentURL, JSON.stringify({ ProjectID: projectID, PDFType: PDFEnumType.UIs }), this.OnViewModelLoaded, context);
+    }
+    public GeneratePDFForConceptGlossaryWith(jsPDF: any, projectID: number) {
+        this.pendingjsPDF = jsPDF; var proxyControl = new PopUpUIControl("Proxy", "", 99, this); var context = this;
+        proxyControl.AjaxCall(this.LoadDocumentURL, JSON.stringify({ ProjectID: projectID, PDFType: PDFEnumType.Glossary }), this.OnViewModelLoaded, context);
+    }
+    
+    public OnViewModelLoaded(response, scope, context: Iteration0) {
+        if (response.Content != undefined) {
+            new PDFGenerator(response, context.pendingjsPDF).Download();
+        }
+        else {
+            context.ShowAlert(response);
+        }
+    }
 }
-//
-//      Project View Model Classes
+
+        //      Project View Model Classes
+class documentViewModel{
+    Title: string;
+    SubTitle: string;
+    FileName: string;
+    Content: Array<DocSectionViewModel>;
+}
+class DocSectionViewModel {
+    Header1: string;
+    Header2: string;
+    Header3: string;
+    Content: string;
+    PageNumber: number;
+}
 class ProjectEditorViewModel {
     DomainContextId: number;
     BusinessProcessesId: number;
@@ -91,10 +129,28 @@ class ProjectContextViewModel {
     Comment: string;
     SortOrder: number;
 }
+class AnalysisMatrixViewModel {
+    ProjectID: number;
+    DefaultRequirements: Array<RequirementViewModel>;
+    ProductAlternatives: Array<ProductAlternativeViewModel>;
+    ProjectProducts: Array<ItemViewModel>;
+    ProjecVersions: Array<ItemViewModel>;
+    //VariationPoints: Array<ProjectContextTypeViewModel>;
+    constructor() {
+        this.ProjectProducts = [];
+    }
+}
+class ProductAlternativeViewModel {
+    ScopeIDs: Array<number>;
+    ScopeSummary: string;
+    AlternativeRequirements: Array<RequirementViewModel>;
+}
 class VersionEditorViewModel {
     ProjectID: number;
     Definition: VersionViewModel;
-    ProductRequirements: Array<RequirementViewModel>;
+    SelectedRequirements: Array<RequirementViewModel>;
+    PendingProductRequirements: Array<RequirementViewModel>;
+    ProductAlternatives: Array<ItemViewModel>;
     ProjectProducts: Array<ItemViewModel>;
     constructor() {
         this.Definition = new VersionViewModel();
@@ -143,7 +199,8 @@ class RequirementViewModel {
     ScopeSummary: string;
     IsSelected: boolean;
     SelectedVersionIDs: Array<number>;
-    SelectedVersionSummary: string;
+    SelectedVersions: Array<string>;
+    SelectedProductIDs: Array<number>;
 }
 class RessourceDefinitionViewModel {
     RessourceID: number;
@@ -257,6 +314,7 @@ class BoardItemViewModel {
 ///////////////////////////////////////////////////
 
 
+enum PDFEnumType { unknown = 0, UseCases = 1, UIs = 2, Glossary = 3 };
 enum RessourceEnumType { unknown = 0, Domain = 1, UseCase = 2, Component = 3, Infrastructure = 4 };
 enum AssociationEnumType { unknown = 0, HasOne = 1, HasMany = 2};
 enum EventEnumType { unknown = 0, Create = 1, Update = 2, Delete = 3 };
@@ -290,7 +348,7 @@ PriorityLevels.push(new ItemViewModel("Low", "1"));
 PriorityLevels.push(new ItemViewModel("Medium", "2"));
 PriorityLevels.push(new ItemViewModel("High", "3"));
 PriorityLevels.push(new ItemViewModel("Urgent", "4"));
-PriorityLevels.push(new ItemViewModel("Mandatory", "5"));
+PriorityLevels.push(new ItemViewModel("Mandatory/Scope", "5"));
 var PrecisionScale = new Array<ItemViewModel>();
 PrecisionScale.push(new ItemViewModel("Slightly Precise", "1"));
 PrecisionScale.push(new ItemViewModel("Moderately Precise", "2"));

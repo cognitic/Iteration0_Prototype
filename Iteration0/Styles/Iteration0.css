@@ -305,6 +305,9 @@ span.action-text {
 .i {
   display: inline;
 }
+.ib {
+  display: inline-block;
+}
 .cb {
   clear: both;
 }
@@ -361,6 +364,10 @@ input#app-search-field {
   width: 190px;
   padding-left: 4px;
 }
+input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+}
 .smallbtn {
   padding: 0px 2px;
   font-size: 14px;
@@ -379,6 +386,9 @@ input#app-search-field {
   vertical-align: middle;
   width: 30px;
 }
+.app-profile-options-dropdown {
+  top: 1px;
+}
 .dropdown {
   position: relative;
   display: inline-block;
@@ -391,7 +401,8 @@ input#app-search-field {
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
 }
-.dropdown-content a {
+.dropdown-content a,
+.dropdown-content div {
   font-size: 14px;
   text-transform: uppercase;
   color: black;
@@ -405,6 +416,35 @@ input#app-search-field {
 }
 .dropdown:hover .dropdown-content {
   display: block;
+}
+.variants-dropdown {
+  top: -2px;
+}
+.variants-dropdown .dropdown-content {
+  width: 300px;
+}
+.variants-dropdown .dropdown-content div {
+  padding: 2px 6px;
+  display: inline-block;
+  width: 140px;
+}
+.variants-dropdown button {
+  padding: 4px 6px;
+  width: 160px;
+  font-size: 14px;
+}
+.variants-dropdown button.max {
+  padding: 10px 22px 8px 18px;
+  width: 200px;
+}
+.tab .requirement-view-tab {
+  background-color: #ccc;
+}
+.tab .requirement-view-tab.active {
+  background: #aaaaaa;
+}
+.tab .requirement-view-tab:hover {
+  background: #ffffff;
 }
 .app-menu {
   background-color: #222;
@@ -444,13 +484,23 @@ input#app-search-field {
 .app-page-context {
   margin-left: -10px;
 }
-.app-page-context select {
+.app-page-context select,
+.filter-selector select {
   font-size: 1.8em;
   padding: 3px 15px 2px 5px;
   margin-top: 6px;
   color: #fff;
   background: #aaaaaa;
   border-radius: 2px;
+}
+.filter-selector select {
+  font-size: 1.2em;
+  padding: 10px 22px 10px 18px;
+  margin-top: 2px;
+  width: 210px;
+}
+.filter-selector select option {
+  font-size: 1.4em;
 }
 /*.app-page-orderby {
         margin: 2px;
@@ -470,15 +520,36 @@ input#app-search-field {
 }
 .app-page-index,
 #editor,
-.app-page-text {
+.app-page-text,
+#matrix {
   padding: 10px;
   padding-top: 40px;
   padding-bottom: 20px;
   margin-bottom: 20px;
   background: #eaeaea;
 }
+#matrix-alternatives-filter .variants-dropdown {
+  top: 2px;
+}
+#editor-versions-wrapper table#matrix-view {
+  margin-bottom: 0px;
+  box-shadow: none;
+}
+#editor-versions-wrapper table#matrix-view tr {
+  display: block;
+}
+#editor-versions-wrapper table#matrix-view th,
+#editor-versions-wrapper table#matrix-view td {
+  min-width: 240px;
+  width: 240px;
+}
+#editor-versions-wrapper table#matrix-view tbody {
+  display: block;
+  overflow: auto;
+  max-height: 580px;
+}
 .underlined-row {
-  border-bottom: 1px solid #ab7684;
+  border-bottom: 1px solid #ababab;
   font-size: 1.8em;
   margin-bottom: 20px;
 }
@@ -599,9 +670,18 @@ button.square .ml4 {
 }
 .pop_up_content_holder {
   font-size: 1.5em;
-  padding: 15px;
   margin-right: auto;
   box-shadow: none;
+}
+.pop_up_content_holder .form-group {
+  padding: 15px;
+}
+.popup-filter {
+  position: absolute;
+  float: right;
+  right: 9px;
+  top: 7px;
+  font-size: 80%;
 }
 .pop_up_buttons {
   padding: 15px 25px 4px 25px;
@@ -618,7 +698,8 @@ button.square .ml4 {
 .form-element-group div {
   margin-bottom: 4px;
 }
-.form-element-group label {
+.form-element-group label,
+label {
   text-transform: uppercase;
 }
 .form-element-group select,
@@ -630,6 +711,10 @@ textarea {
 .form-element-group select,
 .form-element-group input {
   font-size: 1.2em;
+  width: 300px;
+}
+input:disabled {
+  color: #aaa;
 }
 .pop_up_buttons input[type="button"] {
   margin: 4px;
@@ -782,6 +867,12 @@ table.reverse tbody td {
   border-left: 10px solid #555;
   padding: 6px 30px 10px 16px;
 }
+#editor-fields-wrapper table th {
+  font-size: 1.6em;
+  font-weight: bold;
+  padding: 2px;
+  padding-left: 6px;
+}
 #editor-versions-wrapper {
   margin: 0 24px;
 }
@@ -801,6 +892,25 @@ table.reverse tbody td {
 }
 #editor-versions-wrapper table td:first-child {
   width: 200px;
+}
+#editor-versions-wrapper table.requirements {
+  table-layout: fixed;
+  background: none;
+  border: none;
+}
+#editor-versions-wrapper table.requirements thead th {
+  padding: 0;
+  background: none;
+  border-color: none;
+}
+#editor-versions-wrapper table.requirements thead th:first-child {
+  width: 202px;
+}
+#editor-versions-wrapper table.requirements thead th:nth-child(2) {
+  width: 120px;
+}
+#editor-versions-wrapper table.requirements thead th:last-child {
+  width: 120px;
 }
 .table-centered td {
   text-align: center;
@@ -985,9 +1095,29 @@ ol li:before {
 .aggregations-content .aggregations-concept .fmax {
   font-size: 44px;
 }
+.column-list .column-list-row {
+  border-top: 1px solid #aaa;
+  padding: 10px;
+  max-width: 600px;
+  Line-Height: 24px;
+}
+.column-list .clickable {
+  cursor: pointer;
+}
+.column-list .clickable > * {
+  pointer-events: none;
+}
+.column-list .clickable:hover {
+  background: #aaaaaa;
+  color: #fff;
+}
+.version-links-box.r a {
+  padding-top: 4px;
+  padding-right: 4px;
+}
 .requirement-box {
-  border: 1px dotted #555;
-  padding: 4px 1px;
+  border: 3px dotted #aaa;
+  padding: 8px 4px 10px 8px;
   margin: 20px 0;
 }
 .requirement-box .requirement-content {

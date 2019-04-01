@@ -9,4 +9,5 @@
 <script type="text/javascript">
     var boardItemAPI = { ItemEditorURL: "/Project/UIComponentEditor?ComponentID=", ItemSaveURL: "/Project/CreateEditBoardItem", ItemRemoveURL: "/Project/RemoveRessourceDefinition" };
     Iteration0APP.AddControl(new BoardEditorUIControl(@Html.Raw(ViewBag.editorVMAsJson), boardItemAPI));
+    $('#app-page-generator-button').click(function (e) { Iteration0APP.GeneratePDFForUISpecificationsWith(new jsPDF('p', 'pt', 'letter'),@Html.Raw(ViewBag.ProjectID)); return false });
 </script>

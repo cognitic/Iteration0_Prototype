@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using Iteration0.Data.Repositories;
 using Iteration0.Business.Services;
 using System.Linq;
+using System.Data.Entity;
 
 namespace Iteration0.Business.Interfaces
 {
@@ -39,7 +40,7 @@ namespace Iteration0.Business.Interfaces
         void Update(ProjectProduct item);
         //int Add(Event item);
         List<ProjectContextType> GetAllVariationPointsFor(int id);
-        List<ProjectContext> GetAllVariantsFor(int id);
+        List<ProjectContext> GetAllVariantsFor(int id, EntityState state = EntityState.Detached);
         List<ProjectProduct> GetAllProductsFor(int id);
         List<ProjectContext> GetAllDomainContexts(int id);
         List<ProjectContext> GetAllBusinessProcessesFor(int id);
@@ -50,7 +51,8 @@ namespace Iteration0.Business.Interfaces
         List<RessourceDefinition> GetAllConceptDefinitionsFor(int id);
         List<RessourceDefinition> GetAllUseCaseDefinitionsFor(int id);
         List<RessourceDefinition> GetAllUIDefinitionsFor(int id);
-        List<RessourceRequirement> GetAllRequirementsFor(int id);
+        List<RessourceRequirement> GetAllBehaviorRequirementsFor(int id);
+        List<RessourceRequirement> GetAllBehaviorRequirementsFor(int id, int productId, int versionId);
         //List<Event> GetAllEventsFor(int id);
         //List<Event> GetAllEventsFor(int id, EventEnumType filter);
     }
@@ -58,13 +60,14 @@ namespace Iteration0.Business.Interfaces
     {
         IQueryable<RessourceDefinition> SearchAllRessourcesWith(int projectId, String content);
         IQueryable<RessourceRequirement> SearchAllRequirementsWith(int projectId, String content);
-        RessourceDefinition GetDefinition(int id);
+        RessourceDefinition GetDefinition(int id, EntityState state = EntityState.Detached);
         RessourceAssociation GetAssociation(int id);
         RessourceRequirement GetRequirement(int id);
         List<RessourceAssociation> GetAllChildrenAggregations(int id);
-        List<RessourceAssociation> GetAllParentAggregations(int id);        
-        List<RessourceRequirement> GetAllBehaviorRequirementsBy(int ConceptId);
-        List<RessourceRequirement> GetAllBehaviorRequirementsFrom(int UIComponentId);
+        List<RessourceAssociation> GetAllParentAggregationsFor(int id);
+        List<RessourceRequirement> GetAllBehaviorRequirementsForUI(int UIComponentId);
+        List<RessourceRequirement> GetAllBehaviorRequirementsForUC(int UseCaseId);
+        List<RessourceRequirement> GetAllBehaviorRequirementsForConcept(int UIConceptId);
         void Update(RessourceDefinition item);
         void Add(RessourceAssociation item);
         void Update(RessourceAssociation item);

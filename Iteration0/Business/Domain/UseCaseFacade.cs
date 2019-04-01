@@ -11,14 +11,14 @@ namespace Iteration0.Business.Domain
     {
         private Ressource _ressource;
         public RessourceDefinition Definition { get; set; }
-        public UseCaseFacade(Ressource ressource)
+        public UseCaseFacade(Ressource ressource, List<RessourceRequirement> behaviors)
         {
             this._ressource = ressource;
             this.Definition = ressource.Definition;
-            this._Scenarios = ressource.Requirements.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Scenario).OrderBy(x => x.SortOrder).ToList();
+            //this._Scenarios = Requirements.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Scenario).OrderBy(x => x.SortOrder).ToList();
             //this._UISteps = ressource.Associations.Where( x => x.AssociationEnumType == (short)AssociationEnumType.UISteps).OrderBy(x => x.SortOrder).ToList();
-            this._Requirements = ressource.Requirements.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Default).OrderBy(x => x.SortOrder).ToList();
-            this._Alternatives = ressource.Requirements.Where(x => x.IsEnabled == true && x.IsAlternative == true).OrderBy(x => x.SortOrder).ToList();
+            this._Requirements = behaviors.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Default).OrderBy(x => x.SortOrder).ToList();
+            this._Alternatives = behaviors.Where(x => x.IsEnabled == true && x.IsAlternative == true).OrderBy(x => x.SortOrder).ToList();
         }
     
     private List<RessourceRequirement> _Scenarios = new List<RessourceRequirement>();

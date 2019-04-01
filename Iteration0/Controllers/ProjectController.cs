@@ -8,6 +8,8 @@ using Iteration0.Business.Interfaces;
 using Iteration0.Business.Services;
 using Iteration0.Data.Repositories;
 using System.Web.Script.Serialization;
+using System.IO.Compression;
+using Iteration0.Business.Domain;
 
 namespace Iteration0.Controllers
 {
@@ -15,13 +17,16 @@ namespace Iteration0.Controllers
     {
         private IProjectService _projectService;
         private IUserService _userService;
+        private IFileStorageService _FileStorageService;
         //private ILogger _logger;
 
-        public ProjectController(IProjectService projectService, IUserService userService, IProjectRepository projectRepository, IRessourceRepository ressourceRepository, IMappingService mapperService)
+        public ProjectController(IProjectService projectService, IUserService userService, IProjectRepository projectRepository, IRessourceRepository ressourceRepository, IMappingService mapperService, IFileStorageService FileStorageService)
         {
             this._projectService = projectService;
             this._projectService.ConfigureDependencies(projectRepository, ressourceRepository, mapperService);
             this._userService = userService;
+            this._FileStorageService = FileStorageService;
+            this._FileStorageService.ConfigurePathsWith(HttpRuntime.AppDomainAppPath);
             //this._logger = logger;
             ViewBag.SelectorProjects = _projectService.GetAllProjectAsItemViewModel();
         }
@@ -69,22 +74,15 @@ namespace Iteration0.Controllers
             //ViewBag.AllItems = _projectService.SummarizeAllConceptsFor(ProjectID);
             ViewBag.editorVMAsJson = new JavaScriptSerializer().Serialize(_projectService.GetDomainConceptsBoardEditorViewModelFor(ProjectID));
             return View();
-        }      
+        }
 
-        //[HttpGet]// GET: /Project/Scaffold
-        //public FileResult Scaffold(int ProjectID)
-        //{
-        //    //GenerateScaffoldZIPFileFor
-        //    //ViewBag.ProjectID = ProjectID;
-        //    //using (ZipFile zip = new ZipFile())
-        //    //{
-        //    //    zip.AddDirectory(Server.MapPath("~/Directories/hello"));
-        //    //    MemoryStream output = new MemoryStream();
-        //    //    zip.Save(output);
-        //    //    return File(output.ToArray(), "application/zip", "scaffold.zip");
-        //    //}
-        //    return File();
-        //}
+        [HttpGet]// GET: /Project/BusinessLayerScaffoldDownload
+        public ActionResult BusinessLayerScaffoldDownload(int ProjectID)
+        {
+            BusinessLayerScaffold scaffold = _projectService.GetBusinessLayerScaffoldFor(ProjectID, _FileStorageService.GetTemporaryFolderFor("Business\\Templates\\Default\\ScaffoldFolders\\"));
+            String scaffoldZipPath = _FileStorageService.GetTemporaryZIPArchivePathFor(scaffold.Folder.RootPath);
+            return File(scaffoldZipPath, "application/zip", "Business_Layer_CSharp.zip");
+        }
 
         // GET: /Project/DomainConceptEditor
         public ActionResult DomainConceptEditor(int ConceptID)
@@ -134,12 +132,23 @@ namespace Iteration0.Controllers
         {
             ViewBag.ProjectID = ProjectID;
             ViewBag.AllItems = _projectService.GetProductViewModelsFor( ProjectID);
+            ViewBag.RequirementFunnel = _projectService.GetRequirementFunnelViewModelFor(ProjectID);
             var ProductItems = new List<ItemViewModel>();
             foreach (ProductViewModel prod in ViewBag.AllItems)
             {
                 ProductItems.Add(new ItemViewModel() { KeyValue = prod.ProductID.ToString(), Label = prod.Name });
             }
             ViewBag.ProductItemsAsJson = new JavaScriptSerializer().Serialize(ProductItems);
+            return View();
+        }
+        // GET: /Project/AnalysisMatrix
+        public ActionResult AnalysisMatrix(int ProjectID, int VersionID)
+        {
+            AnalysisMatrixViewModel editorVM = _projectService.GetAnalysisMatrixViewModelFor(ProjectID);
+            ViewBag.ProjectID = ProjectID;
+            ViewBag.EditorTitle = "Product Alternatives";
+            ViewBag.VersionID = VersionID;
+            ViewBag.editorVMAsJson = new JavaScriptSerializer().Serialize(editorVM);
             return View();
         }
         // GET: /Project/VersionEditor
@@ -151,18 +160,18 @@ namespace Iteration0.Controllers
             ViewBag.editorVMAsJson = new JavaScriptSerializer().Serialize(editorVM);
             return View();
         }
-                // GET: /Project/Downloads
-        public ActionResult Downloads(int ProjectID)
-        {
-            ViewBag.ProjectID = ProjectID;
-            return View();
-        }
-        // GET: Project/Glossary
-        public ActionResult Glossary(int ProjectID)
-        {
-            ViewBag.ProjectID = ProjectID;
-            return View();
-        }
+        //        // GET: /Project/Downloads
+        //public ActionResult Downloads(int ProjectID)
+        //{
+        //    ViewBag.ProjectID = ProjectID;
+        //    return View();
+        //}
+        //// GET: Project/Glossary
+        //public ActionResult Glossary(int ProjectID)
+        //{
+        //    ViewBag.ProjectID = ProjectID;
+        //    return View();
+        //}
         // GET: Project/Options
         public ActionResult Options()
         {
@@ -181,7 +190,30 @@ namespace Iteration0.Controllers
         {
             return View();
         }
-
+        // GET: Project/GetDocumentViewModel
+        public JsonResult GetDocumentViewModel(int ProjectID, short PDFType)
+        {
+            if (true)
+            {
+                DocumentViewModel documentVM;
+                switch (PDFType)
+                {
+                    case (short)PDFEnumType.Glossary:
+                        documentVM = _projectService.GetGlossaryDocumentViewModelFor(ProjectID);
+                        break;
+                    case (short)PDFEnumType.UseCases:
+                        documentVM = _projectService.GetUseCasesDocumentViewModelFor(ProjectID);
+                        break;
+                    case (short)PDFEnumType.UIs:
+                        documentVM = _projectService.GetUIsDocumentViewModelFor(ProjectID);
+                        break;
+                    default:
+                        documentVM = new DocumentViewModel("Project not found", "Document not found", null, "Not_found_error");
+                        break;
+                }
+                return Json(documentVM);
+            }
+        }
 
         // POST: /Project/RemoveProjectContextType
         [HttpPost]
@@ -263,8 +295,13 @@ namespace Iteration0.Controllers
             {
                 int userId = 1;// Session["UserID"] as int;
                 _projectService.RemoveRessourceAssociationWith(associationID, ressourceID, userId);
+                var editorVM = _projectService.GetRessourceEditorViewModelFor(ressourceID);
+                return Json(editorVM);
             }
-            return Json("OK", JsonRequestBehavior.AllowGet);
+            else
+            {
+            return Json("No Authorisation Error", JsonRequestBehavior.AllowGet);
+            }
         }
         // POST: /Project/RemoveRessourceRequirement
         [HttpPost]
@@ -462,7 +499,7 @@ namespace Iteration0.Controllers
             }
         }
 
-        // POST: /Project/CreateEditRessourceRequirement
+        // POST: /Project/CreateEditRessourceRequirement //TODO add ressourceId parameter
         [HttpPost]
         public JsonResult CreateEditRessourceRequirement(RequirementViewModel formVM, int ProjectID)
         {
@@ -506,6 +543,47 @@ namespace Iteration0.Controllers
             }
             else
                 return "No Authorisation Error";
+        }
+
+        // POST: /Project/UploadScreen
+        [HttpPost]
+        public JsonResult UploadScreen(HttpPostedFileBase uploadedFile, int id)
+        {
+            if (true)
+            {
+                if (uploadedFile != null && uploadedFile.ContentLength > 0)
+                {
+                    try
+                    {
+                        byte[] FileByteArray = new byte[uploadedFile.ContentLength - 1 + 1];
+                        uploadedFile.InputStream.Read(FileByteArray, 0, uploadedFile.ContentLength);
+                        //DirectAttachmentFile newAttachment = new DirectAttachmentFile(id, "ref" + id.ToString(), DirectAttachmentTypes.adVisualFile);
+                        //newAttachment.FileContent = FileByteArray;
+                        //newAttachment.ContentType = uploadedFile.ContentType;
+                        //OperationResult operationResult = AttachmentManager.SaveAttachment(newAttachment);
+
+                        
+                //Dim filePath As String = GetDirectAttachmentPathFor(NewAttachment.TableId, NewAttachment.AttachmentType)
+                //If System.IO.File.Exists(filePath) Then
+                //    System.IO.File.Move(filePath, filePath.Substring(0, filePath.Length - 4) & "_updated_" & DateTime.Now.ToString("yyyyMMMdd_hhmmss_") & filePath.Substring(filePath.Length - 4, 4))
+                //End If
+                //Using memStream As New MemoryStream(NewAttachment.FileContent)
+                //    Using fstream As New FileStream(filePath, FileMode.Create)
+                //        memStream.WriteTo(fstream)
+                //    End Using
+                //End Using
+                            return Json("OK");//must return VM
+                    }
+                    catch (Exception ex)
+                    {
+                        return Json(ex.Message);
+                    }
+                }
+                else
+                    return Json("Stream file empty");
+            }
+            else
+                return Json("Only admin can upload file");
         }
 
 

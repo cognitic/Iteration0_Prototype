@@ -1,7 +1,7 @@
 ﻿@{
     ViewBag.Title = "Domain Board";
     ViewBag.AddButtonLabel = "Add New Concept";
-    ViewBag.GeneratorTitle = "Generate Scaffold";
+    ViewBag.GeneratorTitle = "Download Glossary";
 }
 
 <div id="board"></div>
@@ -9,5 +9,6 @@
 <script type="text/javascript">
     var boardItemAPI = { ItemEditorURL: "/Project/DomainConceptEditor?ConceptID=", ItemSaveURL: "/Project/CreateEditBoardItem", ItemRemoveURL:"/Project/RemoveRessourceDefinition"};
     Iteration0APP.AddControl(new BoardEditorUIControl(@Html.Raw(ViewBag.editorVMAsJson), boardItemAPI));
+    $('#app-page-generator-button').click(function (e) { Iteration0APP.GeneratePDFForConceptGlossaryWith(new jsPDF('p', 'pt', 'letter'),@Html.Raw(ViewBag.ProjectID)); return false });
 </script>
 

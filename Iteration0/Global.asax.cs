@@ -26,7 +26,7 @@ namespace Iteration0
             builder.RegisterType<ProjectRepository>().As<IProjectRepository>();
             builder.RegisterType<RessourceRepository>().As<IRessourceRepository>();
             builder.RegisterType<MappingService>().As<IMappingService>();
-            builder.RegisterType<MockUpGeneratorService>().As<IMockUpGeneratorService>();
+            builder.RegisterType<FileStorageService>().As<IFileStorageService>();
             builder.RegisterType<UserService>().As<IUserService>();
             builder.RegisterType<ProjectService>().As<IProjectService>();
             //builder.Register(c => new LogManager(DateTime.Now))

@@ -5,6 +5,7 @@ using Iteration0.Business.Domain.Entities;
 using Iteration0.ViewModels;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Iteration0.Business.Services
 {
@@ -33,6 +34,13 @@ namespace Iteration0.Business.Services
                     .ForMember(dest => dest.KeyValue, opts => opts.MapFrom(src => src.Id))
                     .ForMember(dest => dest.Label, opts => opts.MapFrom(src => src.Name))
                     .ForMember(dest => dest.SortOrder, opts => opts.MapFrom(src => src.SortOrder))
+                    .ReverseMap();
+                cfg.CreateMap<ProjectVersion, ItemViewModel>()
+                    .ForMember(dest => dest.ParentKeyValue, opts => opts.MapFrom(src => src.Product.Id))
+                    .ForMember(dest => dest.Code, opts => opts.MapFrom(src => src.VersionEnumType))
+                    .ForMember(dest => dest.KeyValue, opts => opts.MapFrom(src => src.Id))
+                    .ForMember(dest => dest.Label, opts => opts.MapFrom(src => src.NumberName))
+                    .ForMember(dest => dest.SortOrder, opts => opts.MapFrom(src => src.ReleasedYear*100 + src.ReleasedMonth))
                     .ReverseMap();
                 cfg.CreateMap<RessourceDefinition, RessourceDefinitionViewModel>()
                     .ForMember(dest => dest.RessourceID, opts => opts.MapFrom(src => src.Id))
@@ -89,6 +97,10 @@ namespace Iteration0.Business.Services
                     .ForMember(dest => dest.Tooltip, opts => opts.MapFrom(src => src.Description))
                     .ForMember(dest => dest.Label, opts => opts.MapFrom(src => "#" + src.Id.ToString() + " " + src.Behavior))
                     .ReverseMap();
+                cfg.CreateMap<ProductAlternativeViewModel, ItemViewModel>()
+                    .ForMember(dest => dest.KeyValue, opts => opts.MapFrom(src => String.Join("_", src.ScopeIDs.ToArray())))
+                    .ForMember(dest => dest.Label, opts => opts.MapFrom(src => src.ScopeSummary))
+                    .ReverseMap();                
                 cfg.CreateMap<RessourceDefinition, BoardItemViewModel>()
                 .ForMember(dest => dest.ItemID, opts => opts.MapFrom(src => src.Id))
                 .ForMember(dest => dest.PoolID, opts => opts.MapFrom(src => src.Context.Id))
@@ -202,8 +214,6 @@ namespace Iteration0.Business.Services
             foreach (RessourceRequirement entity in source)
             {
                 var result = Mapper.Map<RessourceRequirement, RequirementViewModel>(entity);
-                if (entity.IsAlternative)
-                {
                     result.ScopeIDs = entity.Variants.Select(x => x.Id).ToList();
                     foreach (ProjectContextType point in VariationPoints)
                     {
@@ -211,25 +221,23 @@ namespace Iteration0.Business.Services
                         if (pointSummary.Length > 0)
                         {
                             result.ScopeSummary += pointSummary;
-                            if (point.Id != VariationPoints.Last().Id)  result.ScopeSummary += ", ";
                         }
-                    }
-                }else
-                {
-                    result.ScopeSummary = "Default";
                 }
-                    foreach (ProjectProduct pp in ProjectProducts)
+                if (result.ScopeSummary.Length > 1 && result.ScopeSummary.Substring(result.ScopeSummary.Length - 2, 2) == ", ") { result.ScopeSummary = result.ScopeSummary.Substring(0, result.ScopeSummary.Length - 2); }
+                if (!entity.IsAlternative) { result.ScopeSummary = (result.ScopeSummary.Length>0? result.ScopeSummary : "Default"); }
+                result.SelectedVersions = new List<string>();
+                foreach (ProjectProduct pp in ProjectProducts)
                     {
                         foreach (ProjectVersion pv in pp.Versions)
                         {
                             if (result.SelectedVersionIDs.Contains(pv.Id))
                             {
-                            result.IsSelected = true;
-                            result.SelectedVersionSummary += pp.Name + " " + pv.NumberName + ", ";
+                                result.IsSelected = true;
+                                result.SelectedVersions.Add( pv.NumberName);
+                                if (!result.SelectedProductIDs.Contains(pp.Id)) result.SelectedProductIDs.Add(pp.Id);
                             }
                         }
                     }
-                    if (result.SelectedVersionSummary.Length > 0) result.SelectedVersionSummary = result.SelectedVersionSummary.Substring(0, result.SelectedVersionSummary.Length - 2);
                 
                 results.Add(result);
             }
@@ -290,6 +298,17 @@ namespace Iteration0.Business.Services
             return results;
         }
 
+        public List<ItemViewModel> BuildItemViewModelFor(List<ProjectVersion> source)
+        {
+            var results = new List<ItemViewModel>();
+            foreach (ProjectVersion entity in source)
+            {
+                var result = Mapper.Map<ProjectVersion, ItemViewModel>(entity);
+                results.Add(result);
+            }
+            return results;
+        }
+
         public List<ItemViewModel> BuildItemViewModelFor(List<RessourceRequirement> source)
         {
             var results = new List<ItemViewModel>();
@@ -300,6 +319,17 @@ namespace Iteration0.Business.Services
             }
             return results;
         }
+
+        public List<ItemViewModel> BuildItemViewModelFor(List<ProductAlternativeViewModel> source)
+        {
+            var results = new List<ItemViewModel>();
+            foreach (ProductAlternativeViewModel entity in source)
+            {
+                var result = Mapper.Map<ProductAlternativeViewModel, ItemViewModel>(entity);
+                results.Add(result);
+            }
+            return results;
+        }        
 
         public RessourceAssociation ReBuildRessourceAssociationWithViewModel(RessourceAssociationViewModel source)
         {

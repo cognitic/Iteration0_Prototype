@@ -113,7 +113,7 @@ class DomainConceptEditorUIControl extends RequirementUIControl {
     }
     public OnDefinitionSaveClick(context: DomainConceptEditorUIControl) {
         var VM = new RessourceDefinitionViewModel(); //VM.RessourceID = parseInt($("#formHiddenID").val()); VM.RessourceEnumType = RessourceEnumType.Domain;
-        VM.Name = $.trim($("#formDefName").val()); VM.Definition = $.trim($("#formDefVision").val()); //.ContextName = $.trim($("#formDefCodeName").val());
+        VM.Name = $.trim($("#formDefName").val()); VM.Definition = $.trim($("#formDefVision").val()); 
 
         var isOK = true;
         if ((context.FieldIsBlank(VM.Name))) { isOK = false; context.app.ShowAlert("Name is mandatory !"); }
@@ -141,17 +141,19 @@ class DomainConceptEditorUIControl extends RequirementUIControl {
         this.app.ShowCustomMessage("Are you sure you want to delete this aggregation ?", "Remove Aggregation", this.OnAggregationRemoveClick, null, this, null);
     }
     public OnAggregationRemoveClick(context: DomainConceptEditorUIControl) {
-        context.AjaxCall(context.removeAggregationURL, JSON.stringify({ AssociationId: context.removePendingID, ProjectID: context.domainConcept.ProjectID }), context.OnEditorSaved, context);
+        context.AjaxCall(context.removeAggregationURL, JSON.stringify({ associationID: context.removePendingID, ressourceID: context.domainConcept.Definition.RessourceID }), context.OnEditorSaved, context);
     }
     public ShowAggregationForm(aggregation: RessourceAssociationViewModel) {
         var title = ((aggregation.AssociationId > 0) ? "Edit Aggregation" : "Define New Aggregation");
         var formHtml = "";
         formHtml += "<div class='form-element-group'><div><label >Cardinality : </label></div><div>" + this.BuildDropDownHtmlWith("formCardinality", CardinalityOptions, "Select Cardinality", aggregation.AssociationEnumType.toString()) + "</div></div>";
         formHtml += "<div class='form-element-group'><div><label >Child Concept : </label></div><div>" + this.BuildDropDownHtmlWith("formChildConcept", this.domainConcept.ProjectConcepts, "Select Concept", aggregation.RessourceID.toString()) + "</div></div>";
-        this.app.ShowCustomMessage("<div class='form-group'>" + formHtml + "</div>", title, this.OnAggregationSaveClick, null, this, null);
+        this.app.ShowCustomMessage("<div class='form-group' formid='" + aggregation.AssociationId + "' >" + formHtml + "</div>", title, this.OnAggregationSaveClick, null, this, null);
     }
     public OnAggregationSaveClick(context: DomainConceptEditorUIControl) {
-        var VM = new RessourceAssociationViewModel(); VM.RessourceID = parseInt($("#formChildConcept").val()); VM.AssociationEnumType = parseInt($("#formCardinality").val());
+        var VM = new RessourceAssociationViewModel(); VM.AssociationId = parseInt($.trim($(".form-group").attr('formid')));
+        VM.ParentID = context.domainConcept.Definition.RessourceID; VM.RessourceID = parseInt($("#formChildConcept").val());
+        VM.AssociationEnumType = parseInt($("#formCardinality").val());
 
         var isOK = true;
         if ((context.FieldIsBlank(VM.RessourceID))) { isOK = false; context.app.ShowAlert("Child Concept is mandatory !"); }

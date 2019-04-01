@@ -25,8 +25,10 @@ class UseCaseEditorUIControl extends RequirementUIControl {
     public Start() {
         this.Build();
     }
-    public ReBuild(viewModel: any) {
-        this.useCase = viewModel;
+    public ReBuild(formVM: any) {
+        this.useCase = formVM;
+        this.Requirements = formVM.Requirements; this.Alternatives = formVM.Alternatives;
+        this.RequirementUseCase = formVM;
         this.Build();
     }
     public Build() {

@@ -7,6 +7,7 @@ using Iteration0.Business.Domain;
 
 using Iteration0.Business.Domain.Entities;
 using Iteration0.ViewModels;
+using Iteration0.Business.Infrastructure;
 
 namespace Iteration0.Business.Interfaces
 {
@@ -19,15 +20,21 @@ namespace Iteration0.Business.Interfaces
         void ConfigureDependencies(IProjectRepository SvcProjectRepository, IRessourceRepository ressourceRepository, IMappingService SvcMapperService);
 
         //Reader
+        BusinessLayerScaffold GetBusinessLayerScaffoldFor(int ProjectId, TemporaryFolder templateArchive);
         List<ProjectSummaryViewModel> SummarizeAllProjects();
         BoardEditorViewModel GetDomainConceptsBoardEditorViewModelFor(int ProjectId);
         BoardEditorViewModel GetUseCasesBoardEditorViewModelFor(int ProjectId);
         BoardEditorViewModel GetUIComponentsBoardEditorViewModelFor(int ProjectId);
         List<ProductViewModel> GetProductViewModelsFor(int  ProjectID);
+        RequirementFunnel GetRequirementFunnelViewModelFor(int ProjectID);
         RessourceDefinitionViewModel GetRessourceDefinitionFor(int RessourceId);
         ProjectEditorViewModel GetProjectEditorViewModelFor(int ProjectId);
         VersionEditorViewModel GetVersionEditorViewModelFor(int VersionId);
-        List<SearchResultViewModel> GetSearchResultViewModelsFor(int ProjectId, string Query);
+        AnalysisMatrixViewModel GetAnalysisMatrixViewModelFor(int ProjectId);
+        List<SearchResultViewModel> GetSearchResultViewModelsFor(int ProjectId, string Query);        
+        DocumentViewModel GetGlossaryDocumentViewModelFor(int projectID);
+        DocumentViewModel GetUseCasesDocumentViewModelFor(int projectID);
+        DocumentViewModel GetUIsDocumentViewModelFor(int projectID);
         dynamic GetRessourceEditorViewModelFor(int RessourceId);
         DomainConceptEditorViewModel GetDomainConceptEditorViewModelFor(int ConceptId);
         UseCaseEditorViewModel GetUseCaseEditorViewModelFor(int UseCaseId);
@@ -60,9 +67,13 @@ namespace Iteration0.Business.Interfaces
         void CreateEditVersionRequirementWith(ref ItemViewModel viewModel, int UserId, int ProjectID);        
         void CreateEditProjectVersionsWith(ref VersionViewModel viewModel, int UserId, int ProjectID);
     }
-    public interface IMockUpGeneratorService
+    public interface IFileStorageService
     {
+        void ConfigurePathsWith(String fileStoragePath);
+        TemporaryFolder GetTemporaryFolderFor(String archiveTemplatePath);
+        String GetTemporaryZIPArchivePathFor(String archiveFolderPath);
     }
+
     public interface IMappingService
     {
         //->VIEW
@@ -78,10 +89,12 @@ namespace Iteration0.Business.Interfaces
         List<RequirementViewModel> BuildRequirementViewModelFor(List<RessourceRequirement> source, List<ProjectProduct> ProjectProducts, List<ProjectContextType> VariationPoints);
         List<ProjectContextViewModel> BuildProjectContextViewModelFor(List<ProjectContext> source);
         List<ItemViewModel> BuildItemViewModelFor(List<ProjectContextType> source);
+        List<ItemViewModel> BuildItemViewModelFor(List<ProjectVersion> source);
         List<ItemViewModel> BuildItemViewModelFor(List<ProjectContext> source);
         List<ItemViewModel> BuildItemViewModelFor(List<RessourceDefinition> source);
         List<ItemViewModel> BuildItemViewModelFor(List<ProjectProduct> source);
         List<ItemViewModel> BuildItemViewModelFor(List<RessourceRequirement> source);
+        List<ItemViewModel> BuildItemViewModelFor(List<ProductAlternativeViewModel> source);        
         List<BoardPoolViewModel> BuildBoardPoolViewModelFor(List<ItemViewModel> Pools, List<RessourceDefinition> Ressources);
 
         //->BUSINESS
