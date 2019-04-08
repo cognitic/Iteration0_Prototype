@@ -29,7 +29,7 @@ namespace Iteration0.Tests.IntegrationTests
             //TODO add temporary project, usecase and requirement
             _projectid = int.Parse(_projectService.GetAllProjectAsItemViewModel().First().KeyValue);
             _useCaseid = int.Parse(_projectService.GetAllUseCaseViewModelsFor(_projectid).First().KeyValue);
-            _requirementid = int.Parse(_projectService.GetAllRequirementViewModelsFor(_projectid).First().KeyValue);
+            _requirementid = int.Parse(_projectService.GetAllSpecificationViewModelsFor(_projectid).First().KeyValue);
         }
 
         [TestMethod]
@@ -57,12 +57,12 @@ namespace Iteration0.Tests.IntegrationTests
         [TestMethod]
         public void ShouldUpdateRequirement()
         {
-            var AllRequirementsBeforeTest = _projectService.GetAllRequirementViewModelsFor(_projectid);
-            RequirementViewModel editorVMDefinition = _projectService.GetRequirementViewModelFor(_requirementid);
+            var AllSpecificationsBeforeTest = _projectService.GetAllSpecificationViewModelsFor(_projectid);
+            SpecificationViewModel editorVMDefinition = _projectService.GetSpecificationViewModelFor(_requirementid);
             var RequirementIdBeforeTest = editorVMDefinition.RequirementID;
             _projectService.CreateEditRessourceRequirementWith(ref editorVMDefinition, 1, _projectid);
-            var AllRequirementsAfterTest = _projectService.GetAllRequirementViewModelsFor(_projectid);
-            Assert.IsTrue(AllRequirementsBeforeTest.Count() == AllRequirementsAfterTest.Count() && editorVMDefinition.RequirementID == RequirementIdBeforeTest);
+            var AllSpecificationsAfterTest = _projectService.GetAllSpecificationViewModelsFor(_projectid);
+            Assert.IsTrue(AllSpecificationsBeforeTest.Count() == AllSpecificationsAfterTest.Count() && editorVMDefinition.RequirementID == RequirementIdBeforeTest);
         }
 
         [TestMethod]

@@ -38,11 +38,11 @@ namespace Iteration0.Business.Interfaces
         dynamic GetRessourceEditorViewModelFor(int RessourceId);
         DomainConceptEditorViewModel GetDomainConceptEditorViewModelFor(int ConceptId);
         UseCaseEditorViewModel GetUseCaseEditorViewModelFor(int UseCaseId);
-        RequirementViewModel GetRequirementViewModelFor(int requirementID);
+        SpecificationViewModel GetSpecificationViewModelFor(int requirementID);
         UIComponentEditorViewModel GetUIComponentEditorViewModelFor(int UIComponentId);
         List<ItemViewModel> GetAllProjectAsItemViewModel();
         List<ItemViewModel> GetAllUseCaseViewModelsFor(int ProjectId);
-        List<ItemViewModel> GetAllRequirementViewModelsFor(int ProjectId);
+        List<ItemViewModel> GetAllSpecificationViewModelsFor(int ProjectId);
         List<RessourceAssociationViewModel> GetAllAssociationViewModelsFor(int ProjectId);
         List<VersionViewModel> GetAllVersionViewModelsFor(int ProjectId);
 
@@ -60,11 +60,11 @@ namespace Iteration0.Business.Interfaces
         void CreateEditProjectDefinitionWith(ref ProjectDefinitionFormViewModel viewModel, int UserId, int ProjectID);
         void CreateEditRessouceDefinitionWith(ref RessourceDefinitionViewModel viewModel, int UserId, int ProjectID);
         void CreateEditRessouceAssociationWith(ref RessourceAssociationViewModel viewModel, int UserId, int ProjectID);
-        void CreateEditRessourceRequirementWith(ref RequirementViewModel viewModel, int UserId, int ProjectID);
+        void CreateEditRessourceRequirementWith(ref SpecificationViewModel viewModel, int UserId, int ProjectID);
         void CreateEditProjectContextTypesWith(ref ProjectContextTypeViewModel viewModel, int UserId, int ProjectID);
         void CreateEditProjectContextsWith(ref ProjectContextViewModel viewModel, int UserId, int ProjectID);
         void CreateEditProjectProductWith(ref ItemViewModel viewModel, int UserId, int ProjectID);
-        void CreateEditVersionRequirementWith(ref ItemViewModel viewModel, int UserId, int ProjectID);        
+        void CreateEditVersionRequirementWith(ref ItemViewModelList viewModel, int UserId, int ProjectID);        
         void CreateEditProjectVersionsWith(ref VersionViewModel viewModel, int UserId, int ProjectID);
     }
     public interface IFileStorageService
@@ -81,12 +81,12 @@ namespace Iteration0.Business.Interfaces
         List<ProjectContextTypeViewModel> BuildProjectContextTypeViewModelFor(List<ProjectContextType> source);
         VersionViewModel BuildVersionViewModelFor(ProjectVersion source);
         List<VersionViewModel> BuildVersionViewModelFor(List<ProjectVersion> source);
-        //List<VersionRequirementViewModel> BuildRessourceVersionRequirementViewModelFor(List<VersionRequirement> source);
+        //List<VersionSpecificationViewModel> BuildRessourceVersionSpecificationViewModelFor(List<VersionRequirement> source);
         RessourceDefinitionViewModel BuildRessourceDefinitionViewModelFor(RessourceDefinition source);
         List<RessourceDefinitionViewModel> BuildRessourceDefinitionViewModelFor(List<RessourceDefinition> source);
         List<RessourceAssociationViewModel> BuildRessourceAssociationViewModelFor(List<RessourceAssociation> source);
-        RequirementViewModel BuildRequirementViewModelFor(RessourceRequirement source);
-        List<RequirementViewModel> BuildRequirementViewModelFor(List<RessourceRequirement> source, List<ProjectProduct> ProjectProducts, List<ProjectContextType> VariationPoints);
+        SpecificationViewModel BuildSpecificationViewModelFor(RessourceRequirement source);
+        List<SpecificationViewModel> BuildSpecificationViewModelFor(List<RessourceRequirement> source, List<ProjectProduct> ProjectProducts, List<ProjectContextType> VariationPoints);
         List<ProjectContextViewModel> BuildProjectContextViewModelFor(List<ProjectContext> source);
         List<ItemViewModel> BuildItemViewModelFor(List<ProjectContextType> source);
         List<ItemViewModel> BuildItemViewModelFor(List<ProjectVersion> source);
@@ -102,12 +102,12 @@ namespace Iteration0.Business.Interfaces
         ProjectContextType ReBuildProjectContextTypeWithViewModel(ProjectContextTypeViewModel source);
         ProjectContext ReBuildProjectContextWithViewModel(ProjectContextViewModel source);
         ProjectVersion ReBuildProjectContextTypeWithViewModel(VersionViewModel source);
-        //VersionRequirement ReBuildVersionRequirementWithViewModel(VersionRequirementViewModel source);
+        //VersionRequirement ReBuildVersionRequirementWithViewModel(VersionSpecificationViewModel source);
         RessourceDefinition ReBuildRessourceDefinitionWithViewModel(RessourceDefinitionViewModel source);
         RessourceDefinition ReBuildRessourceDefinitionWithViewModel(ItemViewModel source);
         RessourceAssociation ReBuildRessourceAssociationWithViewModel(RessourceAssociationViewModel source);
-        RessourceRequirement ReBuildRessourceRequirementWithViewModel(RequirementViewModel source);
-        //RequiremenContext ReBuildRessourceRequirementContextWithViewModel(RequirementViewModel source);
+        RessourceRequirement ReBuildRessourceRequirementWithViewModel(SpecificationViewModel source);
+        //RequiremenContext ReBuildRessourceRequirementContextWithViewModel(SpecificationViewModel source);
         ProjectProduct ReBuildProjectProductWithViewModel(ItemViewModel source);
         ProjectVersion ReBuildProjectVersionWithViewModel(VersionViewModel source);    
     }

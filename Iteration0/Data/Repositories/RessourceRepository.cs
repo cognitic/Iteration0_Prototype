@@ -66,7 +66,7 @@ namespace Iteration0.Data.Repositories
         {
             return ( from m in _dbSetRessourceDefinition where m.Project.Id == projectId && ( m.Name.Contains(content) || m.Definition.Contains(content) ) select m );
         }
-        public IQueryable<RessourceRequirement> SearchAllRequirementsWith(int projectId, String content)
+        public IQueryable<RessourceRequirement> SearchAllSpecificationsWith(int projectId, String content)
         {
             return (from m in _dbSetRequirement where m.Project.Id == projectId && (m.Behavior.Contains(content) || m.Description.Contains(content)) select m);
         }
@@ -83,9 +83,11 @@ namespace Iteration0.Data.Repositories
         {
             return _dbSetRessourceAssociation.Where(c => c.Ressource.Id == id && (c.AssociationEnumType == (short)AssociationEnumType.HasOne || c.AssociationEnumType == (short)AssociationEnumType.HasMany)).ToList();
         }
-        public RessourceRequirement GetRequirement(int id)
+        public RessourceRequirement GetRequirement(int id, EntityState state = EntityState.Detached)
         {
-            return _dbSetRequirement.Where(c => c.Id == id && c.IsEnabled == true).FirstOrDefault();
+            var def = _dbSetRequirement.Find(id);
+            _unitOfWork.DatabaseContext.Entry(def).State = state;
+            return def;
         }
 
         public void Update(RessourceDefinition item)
@@ -118,19 +120,19 @@ namespace Iteration0.Data.Repositories
             _dbSetRessourceAssociation.Remove(original);
         }
 
-        public static readonly short[] BehaviorRequirementsTypes = { (short)RequirementEnumType.Default, (short)RequirementEnumType.LogicAlternative, (short)RequirementEnumType.UIAlternative };
+        public static readonly short[] SpecificationsTypes = { (short)RequirementEnumType.Default, (short)RequirementEnumType.LogicAlternative, (short)RequirementEnumType.UIAlternative };
         
-        public List<RessourceRequirement> GetAllBehaviorRequirementsForUI(int UIComponentId)
+        public List<RessourceRequirement> GetAllSpecificationsForUI(int UIComponentId)
         {
-            return _dbSetRequirement.Where(c => c.UI.Id == UIComponentId && BehaviorRequirementsTypes.Contains(c.RequirementEnumType) && c.IsEnabled == true).ToList();
+            return _dbSetRequirement.Where(c => c.UI.Id == UIComponentId && SpecificationsTypes.Contains(c.RequirementEnumType) && c.IsEnabled == true).ToList();
         }
-        public List<RessourceRequirement> GetAllBehaviorRequirementsForUC(int UseCaseId)
+        public List<RessourceRequirement> GetAllSpecificationsForUC(int UseCaseId)
         {
-            return _dbSetRequirement.Where(c => c.UseCase.Id == UseCaseId && BehaviorRequirementsTypes.Contains(c.RequirementEnumType) && c.IsEnabled == true).ToList();
+            return _dbSetRequirement.Where(c => c.UseCase.Id == UseCaseId && SpecificationsTypes.Contains(c.RequirementEnumType) && c.IsEnabled == true).ToList();
         }
-        public List<RessourceRequirement> GetAllBehaviorRequirementsForConcept(int UIConceptId)
+        public List<RessourceRequirement> GetAllSpecificationsForConcept(int UIConceptId)
         {
-            return _dbSetRequirement.Where(c => c.Concept.Id == UIConceptId && BehaviorRequirementsTypes.Contains(c.RequirementEnumType) && c.IsEnabled == true).ToList();
+            return _dbSetRequirement.Where(c => c.Concept.Id == UIConceptId && SpecificationsTypes.Contains(c.RequirementEnumType) && c.IsEnabled == true).ToList();
         }
 
     }

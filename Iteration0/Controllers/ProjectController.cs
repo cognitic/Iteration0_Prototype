@@ -80,7 +80,7 @@ namespace Iteration0.Controllers
         public ActionResult BusinessLayerScaffoldDownload(int ProjectID)
         {
             BusinessLayerScaffold scaffold = _projectService.GetBusinessLayerScaffoldFor(ProjectID, _FileStorageService.GetTemporaryFolderFor("Business\\Templates\\Default\\ScaffoldFolders\\"));
-            String scaffoldZipPath = _FileStorageService.GetTemporaryZIPArchivePathFor(scaffold.Folder.RootPath);
+            String scaffoldZipPath = _FileStorageService.GetTemporaryZIPArchivePathFor(scaffold.ScaffoldFolder.RootPath);
             return File(scaffoldZipPath, "application/zip", "Business_Layer_CSharp.zip");
         }
 
@@ -260,8 +260,16 @@ namespace Iteration0.Controllers
             {
                 int userId = 1;// Session["UserID"] as int;
                 _projectService.RemoveVersionRequirementWith(requirementID, versionID, userId);
+                //if (result == "OK")
+                //{
+                    var editorVM = _projectService.GetVersionEditorViewModelFor(versionID);
+                    return Json(editorVM);
+                //}
+                //else
+                //{
+                //    return Json(result);
+                //}
             }
-            return Json("OK", JsonRequestBehavior.AllowGet);
         }
 
         // POST: /Project/RemoveProjectProducts
@@ -373,15 +381,15 @@ namespace Iteration0.Controllers
             }
         }
 
-        // POST: /Project/CreateEditVersionRequirementWith
+        // POST: /Project/CreateEditVersionRequirement
         [HttpPost]
-        public JsonResult CreateEditVersionRequirementWith(ItemViewModel formVM, int ProjectID)
+        public JsonResult CreateEditVersionRequirement(ItemViewModelList formVM, int VersionID, int ProjectID)
         {
-            createEditDelegate<ItemViewModel> editorDelegate = _projectService.CreateEditVersionRequirementWith;
-            string result = GetControllerStatusForDelegate<ItemViewModel>(editorDelegate, ref formVM, ProjectID);
+            createEditDelegate<ItemViewModelList> editorDelegate = _projectService.CreateEditVersionRequirementWith;
+            string result = GetControllerStatusForDelegate<ItemViewModelList>(editorDelegate, ref formVM, ProjectID);
             if (result == "OK")
             {
-                var editorVM = _projectService.GetProjectEditorViewModelFor(ProjectID);
+                var editorVM = _projectService.GetVersionEditorViewModelFor(VersionID);
                 return Json(editorVM);
             }
             else
@@ -425,7 +433,7 @@ namespace Iteration0.Controllers
             string result = GetControllerStatusForDelegate<VersionViewModel>(editorDelegate, ref formVM, ProjectID);
             if (result == "OK")
             {
-                var editorVM = _projectService.GetProjectEditorViewModelFor(ProjectID);
+                var editorVM = _projectService.GetVersionEditorViewModelFor(formVM.VersionID);
                 return Json(editorVM);
             }
             else
@@ -501,10 +509,10 @@ namespace Iteration0.Controllers
 
         // POST: /Project/CreateEditRessourceRequirement //TODO add ressourceId parameter
         [HttpPost]
-        public JsonResult CreateEditRessourceRequirement(RequirementViewModel formVM, int ProjectID)
+        public JsonResult CreateEditRessourceRequirement(SpecificationViewModel formVM, int ProjectID)
         {
-            createEditDelegate<RequirementViewModel> editorDelegate = _projectService.CreateEditRessourceRequirementWith;
-            string result = GetControllerStatusForDelegate<RequirementViewModel>(editorDelegate, ref formVM, ProjectID);
+            createEditDelegate<SpecificationViewModel> editorDelegate = _projectService.CreateEditRessourceRequirementWith;
+            string result = GetControllerStatusForDelegate<SpecificationViewModel>(editorDelegate, ref formVM, ProjectID);
             if (result == "OK")
             {
                 //var editorVM = _projectService.GetRessourceEditorViewModelFor(formVM.RessourceID);

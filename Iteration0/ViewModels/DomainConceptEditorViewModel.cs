@@ -13,8 +13,8 @@ namespace Iteration0.ViewModels
         public List<RessourceAssociationViewModel> HasMany { get; set; }
         public List<RessourceAssociationViewModel> PartOf { get; set; }
         public List<RessourceAssociationViewModel> PartsOf { get; set; }
-        public List<RequirementViewModel> Requirements { get; set; }
-        public List<RequirementViewModel> Alternatives { get; set; }
+        public List<SpecificationViewModel> Specifications { get; set; }
+        public List<SpecificationViewModel> Alternatives { get; set; }
         public List<ItemViewModel> ProjectConcepts { get; set; }
         public List<ItemViewModel> ProjectDomainContexts { get; set; }
     }

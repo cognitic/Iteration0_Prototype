@@ -209,9 +209,8 @@
     <Compile Include="Business\Services\UserService.cs" />
     <Compile Include="Business\Services\ProjectService.cs" />
     <Compile Include="Business\Services\FileStorageService.cs" />
-    <Compile Include="Business\Services\ServiceBase.cs" />
     <Compile Include="Controllers\ProjectController.cs" />
-    <Compile Include="Business\Infrastructure\User.cs" />
+    <Compile Include="Business\Infrastructure\UserAccount.cs" />
     <Compile Include="Data\Managers\QueryManager.cs" />
     <Compile Include="Data\Repositories\DatabaseContextFactory .cs" />
     <Compile Include="Data\Repositories\MasterDatabaseContext.cs" />
@@ -294,6 +293,7 @@
     <Folder Include="Business\Templates\Default\ScaffoldFolders\Business\Domain\Aggregates\" />
     <Folder Include="Business\Templates\Default\ScaffoldFolders\Business\Domain\Entities\" />
     <Folder Include="Business\Templates\Default\ScaffoldFolders\Business\Domain\Factories\" />
+    <Folder Include="Business\Templates\Default\ScaffoldFolders\Business\Domain\Specifications\" />
     <Folder Include="Business\Templates\Default\ScaffoldFolders\Business\Infrastructure\" />
     <Folder Include="Business\Templates\Default\ScaffoldFolders\Business\Interfaces\" />
     <Folder Include="Business\Templates\Default\ScaffoldFolders\Business\Services\" />

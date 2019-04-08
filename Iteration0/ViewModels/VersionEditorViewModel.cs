@@ -7,7 +7,7 @@ namespace Iteration0.ViewModels
     public class AnalysisMatrixViewModel
     {
         public int ProjectID { get; set; }
-        public List<RequirementViewModel> DefaultRequirements { get; set; }
+        public List<SpecificationViewModel> DefaultSpecifications { get; set; }
         public List<ProductAlternativeViewModel> ProductAlternatives { get; set; }
         public List<ItemViewModel> ProjectProducts { get; set; }
         public List<ItemViewModel> ProjecVersions { get; set; }
@@ -17,7 +17,7 @@ namespace Iteration0.ViewModels
     {
         public List<int> ScopeIDs { get; set; } = new List<int>();
         public string ScopeSummary { get; set; } = "";
-        public List<RequirementViewModel> AlternativeRequirements { get; set; } = new List<RequirementViewModel>();
+        public List<SpecificationViewModel> AlternativeSpecifications { get; set; } = new List<SpecificationViewModel>();
     }
     public class RequirementFunnel
     {
@@ -36,8 +36,8 @@ namespace Iteration0.ViewModels
     {
         public int ProjectID { get; set; }
         public VersionViewModel Definition { get; set; }
-        public List<RequirementViewModel> SelectedRequirements { get; set; }
-        public List<RequirementViewModel> PendingProductRequirements { get; set; }
+        public List<SpecificationViewModel> SelectedSpecifications { get; set; }
+        public List<SpecificationViewModel> PendingProductSpecifications { get; set; }
         public List<ItemViewModel> ProjectProducts { get; set; }
         public List<ItemViewModel> ProductAlternatives { get; set; }
     }

@@ -16,7 +16,7 @@ class DomainConceptEditorUIControl extends RequirementUIControl {
     constructor(formVM: DomainConceptEditorViewModel) {
         super("DomainConceptEditorUIControl", "#editor");
         this.ProjectID = formVM.ProjectID; this.RessourceID = formVM.Definition.RessourceID;
-        this.Requirements = formVM.Requirements; this.Alternatives = formVM.Alternatives;
+        this.Specifications = formVM.Specifications; this.Alternatives = formVM.Alternatives;
         this.editorURL = "/Project/DomainConceptEditor?ConceptID=";
         this.domainConcept = formVM;
         this.definitionWrapper = $(".editor-header-bubble-definition");
@@ -38,7 +38,7 @@ class DomainConceptEditorUIControl extends RequirementUIControl {
         if (this.wrapper.length>0) {
             this.BuildDefinition();
             this.BuildAggregations();
-            this.BuildRequirements();
+            this.BuildSpecifications();
             this.BuildAlternatives();
         }
     }

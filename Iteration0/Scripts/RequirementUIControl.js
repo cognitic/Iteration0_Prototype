@@ -67,7 +67,7 @@ var RequirementUIControl = /** @class */ (function () {
                 this.requirementsWrapper.html(html);
             }
             else {
-                this.requirementsWrapper.html('<div class="tac">No Required Behaviors yet</div>');
+                this.requirementsWrapper.html('<div class="tac">No Default Behaviors yet</div>');
             }
         }
         $(".edit-requirement-link").click((function (e) { _this.ShowEditRequirementForm(parseInt($(e.target).attr('linkID'))); return false; }));
@@ -163,7 +163,7 @@ var RequirementUIControl = /** @class */ (function () {
     };
     RequirementUIControl.prototype.ShowRequirementForm = function (requirement) {
         var _this = this;
-        var title = ((requirement.RequirementID > 0) ? "Edit Required Behavior" : "New Required Behavior");
+        var title = ((requirement.RequirementID > 0) ? "Edit Default Behavior" : "New Default Behavior");
         var formHtml = "<div class='form-element-group'><div><label >Behavior : </label></div><div><input type='text' id='formBehaviorVerb' class='texttype' maxlength='50' style='width: 500px;' placeholder='Behavior as Verb Phrase..' value='" + requirement.Behavior + "'></div></div>";
         formHtml += "<div class='form-element-group'><div><label>Scope : </label></div>";
         formHtml += "<div>" + this.BuildHtmlButtonSelector(false, requirement.ScopeIDs) + "</div>";
@@ -362,7 +362,7 @@ var RequirementUIControl = /** @class */ (function () {
             error: function (xhRequest, ErrorText, thrownError) {
                 console.log(ErrorText);
                 if (xhRequest.getAllResponseHeaders()) {
-                    this.app.ShowAlert("Sorry, your session has timed out. Please log in again.");
+                    this.app.ShowAlert("An unexpected error occurred while communicating with the server !");
                 }
             }
         });

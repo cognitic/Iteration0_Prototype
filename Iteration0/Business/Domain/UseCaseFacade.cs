@@ -11,14 +11,14 @@ namespace Iteration0.Business.Domain
     {
         private Ressource _ressource;
         public RessourceDefinition Definition { get; set; }
-        public UseCaseFacade(Ressource ressource, List<RessourceRequirement> behaviors)
+        public UseCaseFacade(Ressource ressource, List<RessourceRequirement> Specifications)
         {
             this._ressource = ressource;
             this.Definition = ressource.Definition;
-            //this._Scenarios = Requirements.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Scenario).OrderBy(x => x.SortOrder).ToList();
+            //this._Scenarios = Specifications.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Scenario).OrderBy(x => x.SortOrder).ToList();
             //this._UISteps = ressource.Associations.Where( x => x.AssociationEnumType == (short)AssociationEnumType.UISteps).OrderBy(x => x.SortOrder).ToList();
-            this._Requirements = behaviors.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Default).OrderBy(x => x.SortOrder).ToList();
-            this._Alternatives = behaviors.Where(x => x.IsEnabled == true && x.IsAlternative == true).OrderBy(x => x.SortOrder).ToList();
+            this._Specifications = Specifications.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Default).OrderBy(x => x.SortOrder).ToList();
+            this._Alternatives = Specifications.Where(x => x.IsEnabled == true && x.IsAlternative == true).OrderBy(x => x.SortOrder).ToList();
         }
     
     private List<RessourceRequirement> _Scenarios = new List<RessourceRequirement>();
@@ -38,12 +38,12 @@ namespace Iteration0.Business.Domain
             }
         }
         
-    private List<RessourceRequirement> _Requirements = new List<RessourceRequirement>();
-    public List<RessourceRequirement> Requirements
+    private List<RessourceRequirement> _Specifications = new List<RessourceRequirement>();
+    public List<RessourceRequirement> Specifications
     {
         get
         {
-            return _Requirements;
+            return _Specifications;
         }
     }
     private List<RessourceRequirement> _Alternatives = new List<RessourceRequirement>();

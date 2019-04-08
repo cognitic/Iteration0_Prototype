@@ -17,10 +17,11 @@ var VersionEditorUIControl = /** @class */ (function (_super) {
     __extends(VersionEditorUIControl, _super);
     function VersionEditorUIControl(formVM) {
         var _this = _super.call(this, "VersionEditorUIControl", "#editor") || this;
-        _this.versionSaveURL = "/Project/CreateEditProjectVersionWith";
+        _this.versionSaveURL = "/Project/CreateEditProjectVersion";
         _this.removeVersionURL = "/Project/RemoveProjectVersion";
-        _this.versionRequirementSaveURL = "/Project/CreateEditVersionRequirementWith";
+        _this.versionRequirementSaveURL = "/Project/CreateEditVersionRequirement";
         _this.removeVersionRequirementURL = "/Project/RemoveVersionRequirement";
+        _this.editorURL = "/Project/VersionEditor?VersionID=";
         _this.ProjectID = formVM.ProjectID;
         _this.version = formVM;
         _this.versionsWrapper = $("#editor-version-requirement-wrapper");
@@ -112,7 +113,7 @@ var VersionEditorUIControl = /** @class */ (function (_super) {
                     html += (rowIndex > 0) ? '<tr>' : '';
                     html += '<td><div><div class="req-tag"><a href="/Project/UseCaseEditor?FunctionID=' + this.UseCaseID + '#r' + this.RequirementID + '"># ' + this.RequirementID + '</a></div></div></td>';
                     html += '<td><div><span class="b">' + this.Behavior + '</span> <br> ' + this.Description + '</div></td>';
-                    html += '<td><div><a class="remove-version-requirement-link u action-link" linkID="' + this.RequirementID + '">Remove</a></div></td>';
+                    html += '<td><div><a href="/" class="remove-version-requirement-link u action-link" linkID="' + this.RequirementID + '">Remove</a></div></td>';
                     html += '</tr>';
                     rowIndex += 1;
                 });
@@ -137,9 +138,9 @@ var VersionEditorUIControl = /** @class */ (function (_super) {
     };
     VersionEditorUIControl.prototype.ShowRemoveVersionForm = function (versionID) {
         this.removePendingID = versionID;
-        this.app.ShowCustomMessage("Are you sure you want to delete this item ?", "Remove Version", this.OnRequirementRemoveClick, null, this, null);
+        this.app.ShowCustomMessage("Are you sure you want to delete this version ?", "Remove Version", this.OnVersionRemoveClick, null, this, null);
     };
-    VersionEditorUIControl.prototype.OnVersionRequirementClick = function (context) {
+    VersionEditorUIControl.prototype.OnVersionRemoveClick = function (context) {
         context.AjaxCall(context.removeVersionURL, JSON.stringify({ versionID: context.removePendingID, ProjectID: context.ProjectID }), context.OnEditorSaved, context);
     };
     VersionEditorUIControl.prototype.ShowDefinitionForm = function (version) {
@@ -153,12 +154,13 @@ var VersionEditorUIControl = /** @class */ (function (_super) {
         formHtml += "<div class='form-element-group'><div><label >Released Month : </label></div><div>" + this.BuildDropDownHtmlWith("formMonth", MonthOptions, "Select Month", version.ReleasedMonth.toString()) + "</div></div>";
         formHtml += "<div class='form-element-group'><div><label >Released Year : </label></div><div>" + this.BuildDropDownHtmlWith("formYear", YearOptions, "Select Year", version.ReleasedYear.toString()) + "</div></div>";
         //formHtml += "<div class='filter-group'><label >Is Only Visible By Owner : </label><input type='checkbox' id='IsPrivateCB'></div>";
-        this.app.ShowCustomMessage("<div class='form-group'>" + formHtml + "</div>", title, this.OnDefinitionSaveClick, null, this, null);
+        this.app.ShowCustomMessage("<div class='form-group' formid='" + version.VersionID + "' >" + formHtml + "</div>", title, this.OnDefinitionSaveClick, null, this, null);
         return false;
     };
     VersionEditorUIControl.prototype.OnDefinitionSaveClick = function (context) {
         var VM = new VersionViewModel();
         VM.ProductID = parseInt($.trim($("#formProduct").val()));
+        VM.VersionID = parseInt($.trim($(".form-group").attr('formid')));
         VM.NumberName = $.trim($("#formDefName").val());
         VM.NickName = $.trim($("#formNickName").val());
         VM.Summary = $.trim($("#formDefGoal").val());
@@ -179,7 +181,7 @@ var VersionEditorUIControl = /** @class */ (function (_super) {
             context.app.ShowAlert("Status is mandatory !");
         }
         if (isOK) {
-            context.AjaxCall(context.saveURL, JSON.stringify({ formVM: context.version.Definition, ProjectID: context.ProjectID }), context.OnEditorSaved, context);
+            context.AjaxCall(context.versionSaveURL, JSON.stringify({ formVM: VM, ProjectID: context.ProjectID }), context.OnEditorSaved, context);
         }
     };
     VersionEditorUIControl.prototype.ShowVersionRequirementSelectForm = function () {
@@ -224,15 +226,21 @@ var VersionEditorUIControl = /** @class */ (function (_super) {
     VersionEditorUIControl.prototype.OnVersionRequirementSelectClick = function (context) {
         var newRequirementIDs = [];
         jQuery.each($('.column-list-row-checkbox:checked'), function () {
-            newRequirementIDs.push(parseInt($(this).attr('CBId')));
+            newRequirementIDs.push($(this).attr('CBId'));
         });
         var isOK = true;
-        if (newRequirementIDs.length > 0) {
+        if (newRequirementIDs.length == 0) {
             isOK = false;
             context.app.ShowAlert("No Behaviors Selected !");
         }
         if (isOK) {
-            context.AjaxCall(context.versionRequirementSaveURL, JSON.stringify({ requirementIDs: newRequirementIDs, VersionID: context.version.Definition.VersionID, ProjectID: context.ProjectID }), context.OnEditorSaved, context);
+            var requirementList = new ItemViewModelList();
+            jQuery.each(newRequirementIDs, function () {
+                var item = new ItemViewModel("", this);
+                item.ParentKeyValue = context.version.Definition.VersionID.toString();
+                requirementList.Items.push(item);
+            });
+            context.AjaxCall(context.versionRequirementSaveURL, JSON.stringify({ formVM: requirementList, VersionID: context.version.Definition.VersionID, ProjectID: context.ProjectID }), context.OnEditorSaved, context);
         }
     };
     VersionEditorUIControl.prototype.ShowRemoveVersionRequirementForm = function (requirementID) {
@@ -240,7 +248,7 @@ var VersionEditorUIControl = /** @class */ (function (_super) {
         this.app.ShowCustomMessage("Are you sure you want to remove this behavior ?", "Remove Behavior", this.OnRequirementRemoveClick, null, this, null);
     };
     VersionEditorUIControl.prototype.OnRequirementRemoveClick = function (context) {
-        context.AjaxCall(context.removeVersionRequirementURL, JSON.stringify({ requirementID: context.removePendingID, ProjectID: context.ProjectID }), context.OnEditorSaved, context);
+        context.AjaxCall(context.removeVersionRequirementURL, JSON.stringify({ requirementID: context.removePendingID, versionID: context.version.Definition.VersionID }), context.OnEditorSaved, context);
     };
     VersionEditorUIControl.prototype.OnEditorSaved = function (response, context) {
         if (response.Definition != undefined) {
@@ -252,7 +260,7 @@ var VersionEditorUIControl = /** @class */ (function (_super) {
             }
             else {
                 var rootUrl = window.location.href.substring(0, window.location.href.indexOf("/Project/"));
-                window.location.replace(rootUrl + context.editorURL + response.Definition.ProjectID);
+                window.location.replace(rootUrl + context.editorURL + response.Definition.VersionID);
             }
         }
         else {

@@ -17,7 +17,7 @@ namespace Iteration0.Business.Domain.Entities
         public bool IsEnabled { get; set; } = true;
 
         public virtual ProjectProduct Product { get; set; }        
-        public virtual ICollection<RessourceRequirement> Requirements { get; set; }
-        //public virtual ICollection<VersionRequirement> Requirements { get; set; }
+        public virtual ICollection<RessourceRequirement> Specifications { get; set; }
+        //public virtual ICollection<VersionRequirement> Specifications { get; set; }
     }
 }

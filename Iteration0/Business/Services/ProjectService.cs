@@ -60,7 +60,7 @@ namespace Iteration0.Business.Services
             {
                 var header1 = uc.Definition.Context.Name;
                 var header2 = uc.Definition.Name;
-                var header3 = "Requirements";
+                var header3 = "Specifications";
                 var sectionContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
                 content.Add(new DocSectionViewModel(header1, header2, header3, sectionContent));
                 header3 = "Alternatives";
@@ -117,10 +117,10 @@ namespace Iteration0.Business.Services
             return result;
         }
 
-        public List<ItemViewModel> GetAllRequirementViewModelsFor(int ProjectId)
+        public List<ItemViewModel> GetAllSpecificationViewModelsFor(int ProjectId)
         {
             List<ItemViewModel> result = new List<ItemViewModel>();
-            foreach (RessourceRequirement requ in projectRepository.GetAllBehaviorRequirementsFor(ProjectId).ToList())
+            foreach (RessourceRequirement requ in projectRepository.GetAllSpecificationsFor(ProjectId).ToList())
             {
                 result.Add(new ItemViewModel() { KeyValue = requ.Id.ToString(), Label = requ.Behavior.ToString() });
             }
@@ -233,10 +233,10 @@ namespace Iteration0.Business.Services
             return result;
         }
 
-        public List<int[]> GetScopeCombinaisonListFor(List<RessourceRequirement> requirements, List<ProjectContextType> variationPoints)
+        public List<int[]> GetScopeCombinaisonListFor(List<RessourceRequirement> Specifications, List<ProjectContextType> variationPoints)
         {
             var result = new List<int[]>();
-            foreach (RessourceRequirement req in requirements)
+            foreach (RessourceRequirement req in Specifications)
             {
                 var combination = new int[variationPoints.Count];
                 var pointIndex = 0;
@@ -249,25 +249,25 @@ namespace Iteration0.Business.Services
             }
             return result;
         }
-        public List<ProductAlternativeViewModel> GetProductAlternativeViewModelsFor(List<ProjectContextType> variationPoints, List<RessourceRequirement> requirements, List<ProjectProduct> ProjectProducts)
+        public List<ProductAlternativeViewModel> GetProductAlternativeViewModelsFor(List<ProjectContextType> variationPoints, List<RessourceRequirement> Specifications, List<ProjectProduct> ProjectProducts)
         {
             var result = new List<ProductAlternativeViewModel>();
-            var alternativeCombinations = GetScopeCombinaisonListFor(requirements, variationPoints);
+            var alternativeCombinations = GetScopeCombinaisonListFor(Specifications, variationPoints);
             foreach (var scope in alternativeCombinations)
             {
                 var ProductAlternative = new ProductAlternativeViewModel();
                 ProductAlternative.ScopeIDs = scope.ToList();
                 ProductAlternative.ScopeSummary = GetScopeSummaryFor(scope, variationPoints);
-                if (ProjectProducts.Count>0) ProductAlternative.AlternativeRequirements = mappingService.BuildRequirementViewModelFor(GetRequirementsWithinScope(requirements, variationPoints, scope), ProjectProducts, variationPoints);
+                if (ProjectProducts.Count>0) ProductAlternative.AlternativeSpecifications = mappingService.BuildSpecificationViewModelFor(GetSpecificationsWithinScope(Specifications, variationPoints, scope), ProjectProducts, variationPoints);
                 result.Add(ProductAlternative);
             }
             return result.OrderBy(alt => alt.ScopeSummary).ToList();
         }
 
-        public List<RessourceRequirement> GetRequirementsWithinScope(List<RessourceRequirement> requirements, List<ProjectContextType> variationPoints, int[] scope)
+        public List<RessourceRequirement> GetSpecificationsWithinScope(List<RessourceRequirement> Specifications, List<ProjectContextType> variationPoints, int[] scope)
         {
             var result = new List<RessourceRequirement>();
-            foreach (RessourceRequirement req in requirements)
+            foreach (RessourceRequirement req in Specifications)
             {
                 var IsWithinScope = true;
                 var pointIndex = 0;
@@ -303,11 +303,11 @@ namespace Iteration0.Business.Services
             var versionMandatoryDictionnary = new Dictionary<int, List<int[]>>();
             foreach (ProjectVersion pv in allVersions)
             {
-                var mandatoryRequirements = pv.Requirements.Where(r => r.Priority == 5).ToList();
-                versionMandatoryDictionnary.Add(pv.Id, GetScopeCombinaisonListFor(mandatoryRequirements, allVariationPoints));                
+                var mandatorySpecifications = pv.Specifications.Where(r => r.Priority == 5).ToList();
+                versionMandatoryDictionnary.Add(pv.Id, GetScopeCombinaisonListFor(mandatorySpecifications, allVariationPoints));                
             }
-            var NonAssignedMandatoryRequirements = projectRepository.GetAllBehaviorRequirementsFor(ProjectId).Where(r => r.Versions.Count ==0 && r.Priority == 5).ToList();//Priority 5: Mandatory/Scope
-            var projectNonAssignedCombinations = GetScopeCombinaisonListFor(NonAssignedMandatoryRequirements, allVariationPoints);
+            var NonAssignedMandatorySpecifications = projectRepository.GetAllSpecificationsFor(ProjectId).Where(r => r.Versions.Count ==0 && r.Priority == 5).ToList();//Priority 5: Mandatory/Scope
+            var projectNonAssignedCombinations = GetScopeCombinaisonListFor(NonAssignedMandatorySpecifications, allVariationPoints);
             var projectDistinctCombinations = BuildDeepCopyFrom(projectNonAssignedCombinations);
             //Totals
             var combinationsWithAllMandatory = new List<int[]>(); var versionWithAllMandatoryCounters = new Dictionary<int, int>();
@@ -345,43 +345,43 @@ namespace Iteration0.Business.Services
         }
         public RequirementFunnel GetRequirementFunnelViewModelFor(int ProjectId)
         {
-            var AllRequirements = projectRepository.GetAllBehaviorRequirementsFor(ProjectId).ToList();
-            var PlannedRequirements = new List<int>();
-            var CompletedRequirements = new List<int>();
-            var ReleasedRequirements = new List<int>();
+            var AllSpecifications = projectRepository.GetAllSpecificationsFor(ProjectId).ToList();
+            var PlannedSpecifications = new List<int>();
+            var CompletedSpecifications = new List<int>();
+            var ReleasedSpecifications = new List<int>();
             var AllVersions = projectRepository.GetAllVersionFor(ProjectId);
             foreach (ProjectVersion version in AllVersions.OrderBy(x => x.NumberName))
             {
                 switch (version.VersionEnumType)
                 {
                     case (short)VersionEnumType.Planned:
-                        PlannedRequirements.AddRange(version.Requirements.Select(x => x.Id));
+                        PlannedSpecifications.AddRange(version.Specifications.Select(x => x.Id));
                         break;
                     case (short)VersionEnumType.InProgress:
-                        PlannedRequirements.AddRange(version.Requirements.Select(x => x.Id));
+                        PlannedSpecifications.AddRange(version.Specifications.Select(x => x.Id));
                         break;
                     case (short)VersionEnumType.Completed:
-                        CompletedRequirements.AddRange(version.Requirements.Select(x => x.Id));
+                        CompletedSpecifications.AddRange(version.Specifications.Select(x => x.Id));
                         break;
                     case (short)VersionEnumType.Released:
-                        ReleasedRequirements.AddRange(version.Requirements.Select(x => x.Id));
+                        ReleasedSpecifications.AddRange(version.Specifications.Select(x => x.Id));
                         break;
                     default:
                         break;
                 }
             }
-            decimal AllRequirementsTotal = AllRequirements.Count;
+            decimal AllSpecificationsTotal = AllSpecifications.Count;
             decimal UCTotal = projectRepository.GetAllUseCaseDefinitionsFor(ProjectId).Count;
-            decimal UCWithRequirementTotal = AllRequirements.GroupBy(r => r.UseCase.Id).Count();
-            decimal ReleasedRequirementsTotal = ReleasedRequirements.Distinct().Count();
-            decimal CompletedRequirementsTotal = ReleasedRequirementsTotal + CompletedRequirements.Distinct().Count();
-            decimal PlannedRequirementsTotal = ReleasedRequirementsTotal + CompletedRequirementsTotal + PlannedRequirements.Distinct().Count();
+            decimal UCWithRequirementTotal = AllSpecifications.GroupBy(r => r.UseCase.Id).Count();
+            decimal ReleasedSpecificationsTotal = ReleasedSpecifications.Distinct().Count();
+            decimal CompletedSpecificationsTotal = ReleasedSpecificationsTotal + CompletedSpecifications.Distinct().Count();
+            decimal PlannedSpecificationsTotal = ReleasedSpecificationsTotal + CompletedSpecificationsTotal + PlannedSpecifications.Distinct().Count();
             RequirementFunnel result = new RequirementFunnel();
             if (UCTotal > 0) result.RequiredUCPercent = (int)Math.Round(UCWithRequirementTotal / UCTotal * 100, 0);
-            if (AllRequirementsTotal > 0) {
-                result.PlannedPercent = (int)Math.Round((PlannedRequirementsTotal / AllRequirementsTotal) * result.RequiredUCPercent); 
-                result.CompletedPercent = (int)Math.Round((CompletedRequirementsTotal / AllRequirementsTotal) * result.RequiredUCPercent);
-                result.ReleasedPercent = (int)Math.Round((ReleasedRequirementsTotal / AllRequirementsTotal) * result.RequiredUCPercent);
+            if (AllSpecificationsTotal > 0) {
+                result.PlannedPercent = (int)Math.Round((PlannedSpecificationsTotal / AllSpecificationsTotal) * result.RequiredUCPercent); 
+                result.CompletedPercent = (int)Math.Round((CompletedSpecificationsTotal / AllSpecificationsTotal) * result.RequiredUCPercent);
+                result.ReleasedPercent = (int)Math.Round((ReleasedSpecificationsTotal / AllSpecificationsTotal) * result.RequiredUCPercent);
             } 
             return result;
         }
@@ -394,10 +394,10 @@ namespace Iteration0.Business.Services
             var editorVM = new VersionEditorViewModel();
             editorVM.ProjectID = version.Product.Project.Id;
             editorVM.Definition = mappingService.BuildVersionViewModelFor(version);//VersionViewModel
-            editorVM.SelectedRequirements = mappingService.BuildRequirementViewModelFor(projectRepository.GetAllBehaviorRequirementsFor(editorVM.ProjectID, version.Product.Id, VersionId).ToList(), ProjectProducts, allVariationPoints);
-            editorVM.PendingProductRequirements = mappingService.BuildRequirementViewModelFor(projectRepository.GetAllBehaviorRequirementsFor(editorVM.ProjectID, version.Product.Id, 0).ToList(), ProjectProducts, allVariationPoints);
-            var alternativeRequirements = projectRepository.GetAllBehaviorRequirementsFor(editorVM.ProjectID).Where(x => x.IsAlternative).ToList();
-            editorVM.ProductAlternatives = mappingService.BuildItemViewModelFor(GetProductAlternativeViewModelsFor(allVariationPoints, alternativeRequirements, new List<ProjectProduct>()));
+            editorVM.SelectedSpecifications = mappingService.BuildSpecificationViewModelFor(projectRepository.GetAllSpecificationsFor(editorVM.ProjectID, version.Product.Id, VersionId).ToList(), ProjectProducts, allVariationPoints);
+            editorVM.PendingProductSpecifications = mappingService.BuildSpecificationViewModelFor(projectRepository.GetAllSpecificationsFor(editorVM.ProjectID, version.Product.Id, 0).ToList(), ProjectProducts, allVariationPoints);
+            var alternativeSpecifications = projectRepository.GetAllSpecificationsFor(editorVM.ProjectID).Where(x => x.IsAlternative).ToList();
+            editorVM.ProductAlternatives = mappingService.BuildItemViewModelFor(GetProductAlternativeViewModelsFor(allVariationPoints, alternativeSpecifications, new List<ProjectProduct>()));
             editorVM.ProjectProducts = mappingService.BuildItemViewModelFor(projectRepository.GetAllProductsFor(editorVM.ProjectID).ToList());
             return editorVM;
         }
@@ -405,15 +405,15 @@ namespace Iteration0.Business.Services
         public AnalysisMatrixViewModel GetAnalysisMatrixViewModelFor(int ProjectId)
         {
             List<ProjectProduct> ProjectProducts = projectRepository.GetAllProductsFor(ProjectId); 
-            var allRequirements = projectRepository.GetAllBehaviorRequirementsFor(ProjectId);
+            var allSpecifications = projectRepository.GetAllSpecificationsFor(ProjectId);
             var allVariationPoints = projectRepository.GetAllVariationPointsFor(ProjectId).Where(v => v.UsedAsProductAlternative).ToList();
-            var alternativeRequirements = allRequirements.Where(x => x.IsAlternative).ToList();
-            var alternativeDefaultRequirementIds = alternativeRequirements.Select(x => x.DefaultBehavior.Id).ToList();
-            var alternativeCombinations = GetScopeCombinaisonListFor(alternativeRequirements, allVariationPoints);
+            var alternativeSpecifications = allSpecifications.Where(x => x.IsAlternative).ToList();
+            var alternativeDefaultRequirementIds = alternativeSpecifications.Select(x => x.DefaultBehavior.Id).ToList();
+            var alternativeCombinations = GetScopeCombinaisonListFor(alternativeSpecifications, allVariationPoints);
             var editorVM = new AnalysisMatrixViewModel();
             editorVM.ProjectID = ProjectId;
-            editorVM.DefaultRequirements = mappingService.BuildRequirementViewModelFor(allRequirements.Where(x=> alternativeDefaultRequirementIds.Contains(x.Id)).ToList(), ProjectProducts, allVariationPoints);
-            editorVM.ProductAlternatives = GetProductAlternativeViewModelsFor(allVariationPoints, alternativeRequirements, ProjectProducts);
+            editorVM.DefaultSpecifications = mappingService.BuildSpecificationViewModelFor(allSpecifications.Where(x=> alternativeDefaultRequirementIds.Contains(x.Id)).ToList(), ProjectProducts, allVariationPoints);
+            editorVM.ProductAlternatives = GetProductAlternativeViewModelsFor(allVariationPoints, alternativeSpecifications, ProjectProducts);
             editorVM.ProjectProducts = mappingService.BuildItemViewModelFor(projectRepository.GetAllProductsFor(editorVM.ProjectID).ToList());
             editorVM.ProjecVersions = mappingService.BuildItemViewModelFor(projectRepository.GetAllVersionFor(editorVM.ProjectID).ToList());
             //editorVM.VariationPoints = mappingService.BuildProjectContextTypeViewModelFor(allVariationPoints);
@@ -425,10 +425,10 @@ namespace Iteration0.Business.Services
             List<DomainConceptFacade> AllConcepts = projectRepository.GetAllDomainConcepts(ProjectId).ToList();
             List<RessourceDefinition> AllInfrastructures = projectRepository.GetAllInfrastructuresFor(ProjectId).ToList();
             List<RessourceAssociation> AllAggregations = projectRepository.GetAllAssociationsFor(ProjectId).ToList();
-            List<RessourceRequirement> AllBehaviors = projectRepository.GetAllBehaviorRequirementsFor(ProjectId).ToList();
-            List<ProjectContext> AllAlternativeVariants = projectRepository.GetAllVariantsFor(ProjectId).ToList();
-            BusinessLayerScaffold result = new BusinessLayerScaffold(AllConcepts, AllInfrastructures, AllAggregations, AllBehaviors, AllAlternativeVariants, templateArchive);
-            result.BuildAll();
+            List<RessourceRequirement> AllSpecifications = projectRepository.GetAllSpecificationsFor(ProjectId).ToList();
+            AnalysisMatrixViewModel AllSpecificationsMatrix = GetAnalysisMatrixViewModelFor(ProjectId);
+            BusinessLayerScaffold result = new BusinessLayerScaffold(AllConcepts, AllInfrastructures, AllAggregations, AllSpecifications, AllSpecificationsMatrix, templateArchive);
+            result.GenerateAllFiles();
             return result;
         }
 
@@ -448,10 +448,10 @@ namespace Iteration0.Business.Services
             editorVM.Infrastructures = mappingService.BuildItemViewModelFor(projectRepository.GetAllInfrastructuresFor(ProjectId).ToList());
             return editorVM;
         }
-        public RequirementViewModel GetRequirementViewModelFor(int requirementID)
+        public SpecificationViewModel GetSpecificationViewModelFor(int requirementID)
         {
             RessourceRequirement requirement = projectRepository.GetRequirement(requirementID);
-            return mappingService.BuildRequirementViewModelFor(requirement); 
+            return mappingService.BuildSpecificationViewModelFor(requirement); 
         }
 
 
@@ -480,7 +480,7 @@ namespace Iteration0.Business.Services
         {
             List<RessourceAssociation> childrenAggregations = ressourceRepository.GetAllChildrenAggregations(ConceptId).ToList();
             List<RessourceAssociation> parentAggregations = ressourceRepository.GetAllParentAggregationsFor(ConceptId).ToList();
-            DomainConceptFacade concept = new DomainConceptFacade(ressourceRepository.Get(ConceptId), childrenAggregations, parentAggregations, ressourceRepository.GetAllBehaviorRequirementsForConcept(ConceptId));
+            DomainConceptFacade concept = new DomainConceptFacade(ressourceRepository.Get(ConceptId), childrenAggregations, parentAggregations, ressourceRepository.GetAllSpecificationsForConcept(ConceptId));
             List<ProjectContextType> VariationPoints = projectRepository.GetAllVariationPointsFor(concept.Definition.Project.Id).ToList();
             List<ProjectProduct> ProjectProducts = projectRepository.GetAllProductsFor(concept.Definition.Project.Id);
             var editorVM = new DomainConceptEditorViewModel();
@@ -490,25 +490,25 @@ namespace Iteration0.Business.Services
             editorVM.HasMany = mappingService.BuildRessourceAssociationViewModelFor(concept.GetChildrenAggregatedAs(AssociationEnumType.HasMany));
             editorVM.PartOf = mappingService.BuildRessourceAssociationViewModelFor(concept.GetParentAggregatedAs(AssociationEnumType.HasOne));
             editorVM.PartsOf = mappingService.BuildRessourceAssociationViewModelFor(concept.GetParentAggregatedAs(AssociationEnumType.HasMany));
-            editorVM.Requirements = mappingService.BuildRequirementViewModelFor(concept.Requirements, ProjectProducts, VariationPoints);
-            editorVM.Alternatives = mappingService.BuildRequirementViewModelFor(concept.Alternatives, ProjectProducts, VariationPoints);
+            editorVM.Specifications = mappingService.BuildSpecificationViewModelFor(concept.Specifications, ProjectProducts, VariationPoints);
+            editorVM.Alternatives = mappingService.BuildSpecificationViewModelFor(concept.Alternatives, ProjectProducts, VariationPoints);
             editorVM.ProjectConcepts = mappingService.BuildItemViewModelFor(projectRepository.GetAllConceptDefinitionsFor(editorVM.ProjectID).ToList());
             editorVM.ProjectDomainContexts = mappingService.BuildItemViewModelFor(projectRepository.GetAllDomainContexts(editorVM.ProjectID).ToList());
             return editorVM;
         }
         public UseCaseEditorViewModel GetUseCaseEditorViewModelFor(int FunctionId)
         {
-            UseCaseFacade uc = new UseCaseFacade( ressourceRepository.Get(FunctionId), ressourceRepository.GetAllBehaviorRequirementsForUC(FunctionId));
+            UseCaseFacade uc = new UseCaseFacade( ressourceRepository.Get(FunctionId), ressourceRepository.GetAllSpecificationsForUC(FunctionId));
             List<ProjectContextType> VariationPoints = projectRepository.GetAllVariationPointsFor(uc.Definition.Project.Id).ToList();
             List<ProjectProduct> ProjectProducts = projectRepository.GetAllProductsFor(uc.Definition.Project.Id);
             var editorVM = new UseCaseEditorViewModel();
             editorVM.ProjectID = uc.Definition.Project.Id;
             editorVM.Definition = mappingService.BuildRessourceDefinitionViewModelFor(uc.Definition);
-            editorVM.Scenarios = mappingService.BuildRequirementViewModelFor(uc.Scenarios, null, null);
+            editorVM.Scenarios = mappingService.BuildSpecificationViewModelFor(uc.Scenarios, null, null);
             editorVM.UISteps = mappingService.BuildRessourceAssociationViewModelFor(uc.UISteps);
-            editorVM.Requirements = mappingService.BuildRequirementViewModelFor(uc.Requirements, ProjectProducts, VariationPoints);
-            editorVM.RequirementOptions = mappingService.BuildItemViewModelFor(uc.Requirements);
-            editorVM.Alternatives = mappingService.BuildRequirementViewModelFor(uc.Alternatives, ProjectProducts, VariationPoints);
+            editorVM.Specifications = mappingService.BuildSpecificationViewModelFor(uc.Specifications, ProjectProducts, VariationPoints);
+            editorVM.RequirementOptions = mappingService.BuildItemViewModelFor(uc.Specifications);
+            editorVM.Alternatives = mappingService.BuildSpecificationViewModelFor(uc.Alternatives, ProjectProducts, VariationPoints);
             editorVM.VariationPoints = mappingService.BuildProjectContextTypeViewModelFor(VariationPoints);
             editorVM.ProjectBusinessProcesses = mappingService.BuildItemViewModelFor(projectRepository.GetAllBusinessProcessesFor(editorVM.ProjectID).ToList());
             editorVM.ProjectConcepts = mappingService.BuildItemViewModelFor(projectRepository.GetAllConceptDefinitionsFor(editorVM.ProjectID).ToList());
@@ -518,16 +518,16 @@ namespace Iteration0.Business.Services
         }
         public UIComponentEditorViewModel GetUIComponentEditorViewModelFor(int UIComponentId)
         {
-            UIComponentFacade component = new UIComponentFacade(ressourceRepository.Get(UIComponentId), ressourceRepository.GetAllBehaviorRequirementsForUI(UIComponentId));
+            UIComponentFacade component = new UIComponentFacade(ressourceRepository.Get(UIComponentId), ressourceRepository.GetAllSpecificationsForUI(UIComponentId));
             List<ProjectContextType> VariationPoints = projectRepository.GetAllVariationPointsFor(component.Definition.Project.Id).ToList();
             List<ProjectProduct> ProjectProducts = projectRepository.GetAllProductsFor(component.Definition.Project.Id);
             var editorVM = new UIComponentEditorViewModel();
             editorVM.ProjectID = component.Definition.Project.Id;
             editorVM.Definition = mappingService.BuildRessourceDefinitionViewModelFor(component.Definition);
-            //editorVM.Screens = mappingService.BuildRequirementViewModelFor(component.Screens, null, null);
-            //editorVM.Fields = mappingService.BuildRequirementViewModelFor(component.Fields, null, null);
-            editorVM.Requirements = mappingService.BuildRequirementViewModelFor(component.Requirements, ProjectProducts, VariationPoints);
-            editorVM.Alternatives = mappingService.BuildRequirementViewModelFor(component.Alternatives, ProjectProducts, VariationPoints);
+            //editorVM.Screens = mappingService.BuildSpecificationViewModelFor(component.Screens, null, null);
+            //editorVM.Fields = mappingService.BuildSpecificationViewModelFor(component.Fields, null, null);
+            editorVM.Specifications = mappingService.BuildSpecificationViewModelFor(component.Specifications, ProjectProducts, VariationPoints);
+            editorVM.Alternatives = mappingService.BuildSpecificationViewModelFor(component.Alternatives, ProjectProducts, VariationPoints);
             editorVM.VariationPoints = mappingService.BuildProjectContextTypeViewModelFor(projectRepository.GetAllVariationPointsFor(editorVM.ProjectID).ToList());
             editorVM.ProjectFeatures = mappingService.BuildItemViewModelFor(projectRepository.GetAllFeaturesFor(editorVM.ProjectID).ToList());
             return editorVM;
@@ -592,7 +592,7 @@ namespace Iteration0.Business.Services
             viewModel.AssociationId = assoc.Id;
         }
 
-        public void CreateEditRessourceRequirementWith(ref RequirementViewModel viewModel, int UserId, int ProjectID)
+        public void CreateEditRessourceRequirementWith(ref SpecificationViewModel viewModel, int UserId, int ProjectID)
         {
             RessourceRequirement requirement = mappingService.ReBuildRessourceRequirementWithViewModel(viewModel);
             var variantIds = viewModel.ScopeIDs;
@@ -600,7 +600,7 @@ namespace Iteration0.Business.Services
             Change(requirement, UserId, true);
             if (requirement.IsAlternative)
             {
-                RessourceRequirement defaultRequirement = ressourceRepository.GetRequirement(viewModel.DefaultBehaviorID);
+                RessourceRequirement defaultRequirement = ressourceRepository.GetRequirement(viewModel.DefaultSpecificationID);
                 requirement.UseCase = defaultRequirement.UseCase;
                 requirement.Concept = defaultRequirement.Concept;
                 requirement.UI = defaultRequirement.UI;
@@ -614,8 +614,8 @@ namespace Iteration0.Business.Services
                 if (viewModel.InfrastructureID > 0) requirement.Infrastructure = ressourceRepository.GetDefinition(viewModel.InfrastructureID, EntityState.Unchanged);
 
                 //TODO trigger changes after VM update
-                //List<RessourceRequirement> altRequirements = projectRepository.GetAlternativeRequirementFor(viewModel.DefaultBehaviorID);
-                //foreach (var altRequirement in altRequirements)
+                //List<RessourceRequirement> altSpecifications = projectRepository.GetAlternativeRequirementFor(viewModel.DefaultSpecificationID);
+                //foreach (var altRequirement in altSpecifications)
                 //{
                 //    altRequirement.UseCase = requirement.UseCase;
                 //    altRequirement.Concept = requirement.Concept;
@@ -707,12 +707,18 @@ namespace Iteration0.Business.Services
             unitOfWork.Commit();
             viewModel.VersionID = version.Id;
         }
-        public void CreateEditVersionRequirementWith(ref ItemViewModel viewModel, int UserId, int ProjectID)
+        public void CreateEditVersionRequirementWith(ref ItemViewModelList viewModel, int UserId, int ProjectID)
         {
-            ProjectVersion version = projectRepository.GetVersion(Int32.Parse(viewModel.ParentKeyValue));
-            RessourceRequirement requ = ressourceRepository.GetRequirement(Int32.Parse(viewModel.KeyValue));
-            version.Requirements.Add(requ);
-            unitOfWork.Commit();
+            if (viewModel.Items.Count > 0)
+            {
+                ProjectVersion version = projectRepository.GetVersion(Int32.Parse(viewModel.Items.First().ParentKeyValue));
+                foreach (ItemViewModel item in viewModel.Items)
+                {
+                    RessourceRequirement requ = ressourceRepository.GetRequirement(Int32.Parse(item.KeyValue), EntityState.Unchanged);
+                    version.Specifications.Add(requ);
+                }
+                unitOfWork.Commit();
+            }
         }
 
         public void RemoveProjectVersionWith(int versionID, int ProjectID, int UserId)
@@ -777,9 +783,9 @@ namespace Iteration0.Business.Services
         }
         public void RemoveVersionRequirementWith(int requirementID, int VersionID, int UserId)
         {
-            RessourceRequirement requirement = ressourceRepository.GetRequirement(requirementID);
+            RessourceRequirement requirement = ressourceRepository.GetRequirement(requirementID, EntityState.Unchanged);
             ProjectVersion version = projectRepository.GetVersion(VersionID);
-            version.Requirements.Remove(requirement);
+            version.Specifications.Remove(requirement);
             unitOfWork.Commit();
         }
         
@@ -803,7 +809,7 @@ namespace Iteration0.Business.Services
             if (Query.Length > 0)
             {
             IQueryable<RessourceDefinition> ressMatches = ressourceRepository.SearchAllRessourcesWith(ProjectId, Query);
-            IQueryable<RessourceRequirement> requMatches = ressourceRepository.SearchAllRequirementsWith(ProjectId, Query);
+            IQueryable<RessourceRequirement> requMatches = ressourceRepository.SearchAllSpecificationsWith(ProjectId, Query);
             foreach (RessourceDefinition ress in ressMatches.OrderBy(x => x.ScaleOrder).ThenBy(x => x.StepOrder))
             {
                 var VM = new SearchResultViewModel();

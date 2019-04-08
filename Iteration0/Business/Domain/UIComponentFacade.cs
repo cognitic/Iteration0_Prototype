@@ -12,14 +12,14 @@ namespace Iteration0.Business.Domain
         public RessourceDefinition Definition { get; set; }
 
         private Ressource _ressource;
-        public UIComponentFacade(Ressource ressource, List<RessourceRequirement> behaviors)
+        public UIComponentFacade(Ressource ressource, List<RessourceRequirement> Specifications)
         {
             this._ressource = ressource;
             this.Definition = ressource.Definition;
-            //this._screens = Requirements.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Screen).OrderBy(x => x.SortOrder).ToList();
-            //this._fields = Requirements.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Field).OrderBy(x => x.SortOrder).ToList();
-            this._Requirements = behaviors.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Default).OrderBy(x => x.SortOrder).ToList();
-            this._Alternatives = behaviors.Where(x => x.IsEnabled == true && x.IsAlternative == true).OrderBy(x => x.SortOrder).ToList();
+            //this._screens = Specifications.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Screen).OrderBy(x => x.SortOrder).ToList();
+            //this._fields = Specifications.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Field).OrderBy(x => x.SortOrder).ToList();
+            this._Specifications = Specifications.Where(x => x.IsEnabled == true && x.RequirementEnumType == (short)RequirementEnumType.Default).OrderBy(x => x.SortOrder).ToList();
+            this._Alternatives = Specifications.Where(x => x.IsEnabled == true && x.IsAlternative == true).OrderBy(x => x.SortOrder).ToList();
         }
         
         private List<RessourceRequirement> _screens;
@@ -38,12 +38,12 @@ namespace Iteration0.Business.Domain
                 return _fields;
             }
         }
-        private List<RessourceRequirement> _Requirements = new List<RessourceRequirement>();
-        public List<RessourceRequirement> Requirements
+        private List<RessourceRequirement> _Specifications = new List<RessourceRequirement>();
+        public List<RessourceRequirement> Specifications
         {
             get
             {
-                return _Requirements;
+                return _Specifications;
             }
         }
         private List<RessourceRequirement> _Alternatives = new List<RessourceRequirement>();

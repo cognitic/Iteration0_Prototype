@@ -47,8 +47,9 @@ namespace Iteration0.Business.Services
                     .ForMember(dest => dest.ProjectContextName, opts => opts.MapFrom(src => src.Context.Name))
                     .ForMember(dest => dest.ProjectContextId, opts => opts.MapFrom(src => src.Context.Id))
                     .ReverseMap();
-                cfg.CreateMap<RessourceRequirement, RequirementViewModel>()
+                cfg.CreateMap<RessourceRequirement, SpecificationViewModel>()
                     .ForMember(dest => dest.RequirementID, opts => opts.MapFrom(src => src.Id))
+                    .ForMember(dest => dest.Name, opts => opts.MapFrom(src => src.Behavior))
                     .ForMember(dest => dest.UseCaseID, opts => opts.MapFrom(src => src.UseCase.Id))
                     .ForMember(dest => dest.UseCase, opts => opts.MapFrom(src => src.UseCase.Name))
                     .ForMember(dest => dest.ConceptID, opts => opts.MapFrom(src => src.Concept.Id))
@@ -57,10 +58,10 @@ namespace Iteration0.Business.Services
                     .ForMember(dest => dest.UI, opts => opts.MapFrom(src => src.UI.Name))
                     .ForMember(dest => dest.InfrastructureID, opts => opts.MapFrom(src => src.Infrastructure.Id))
                     .ForMember(dest => dest.Infrastructure, opts => opts.MapFrom(src => src.Infrastructure.Name))
-                    .ForMember(dest => dest.DefaultBehaviorID, opts => opts.MapFrom(src => src.DefaultBehavior.Id))
-                    .ForMember(dest => dest.DefaultBehavior, opts => opts.MapFrom(src => src.DefaultBehavior.Behavior))
+                    .ForMember(dest => dest.DefaultSpecificationID, opts => opts.MapFrom(src => src.DefaultBehavior.Id))
+                    .ForMember(dest => dest.DefaultSpecification, opts => opts.MapFrom(src => src.DefaultBehavior.Behavior))
                     .ForMember(dest => dest.SelectedVersionIDs, opts => opts.MapFrom(src => src.Versions.Select(x => x.Id)));
-                cfg.CreateMap<RequirementViewModel, RessourceRequirement>()
+                cfg.CreateMap<SpecificationViewModel, RessourceRequirement>()
                     .ForMember(dest => dest.Id, opts => opts.MapFrom(src => src.RequirementID))
                     .ForMember(dest => dest.UseCase, opt => opt.Ignore())
                     .ForMember(dest => dest.Concept, opt => opt.Ignore())
@@ -73,7 +74,7 @@ namespace Iteration0.Business.Services
                     .ForMember(dest => dest.Label, opts => opts.MapFrom(src => src.Name))
                     .ForMember(dest => dest.Tooltip, opts => opts.MapFrom(src => src.Definition))
                     .ReverseMap();
-                //cfg.CreateMap<RequiremenContext, RequirementViewModel>()
+                //cfg.CreateMap<RequiremenContext, SpecificationViewModel>()
                 //    .ForMember(dest => dest.RequirementID, opts => opts.MapFrom(src => src.Id))                  
                 //    .ReverseMap();
                 cfg.CreateMap<RessourceAssociation, RessourceAssociationViewModel>()
@@ -107,7 +108,7 @@ namespace Iteration0.Business.Services
                 .ForMember(dest => dest.ItemType, opts => opts.MapFrom(src => src.RessourceEnumType))
                 .ReverseMap();
                 //rsc.Name = formVM.Name; rsc.ProjectContextId = formVM.PoolID; rsc.ScaleOrder = formVM.ScaleOrder; rsc.StepOrder = formVM.StepOrder; rsc.SortOrder = formVM.SortOrder;
-                //cfg.CreateMap<VersionRequirement, VersionRequirementViewModel>()
+                //cfg.CreateMap<VersionRequirement, VersionSpecificationViewModel>()
                 //    .ForMember(dest => dest.VersionID, opts => opts.MapFrom(src => src.Version.Id))
                 //    .ForMember(dest => dest.RequirementID, opts => opts.MapFrom(src => src.Requirement.Id))
                 //    .ReverseMap();
@@ -134,9 +135,9 @@ namespace Iteration0.Business.Services
             return results;
     }
 
-        public RequirementViewModel BuildRequirementViewModelFor(RessourceRequirement source)
+        public SpecificationViewModel BuildSpecificationViewModelFor(RessourceRequirement source)
         {
-            return Mapper.Map<RessourceRequirement, RequirementViewModel>(source);
+            return Mapper.Map<RessourceRequirement, SpecificationViewModel>(source);
         }
 
         public RessourceDefinitionViewModel BuildRessourceDefinitionViewModelFor(RessourceDefinition source)
@@ -164,14 +165,14 @@ namespace Iteration0.Business.Services
             return Mapper.Map<ItemViewModel, RessourceDefinition>(source);
         }
         
-        //public RequiremenContext ReBuildRessourceRequirementContextWithViewModel(RequirementViewModel source)
+        //public RequiremenContext ReBuildRessourceRequirementContextWithViewModel(SpecificationViewModel source)
         //{
-        //    return Mapper.Map<RequirementViewModel, RequiremenContext>(source);
+        //    return Mapper.Map<SpecificationViewModel, RequiremenContext>(source);
         //}
 
-        public RessourceRequirement ReBuildRessourceRequirementWithViewModel(RequirementViewModel source)
+        public RessourceRequirement ReBuildRessourceRequirementWithViewModel(SpecificationViewModel source)
         {
-            return Mapper.Map<RequirementViewModel, RessourceRequirement>(source);
+            return Mapper.Map<SpecificationViewModel, RessourceRequirement>(source);
         }
         
         public ProjectProduct ReBuildProjectProductWithViewModel(ItemViewModel source)
@@ -182,9 +183,9 @@ namespace Iteration0.Business.Services
         {
             return Mapper.Map<VersionViewModel, ProjectVersion>(source);
         }
-        //public VersionRequirement ReBuildVersionRequirementWithViewModel(VersionRequirementViewModel source)
+        //public VersionRequirement ReBuildVersionRequirementWithViewModel(VersionSpecificationViewModel source)
         //{
-        //    return Mapper.Map<VersionRequirementViewModel, VersionRequirement>(source);
+        //    return Mapper.Map<VersionSpecificationViewModel, VersionRequirement>(source);
         //}
         public List<RessourceDefinitionViewModel> BuildRessourceDefinitionViewModelFor(List<RessourceDefinition> source)
         {
@@ -208,12 +209,12 @@ namespace Iteration0.Business.Services
             return results;
         }
 
-        public List<RequirementViewModel> BuildRequirementViewModelFor(List<RessourceRequirement> source, List<ProjectProduct>  ProjectProducts, List<ProjectContextType> VariationPoints = null)
+        public List<SpecificationViewModel> BuildSpecificationViewModelFor(List<RessourceRequirement> source, List<ProjectProduct>  ProjectProducts, List<ProjectContextType> VariationPoints = null)
         {
-            var results = new List<RequirementViewModel>();
+            var results = new List<SpecificationViewModel>();
             foreach (RessourceRequirement entity in source)
             {
-                var result = Mapper.Map<RessourceRequirement, RequirementViewModel>(entity);
+                var result = Mapper.Map<RessourceRequirement, SpecificationViewModel>(entity);
                     result.ScopeIDs = entity.Variants.Select(x => x.Id).ToList();
                     foreach (ProjectContextType point in VariationPoints)
                     {
@@ -349,12 +350,12 @@ namespace Iteration0.Business.Services
         {
             return Mapper.Map<ProjectVersion, VersionViewModel>(source);
         }
-        //public List<VersionRequirementViewModel> BuildRessourceVersionRequirementViewModelFor(List<VersionRequirement> source)
+        //public List<VersionSpecificationViewModel> BuildRessourceVersionSpecificationViewModelFor(List<VersionRequirement> source)
         //{
-        //    var results = new List<VersionRequirementViewModel>();
+        //    var results = new List<VersionSpecificationViewModel>();
         //    foreach (VersionRequirement entity in source)
         //    {
-        //        var result = Mapper.Map<VersionRequirement, VersionRequirementViewModel>(entity);
+        //        var result = Mapper.Map<VersionRequirement, VersionSpecificationViewModel>(entity);
         //        results.Add(result);
         //    }
         //    return results;

@@ -71,52 +71,52 @@ class AnalysisMatrixUIControl extends RequirementUIControl {
         }
         var filterAltRequirementDefaultIDs = [];
         jQuery.each(this.matrix.ProductAlternatives, function () {
-            jQuery.each(this.AlternativeRequirements, function () {
+            jQuery.each(this.AlternativeSpecifications, function () {
                 var requirement = this;
                 jQuery.each(selectedVersion, function () {
                     if (requirement.SelectedVersionIDs.indexOf(parseInt(this.KeyValue)) > -1) {
-                        if (filterAltRequirementDefaultIDs.indexOf(requirement.DefaultBehaviorID) == -1) filterAltRequirementDefaultIDs.push(requirement.DefaultBehaviorID);
+                        if (filterAltRequirementDefaultIDs.indexOf(requirement.DefaultSpecificationID) == -1) filterAltRequirementDefaultIDs.push(requirement.DefaultSpecificationID);
                         return false;
                     }
                 });
             });
         });
-        var filterRequirements = [];
-        jQuery.each(this.matrix.DefaultRequirements, function () {
+        var filterSpecifications = [];
+        jQuery.each(this.matrix.DefaultSpecifications, function () {
             var requirement = this;
             jQuery.each(selectedVersion, function () {
                 if ((filterAltRequirementDefaultIDs.indexOf(requirement.RequirementID) > -1) || (requirement.SelectedVersionIDs.indexOf(parseInt(this.KeyValue)) > -1)) {
-                    filterRequirements.push(requirement); return false;
+                    filterSpecifications.push(requirement); return false;
                 }
             });
         });
         if ((versionId == '-1') || (versionId == '0')) { //NONE OR ALL
-            jQuery.each(this.matrix.DefaultRequirements, function () {
-                if (this.SelectedVersionIDs.length == 0) { filterRequirements.push(this); }
+            jQuery.each(this.matrix.DefaultSpecifications, function () {
+                if (this.SelectedVersionIDs.length == 0) { filterSpecifications.push(this); }
             });
         } 
         $("#version-filter-wrapper").html(this.BuildDropDownHtmlWith("formVersions", selectableVersion, "Select Version", versionId));
         $('#formVersions').change((e => { this.UpdateMatrix(); }));
-        this.BuildMatrixFor(filterRequirements, filterAlternatives); 
+        this.BuildMatrixFor(filterSpecifications, filterAlternatives); 
     }
-    public BuildMatrixFor(requirements: Array<RequirementViewModel>, alternatives: Array<ProductAlternativeViewModel>) {        
+    public BuildMatrixFor(Specifications: Array<SpecificationViewModel>, alternatives: Array<ProductAlternativeViewModel>) {        
         var Context = this;
         var html = ''; 
-        if (requirements.length > 0) {
-            var html = '<thead><tr><th>Default Behavior</th>';
+        if (Specifications.length > 0) {
+            var html = '<thead><tr><th>Business Rule</th>';
             var dataFound = false;
             jQuery.each(alternatives, function () {
                 html += '<th>' + this.ScopeSummary + '</th>';
             });
             html += '</tr></thead><tbody>';
             var alternativeHtml = "";
-            jQuery.each(requirements, function () {
-                var rowHtml = '<tr><td><div class="req-tag"><a href="/Project/UseCaseEditor?FunctionID=' + this.UseCaseID + '#r' + this.RequirementID + '"># ' + this.RequirementID + '</a></div>' + this.Behavior +'</td>';
+            jQuery.each(Specifications, function () {
+                var rowHtml = '<tr><td><div class="req-tag"><a href="/Project/UseCaseEditor?FunctionID=' + this.UseCaseID + '#r' + this.RequirementID + '"># ' + this.RequirementID + '</a></div>' + this.Name +'</td>';
                 var defaultID = this.RequirementID; var dataFound = false;
                     jQuery.each(alternatives, function () {
-                        var requirementAlternatives = this.AlternativeRequirements.filter(function (el) { return el.DefaultBehaviorID == defaultID; });
+                        var requirementAlternatives = this.AlternativeSpecifications.filter(function (el) { return el.DefaultSpecificationID == defaultID; });
                         if (requirementAlternatives.length > 0) {
-                            rowHtml += '<td>' + requirementAlternatives[0].Behavior + '</td>'; dataFound = true;//TODO add priority
+                            rowHtml += '<td>' + requirementAlternatives[0].Name + '</td>'; dataFound = true;//TODO add priority
                         } else {
                             rowHtml += '<td></td>';
                         }
@@ -124,10 +124,10 @@ class AnalysisMatrixUIControl extends RequirementUIControl {
                     rowHtml += '</tr>';
                     if (dataFound) alternativeHtml += rowHtml;//We keep only rows with alternatives data
             });
-            if (alternativeHtml.length == 0) alternativeHtml = '<tr><td colspan="' + alternatives.length + '">No Alternative Behaviors</td></tr>';
+            if (alternativeHtml.length == 0) alternativeHtml = '<tr><td colspan="' + alternatives.length + '">No Rules Alternatives</td></tr>';
             html += alternativeHtml + '</tbody>';
         } else {
-                html = '<tr><td>No Default Behaviors</td></tr>';
+                html = '<tr><td>No Rules</td></tr>';
         }
         $("#matrix-view").html(html);
     }

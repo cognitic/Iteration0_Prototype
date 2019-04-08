@@ -709,7 +709,7 @@ textarea {
   border: 1px solid #848484;
 }
 .form-element-group select,
-.form-element-group input {
+.form-element-group input[type="text"] {
   font-size: 1.2em;
   width: 300px;
 }
@@ -893,23 +893,23 @@ table.reverse tbody td {
 #editor-versions-wrapper table td:first-child {
   width: 200px;
 }
-#editor-versions-wrapper table.requirements {
+#editor-versions-wrapper table.Specifications {
   table-layout: fixed;
   background: none;
   border: none;
 }
-#editor-versions-wrapper table.requirements thead th {
+#editor-versions-wrapper table.Specifications thead th {
   padding: 0;
   background: none;
   border-color: none;
 }
-#editor-versions-wrapper table.requirements thead th:first-child {
+#editor-versions-wrapper table.Specifications thead th:first-child {
   width: 202px;
 }
-#editor-versions-wrapper table.requirements thead th:nth-child(2) {
+#editor-versions-wrapper table.Specifications thead th:nth-child(2) {
   width: 120px;
 }
-#editor-versions-wrapper table.requirements thead th:last-child {
+#editor-versions-wrapper table.Specifications thead th:last-child {
   width: 120px;
 }
 .table-centered td {
@@ -1124,10 +1124,10 @@ ol li:before {
   Line-Height: 24px;
   font-size: 20px;
 }
-.requirement-box .requirement-content .requirement-behavior {
+.requirement-box .requirement-content .requirement-Specification {
   font-weight: bold;
 }
-.requirement-box .requirement-content .requirement-behavior a.u {
+.requirement-box .requirement-content .requirement-Specification a.u {
   font-weight: normal;
 }
 .funnel_outer {

@@ -16,8 +16,8 @@ class UIComponentEditorUIControl extends RequirementUIControl {
 
     constructor(formVM: UIComponentEditorViewModel) {
         super("UIComponentEditorUIControl", "#editor");
-        this.ProjectID = formVM.ProjectID; this.RessourceID = formVM.Definition.RessourceID; this.Requirements = formVM.Requirements;
-        this.Requirements = formVM.Requirements; this.Alternatives = formVM.Alternatives;
+        this.ProjectID = formVM.ProjectID; this.RessourceID = formVM.Definition.RessourceID; this.Specifications = formVM.Specifications;
+        this.Specifications = formVM.Specifications; this.Alternatives = formVM.Alternatives;
         //this.VariationPoints = formVM.VariationPoints;
         this.editorURL = "/Project/UIComponentEditor?ComponentID=";
         this.uIComponent = formVM;
@@ -43,7 +43,7 @@ class UIComponentEditorUIControl extends RequirementUIControl {
             this.BuildDefinition();
             //this.BuildScreens();
             //this.BuildFields();
-            this.BuildRequirements();
+            this.BuildSpecifications();
             this.BuildAlternatives();
         }
     }
@@ -121,13 +121,13 @@ class UIComponentEditorUIControl extends RequirementUIControl {
 
     //public ShowNewScreenForm() {
     //    this.app.ShowAlert("Coming Soon !");
-    //    //var newVM = new RequirementViewModel(); newVM.RequirementID = 0; newVM.RequirementEnumType = RequirementEnumType.Screen; newVM.Title = "My New Screen";
+    //    //var newVM = new SpecificationViewModel(); newVM.RequirementID = 0; newVM.RequirementEnumType = RequirementEnumType.Screen; newVM.Title = "My New Screen";
     //    //this.ShowScreenForm(newVM);
     //    $('#UploadedFile').change((e => this.preventWrongAttachement(e)));
     //    $('#UploadFile_btn').click((e => this.UploadFileTo(this.uploadScreenURL, this.selectedVisual[1], this.OnUploadedScreenImage)));
     //}
     //public ShowEditScreenForm(screenID: Number) {
-    //    var VM: RequirementViewModel;
+    //    var VM: SpecificationViewModel;
     //    jQuery.each(this.uIComponent.Screens, function () { if (this.RequirementID == screenID) { VM = this; return false; } });
     //    this.ShowFieldForm(VM);
     //}
@@ -147,11 +147,11 @@ class UIComponentEditorUIControl extends RequirementUIControl {
     //}
     //public ShowNewFieldForm() {
     //    this.app.ShowAlert("Coming Soon !");
-    //    //var newVM = new RequirementViewModel(); newVM.RequirementID = 0; newVM.RequirementEnumType = RequirementEnumType.Field; newVM.Title = "Screen New Field";
+    //    //var newVM = new SpecificationViewModel(); newVM.RequirementID = 0; newVM.RequirementEnumType = RequirementEnumType.Field; newVM.Title = "Screen New Field";
     //    //this.ShowFieldForm(newVM);
     //}
     //public ShowEditFieldForm(fieldID: Number) {
-    //    var VM: RequirementViewModel;
+    //    var VM: SpecificationViewModel;
     //    jQuery.each(this.uIComponent.Screens, function () { if (this.RequirementID == fieldID) { VM = this; return false; } });
     //    this.ShowFieldForm(VM);
     //}
@@ -162,7 +162,7 @@ class UIComponentEditorUIControl extends RequirementUIControl {
     //public OnFieldRemoveClick(context: UIComponentEditorUIControl) {
     //    context.AjaxCall(context.removeRequirementURL, JSON.stringify({ requirementID: context.removePendingID, ProjectID: context.ProjectID }), context.OnEditorSaved, context);
     //}
-    //public ShowScreenForm(screen: RequirementViewModel) {
+    //public ShowScreenForm(screen: SpecificationViewModel) {
     //    this.app.ShowAlert('Coming soon !');
     //}
     //public OnScreenSaveClick(context: UIComponentEditorUIControl) {
@@ -176,7 +176,7 @@ class UIComponentEditorUIControl extends RequirementUIControl {
     //        context.AjaxCall(context.saveURL, JSON.stringify({ formVM: VM, ProjectID: context.ProjectID }), context.OnEditorSaved, context);
     //    }
     //}
-    //public ShowFieldForm(field: RequirementViewModel) {
+    //public ShowFieldForm(field: SpecificationViewModel) {
     //    var title = ((field.RequirementID > 0) ? "Edit Requirement" : "Define New Requirement");
     //    var formHtml = "<div class='form-element-group'><div><label >Name : </label></div><div><input type='text' id='formDefName' class='texttype' maxlength='50' style='width: 300px;' value='" + this.uIComponent.Definition.Name + "'></div></div>";
     //    this.app.ShowCustomMessage("<div class='form-group'>" + formHtml + "</div>", title, this.OnDefinitionSaveClick, null, this, null);

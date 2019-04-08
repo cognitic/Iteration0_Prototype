@@ -51,23 +51,23 @@ namespace Iteration0.Business.Interfaces
         List<RessourceDefinition> GetAllConceptDefinitionsFor(int id);
         List<RessourceDefinition> GetAllUseCaseDefinitionsFor(int id);
         List<RessourceDefinition> GetAllUIDefinitionsFor(int id);
-        List<RessourceRequirement> GetAllBehaviorRequirementsFor(int id);
-        List<RessourceRequirement> GetAllBehaviorRequirementsFor(int id, int productId, int versionId);
+        List<RessourceRequirement> GetAllSpecificationsFor(int id);
+        List<RessourceRequirement> GetAllSpecificationsFor(int id, int productId, int versionId);
         //List<Event> GetAllEventsFor(int id);
         //List<Event> GetAllEventsFor(int id, EventEnumType filter);
     }
     public interface IRessourceRepository : IRepository<Ressource>
     {
         IQueryable<RessourceDefinition> SearchAllRessourcesWith(int projectId, String content);
-        IQueryable<RessourceRequirement> SearchAllRequirementsWith(int projectId, String content);
+        IQueryable<RessourceRequirement> SearchAllSpecificationsWith(int projectId, String content);
         RessourceDefinition GetDefinition(int id, EntityState state = EntityState.Detached);
         RessourceAssociation GetAssociation(int id);
-        RessourceRequirement GetRequirement(int id);
+        RessourceRequirement GetRequirement(int id, EntityState state = EntityState.Detached);
         List<RessourceAssociation> GetAllChildrenAggregations(int id);
         List<RessourceAssociation> GetAllParentAggregationsFor(int id);
-        List<RessourceRequirement> GetAllBehaviorRequirementsForUI(int UIComponentId);
-        List<RessourceRequirement> GetAllBehaviorRequirementsForUC(int UseCaseId);
-        List<RessourceRequirement> GetAllBehaviorRequirementsForConcept(int UIConceptId);
+        List<RessourceRequirement> GetAllSpecificationsForUI(int UIComponentId);
+        List<RessourceRequirement> GetAllSpecificationsForUC(int UseCaseId);
+        List<RessourceRequirement> GetAllSpecificationsForConcept(int UIConceptId);
         void Update(RessourceDefinition item);
         void Add(RessourceAssociation item);
         void Update(RessourceAssociation item);

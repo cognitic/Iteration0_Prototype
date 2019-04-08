@@ -16,7 +16,7 @@ namespace Iteration0.Business.Domain
         public List<ProjectContextType> ContextTypes = new List<ProjectContextType>();
         public List<RessourceDefinition> RessourceDefinitions = new List<RessourceDefinition>();
         public List<ProjectProduct> Products = new List<ProjectProduct>();
-        public List<RessourceRequirement> Requirements = new List<RessourceRequirement>();
+        public List<RessourceRequirement> Specifications = new List<RessourceRequirement>();
         
         public List<RessourceDefinition> Concepts
         {
@@ -45,14 +45,14 @@ namespace Iteration0.Business.Domain
             Definition = new ProjectDefinition();
             rootDefinition = Definition;
         }
-        public Project(ProjectDefinition ExistingDefinition, List<RessourceRequirement> RessourcesRequirements)
+        public Project(ProjectDefinition ExistingDefinition, List<RessourceRequirement> RessourcesSpecifications)
         {
             Definition = ExistingDefinition;
             rootDefinition = Definition;
             if (!(ExistingDefinition.ContextTypes is null)) ContextTypes = ExistingDefinition.ContextTypes.ToList();
             if (!(ExistingDefinition.Products is null)) Products = ExistingDefinition.Products.ToList();
             if (!(ExistingDefinition.Ressources is null)) RessourceDefinitions = ExistingDefinition.Ressources.ToList();
-            if (!(RessourcesRequirements is null)) Requirements = RessourcesRequirements;
+            if (!(RessourcesSpecifications is null)) Specifications = RessourcesSpecifications;
         }
         public void StartedBy(int OwnerId)
         {

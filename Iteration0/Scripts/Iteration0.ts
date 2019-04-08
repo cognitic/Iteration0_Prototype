@@ -131,7 +131,7 @@ class ProjectContextViewModel {
 }
 class AnalysisMatrixViewModel {
     ProjectID: number;
-    DefaultRequirements: Array<RequirementViewModel>;
+    DefaultSpecifications: Array<SpecificationViewModel>;
     ProductAlternatives: Array<ProductAlternativeViewModel>;
     ProjectProducts: Array<ItemViewModel>;
     ProjecVersions: Array<ItemViewModel>;
@@ -143,17 +143,20 @@ class AnalysisMatrixViewModel {
 class ProductAlternativeViewModel {
     ScopeIDs: Array<number>;
     ScopeSummary: string;
-    AlternativeRequirements: Array<RequirementViewModel>;
+    AlternativeSpecifications: Array<SpecificationViewModel>;
 }
 class VersionEditorViewModel {
     ProjectID: number;
     Definition: VersionViewModel;
-    SelectedRequirements: Array<RequirementViewModel>;
-    PendingProductRequirements: Array<RequirementViewModel>;
+    SelectedSpecifications: Array<SpecificationViewModel>;
+    PendingProductSpecifications: Array<SpecificationViewModel>;
     ProductAlternatives: Array<ItemViewModel>;
     ProjectProducts: Array<ItemViewModel>;
     constructor() {
         this.Definition = new VersionViewModel();
+        this.SelectedSpecifications = [];
+        this.PendingProductSpecifications = [];
+        this.ProductAlternatives = [];
         this.ProjectProducts = [];
     }
 }
@@ -173,10 +176,10 @@ class VersionViewModel {
     ProgressName: string;
     MonthName: string;
 }
-class RequirementViewModel {
+class SpecificationViewModel {
     RequirementID: number;
     RequirementEnumType: number;
-    Behavior: string;
+    Name: string;
     Description: string;
     Priority: number;
     //ExternalURL: string;
@@ -193,8 +196,8 @@ class RequirementViewModel {
     UI: string;
     InfrastructureID: number;
     Infrastructure: string;
-    DefaultBehaviorID: number;
-    DefaultBehavior: string;
+    DefaultSpecificationID: number;
+    DefaultSpecification: string;
     ScopeIDs: Array<number>;
     ScopeSummary: string;
     IsSelected: boolean;
@@ -231,8 +234,8 @@ class DomainConceptEditorViewModel {
     HasMany: Array<RessourceAssociationViewModel>
     PartOf: Array<RessourceAssociationViewModel>
     PartsOf: Array<RessourceAssociationViewModel>
-    Requirements: Array<RequirementViewModel>;
-    Alternatives: Array<RequirementViewModel>;
+    Specifications: Array<SpecificationViewModel>;
+    Alternatives: Array<SpecificationViewModel>;
     ProjectConcepts: Array<ItemViewModel>;
     ProjectDomainContexts: Array<ItemViewModel>;
     constructor() {
@@ -242,11 +245,11 @@ class DomainConceptEditorViewModel {
 class UseCaseEditorViewModel {
     ProjectID: number;
     Definition: RessourceDefinitionViewModel;
-    Scenarios: Array<RequirementViewModel>;
+    Scenarios: Array<SpecificationViewModel>;
     UISteps: Array<RessourceAssociationViewModel>
-    Requirements: Array<RequirementViewModel>;
+    Specifications: Array<SpecificationViewModel>;
     RequirementOptions: Array<ItemViewModel>;
-    Alternatives: Array<RequirementViewModel>;
+    Alternatives: Array<SpecificationViewModel>;
     VariationPoints: Array<ProjectContextTypeViewModel>;
     ProjectBusinessProcesses: Array<ItemViewModel>;
     ProjectConcepts: Array<ItemViewModel>;
@@ -259,10 +262,10 @@ class UseCaseEditorViewModel {
 class UIComponentEditorViewModel {
     ProjectID: number;
     Definition: RessourceDefinitionViewModel;
-    Screens: Array<RequirementViewModel>;
-    Fields: Array<RequirementViewModel>;
-    Requirements: Array<RequirementViewModel>;
-    Alternatives: Array<RequirementViewModel>;
+    Screens: Array<SpecificationViewModel>;
+    Fields: Array<SpecificationViewModel>;
+    Specifications: Array<SpecificationViewModel>;
+    Alternatives: Array<SpecificationViewModel>;
     VariationPoints: Array<ProjectContextTypeViewModel>;
     ProjectFeatures: Array<ItemViewModel>;
     constructor() {
@@ -280,6 +283,12 @@ class ItemViewModel {
         this.Label = Name;
         this.KeyValue = Id;
     }     
+}
+class ItemViewModelList {
+    Items: Array<ItemViewModel>;
+    constructor() {
+        this.Items = [];
+    }
 }
 class ViewModelAPI {
     ItemEditorURL: string;

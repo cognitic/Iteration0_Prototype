@@ -32,14 +32,14 @@ How to set up your Iteration0 Plateform:
 			>Use Case +
 				Scenarios +
 				UI Steps +
-				Requirements + 
+				Specifications + 
 					Variation Point *
 	>UI Specification
 		Component Type
 			>UI +
 				Screens +
 				Fields +
-				Requirements +
+				Specifications +
 					Variation Point *	
 	>ProductLine
 		Overview

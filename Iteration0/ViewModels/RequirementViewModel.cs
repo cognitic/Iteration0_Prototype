@@ -5,11 +5,11 @@ using System.Web;
 
 namespace Iteration0.ViewModels
 {
-    public class RequirementViewModel
+    public class SpecificationViewModel
     {
         public int RequirementID { get; set; }
         public short RequirementEnumType { get; set; }
-        public string Behavior { get; set; }
+        public string Name { get; set; }
         public string Description { get; set; }
         public int Priority { get; set; }
         public string FieldValue1 { get; set; }
@@ -25,8 +25,8 @@ namespace Iteration0.ViewModels
         public string UI { get; set; }
         public int InfrastructureID { get; set; }
         public string Infrastructure { get; set; }
-        public int DefaultBehaviorID { get; set; }
-        public string DefaultBehavior { get; set; }
+        public int DefaultSpecificationID { get; set; }
+        public string DefaultSpecification { get; set; }
         public List<int> ScopeIDs { get; set; } = new List<int>();
         public string ScopeSummary { get; set; } = "";
         public bool IsSelected { get; set; }

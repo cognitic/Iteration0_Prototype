@@ -5,6 +5,10 @@ using System.Web;
 
 namespace Iteration0.ViewModels
 {
+    public class ItemViewModelList
+    {
+        public List<ItemViewModel> Items { get; set; }
+    }
     public class ItemViewModel
     {
         public String ParentKeyValue { get; set; }
@@ -14,4 +18,5 @@ namespace Iteration0.ViewModels
         public String Tooltip { get; set; }
         public int SortOrder { get; set; }
     }
+    
 }

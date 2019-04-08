@@ -14,7 +14,7 @@ namespace Iteration0.Data.Repositories
         public DbSet<ProjectDefinition> ProjectDefinitions { get; set; }
         public DbSet<ProjectContext> ProjectContexts { get; set; }
         public DbSet<ProjectContextType> ProjectContextTypes { get; set; }
-        public DbSet<RessourceRequirement> RessourceRequirements { get; set; }
+        public DbSet<RessourceRequirement> RessourceSpecifications { get; set; }
         //public DbSet<RequiremenContext> RequiremenContexts { get; set; }
         public DbSet<RessourceAssociation> RessourceAssociations { get; set; }
         public DbSet<RessourceDefinition> RessourceDefinitions { get; set; }

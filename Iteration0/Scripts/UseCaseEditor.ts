@@ -8,13 +8,13 @@ class UseCaseEditorUIControl extends RequirementUIControl {
     useCase: UseCaseEditorViewModel;
     definitionWrapper: JQuery;
     scenarioWrapper: JQuery;
-    requirementsWrapper: JQuery;
+    SpecificationsWrapper: JQuery;
     saveURL: string = "/Project/CreateEditRessouceDefinition";
 
     constructor(formVM: UseCaseEditorViewModel) {
         super("UseCaseEditorUIControl", "#editor");
         this.ProjectID = formVM.ProjectID; this.RessourceID = formVM.Definition.RessourceID;
-        this.Requirements = formVM.Requirements; this.Alternatives = formVM.Alternatives;
+        this.Specifications = formVM.Specifications; this.Alternatives = formVM.Alternatives;
         this.RequirementUseCase = formVM;
         this.editorURL = "/Project/UseCaseEditor?FunctionID=";
         this.useCase = formVM;
@@ -27,7 +27,7 @@ class UseCaseEditorUIControl extends RequirementUIControl {
     }
     public ReBuild(formVM: any) {
         this.useCase = formVM;
-        this.Requirements = formVM.Requirements; this.Alternatives = formVM.Alternatives;
+        this.Specifications = formVM.Specifications; this.Alternatives = formVM.Alternatives;
         this.RequirementUseCase = formVM;
         this.Build();
     }
@@ -35,7 +35,7 @@ class UseCaseEditorUIControl extends RequirementUIControl {
         if (this.wrapper.length>0) {
             this.BuildDefinition();
             this.BuildScenarios();
-            this.BuildRequirements();
+            this.BuildSpecifications();
             this.BuildAlternatives();
         }
         $("#edit-definition-link").click((e => { this.ShowEditDefinitionForm(); return false }));
@@ -70,11 +70,11 @@ class UseCaseEditorUIControl extends RequirementUIControl {
     }
     public ShowNewScenarioForm() {
         this.app.ShowAlert("Coming Soon !");
-        //var newVM = new RequirementViewModel(); newVM.RequirementID = 0; newVM.RequirementEnumType = RequirementEnumType.Scenario; newVM.Title = "My New Scenario";
+        //var newVM = new SpecificationViewModel(); newVM.RequirementID = 0; newVM.RequirementEnumType = RequirementEnumType.Scenario; newVM.Title = "My New Scenario";
         //this.ShowScenarioForm(newVM);
     }
     public ShowEditScenarioForm(scenarioID: Number) {
-        var VM: RequirementViewModel;
+        var VM: SpecificationViewModel;
         jQuery.each(this.useCase.Scenarios, function () { if (this.RequirementID == scenarioID) { VM = this; return false; } });
         this.ShowScenarioForm(VM);
     }
@@ -88,7 +88,7 @@ class UseCaseEditorUIControl extends RequirementUIControl {
     public ShowDefinitionForm(definition: RessourceDefinitionViewModel) {
         var title = ((this.useCase.Definition.RessourceID > 0) ? "Edit Use Case Definition" : "Define New Use Case");
         var formHtml = "<div class='form-element-group'><div><label >Function : </label></div><div><input type='text' id='formDefName' class='texttype' maxlength='50' style='width: 300px;' placeholder='Verb + Noun Phrase' value='" + this.useCase.Definition.Name + "'></div></div>";
-        formHtml += "<div class='form-element-group'><div><label >Description : </label></div><div><textarea id='formDefVision' type='textarea' name='textarea-Vision' maxlength='1000' style='width: 600px; Height:320px;' placeholder='Actors, Goals and Expected System Behavior..'>" + this.useCase.Definition.Definition + "</textarea></div></div>";
+        formHtml += "<div class='form-element-group'><div><label >Description : </label></div><div><textarea id='formDefVision' type='textarea' name='textarea-Vision' maxlength='1000' style='width: 600px; Height:320px;' placeholder='Goal, Actors and Expected System Behavior..'>" + this.useCase.Definition.Definition + "</textarea></div></div>";
         //formHtml += "<div class='form-element-group'><div><label >Activity : </label></div><div><input type='text' id='formDefCodeName' class='texttype' maxlength='30' style='width: 344px;' placeholder='Decision, Control or Coordination' value='" + this.useCase.Definition.ContextName + "'></div></div>";
         this.app.ShowCustomMessage("<div class='form-group'>" + formHtml + "</div>", title, this.OnDefinitionSaveClick, null, this, null);
         //$('#ProductEnabledCB').prop('checked', IsActive);
@@ -104,19 +104,19 @@ class UseCaseEditorUIControl extends RequirementUIControl {
             context.AjaxCall(context.saveURL, JSON.stringify({ formVM: VM, ProjectID: context.ProjectID }), context.OnEditorSaved, context);
         }
     }
-    public ShowScenarioForm(scenario: RequirementViewModel) {
+    public ShowScenarioForm(scenario: SpecificationViewModel) {
         var title = ((scenario.RequirementID > 0) ? "Edit Scenario" : "Define New Scenario");
         //formHtml += "<div class='form-element-group'><div><label >Priority : </label></div><div><input type='number'name='quantity' min='1' max='5' id='formPriority'placeholder='1 - 5' value='" + scenario.Priority + "'></div></div>";
         //var formHtml = "<div class='form-element-group'><div><label >Name : </label></div><div><input type='text' id='formDefName' class='texttype' maxlength='50' style='width: 300px;' value='" + scenario.Title + "'></div></div>";
-        //formHtml += "<div class='form-element-group'><div><label >Given : </label></div><div><textarea id='formDefVision' type='textarea' name='textarea-Vision' maxlength='1000' style='width: 500px; Height:160px;' placeholder='Actors, Goals and Expected System Behavior..'>" + scenario.Attribute1Value + "</textarea></div></div>";
-        //formHtml += "<div class='form-element-group'><div><label >When : </label></div><div><textarea id='formDefVision' type='textarea' name='textarea-Vision' maxlength='1000' style='width: 500px; Height:160px;' placeholder='Actors, Goals and Expected System Behavior..'>" + scenario.Attribute2Value + "</textarea></div></div>";
-        //formHtml += "<div class='form-element-group'><div><label >Then : </label></div><div><textarea id='formDefVision' type='textarea' name='textarea-Vision' maxlength='1000' style='width: 500px; Height:160px;' placeholder='Actors, Goals and Expected System Behavior..'>" + scenario.Attribute3Value + "</textarea></div></div>";
+        //formHtml += "<div class='form-element-group'><div><label >Given : </label></div><div><textarea id='formDefVision' type='textarea' name='textarea-Vision' maxlength='1000' style='width: 500px; Height:160px;' placeholder='Actors, Goals and Expected System Specification..'>" + scenario.Attribute1Value + "</textarea></div></div>";
+        //formHtml += "<div class='form-element-group'><div><label >When : </label></div><div><textarea id='formDefVision' type='textarea' name='textarea-Vision' maxlength='1000' style='width: 500px; Height:160px;' placeholder='Actors, Goals and Expected System Specification..'>" + scenario.Attribute2Value + "</textarea></div></div>";
+        //formHtml += "<div class='form-element-group'><div><label >Then : </label></div><div><textarea id='formDefVision' type='textarea' name='textarea-Vision' maxlength='1000' style='width: 500px; Height:160px;' placeholder='Actors, Goals and Expected System Specification..'>" + scenario.Attribute3Value + "</textarea></div></div>";
 
         //this.app.ShowCustomMessage("<div class='form-group'>" + formHtml + "</div>", title, this.OnDefinitionSaveClick, null, this, null);
         //$('#ProductEnabledCB').prop('checked', IsActive);
     }
     public OnScenarioSaveClick(context: UseCaseEditorUIControl) {
-        var VM = new RequirementViewModel();
+        var VM = new SpecificationViewModel();
         //VM.RessourceID = parseInt($("#formHiddenID").val()); VM.RessourceEnumType = RessourceEnumType.UseCase;
         //VM.Name = $.trim($("#formDefName").val()); VM.Definition = $.trim($("#formDefVision").val()); VM.Category = $.trim($("#formDefCodeName").val());
 
@@ -129,7 +129,7 @@ class UseCaseEditorUIControl extends RequirementUIControl {
     }
     public ShowNewUIStepForm() {
         this.app.ShowAlert("Coming Soon !");
-        //var newVM = new RequirementViewModel(); newVM.RequirementID = 0; newVM.RequirementEnumType = RequirementEnumType.Scenario; newVM.Title = "My New Scenario";
+        //var newVM = new SpecificationViewModel(); newVM.RequirementID = 0; newVM.RequirementEnumType = RequirementEnumType.Scenario; newVM.Title = "My New Scenario";
         //this.ShowScenarioForm(newVM);
     }
 }
